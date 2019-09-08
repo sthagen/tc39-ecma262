@@ -60,9 +60,8 @@
     <li>
       Editors:
       <ul>
-        <li><a href="mailto:brian.terlson at microsoft dot com">Brian Terlson</a> (<a href="https://twitter.com/bterlson">@bterlson</a>)</li>
-        <li><a href="mailto:bradley.meck at gmail dot com">Bradley Farias</a> (<a href="https://twitter.com/bradleymeck">@bradleymeck</a>)</li>
         <li><a href="mailto:ljharb at gmail dot com">Jordan Harband</a> (<a href="https://twitter.com/ljharb">@ljharb</a>)</li>
+        <li><a href="mailto:zenparsing at gmail dot com">Kevin Smith</a> (<a href="https://twitter.com/zenparsing">@zenparsing</a>)</li>
       </ul>
     </li>
     <li>
@@ -22706,7 +22705,7 @@
             </dl>
           </li>
           <li>
-            Every call to HostImportModuleDynamically with the same _referencingScriptOrModule_ and _specifier_ arguments must conform to the <em>same</em> set of requirements above as previous calls do. That is, if the host environment takes the success path once for a given _referencingScriptOrModule_, _specifier_ pair, it must always do so, and the same for the failure path.
+            If the host environment takes the success path once for a given _referencingScriptOrModule_, _specifier_ pair, it must always do so for subsequent calls.
           </li>
           <li>
             The operation must not call _promiseCapability_.[[Resolve]] or _promiseCapability_.[[Reject]], but instead must treat _promiseCapability_ as an opaque identifying value to be passed through to FinishDynamicImport.
