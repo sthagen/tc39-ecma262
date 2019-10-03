@@ -4908,14 +4908,14 @@
       </emu-note>
     </emu-clause>
 
-    <emu-clause id="sec-to-bigint" aoid="ToBigInt">
+    <emu-clause id="sec-tobigint" aoid="ToBigInt">
       <h1>ToBigInt ( _argument_ )</h1>
       <p>The abstract operation ToBigInt converts its argument _argument_ to a BigInt value, or throws if an implicit conversion from Number would be required.</p>
       <emu-alg>
         1. Let _prim_ be ? ToPrimitive(_argument_, hint Number).
-        1. Return the value that _prim_ corresponds to in <emu-xref href="#table-to-bigint"></emu-xref>.
+        1. Return the value that _prim_ corresponds to in <emu-xref href="#table-tobigint"></emu-xref>.
       </emu-alg>
-      <emu-table id="table-to-bigint" caption="BigInt Conversions">
+      <emu-table id="table-tobigint" caption="BigInt Conversions">
         <table>
           <tbody>
             <tr>
@@ -4991,7 +4991,7 @@
       </emu-table>
     </emu-clause>
 
-    <emu-clause id="sec-string-to-bigint" aoid="StringToBigInt">
+    <emu-clause id="sec-stringtobigint" aoid="StringToBigInt">
       <h1>StringToBigInt ( _argument_ )</h1>
       <p>Apply the algorithm in <emu-xref href="#sec-tonumber-applied-to-the-string-type"></emu-xref> with the following changes:</p>
       <ul>
@@ -5000,7 +5000,7 @@
       </ul>
     </emu-clause>
 
-    <emu-clause id="sec-to-big-int64" aoid="ToBigInt64">
+    <emu-clause id="sec-tobigint64" aoid="ToBigInt64">
       <h1>ToBigInt64 ( _argument_ )</h1>
       <p>The abstract operation ToBigInt64 converts _argument_ to one of 2<sup>64</sup> integer values in the range -2<sup>63</sup> through 2<sup>63</sup>-1, inclusive. This abstract operation functions as follows:</p>
       <emu-alg>
@@ -5010,7 +5010,7 @@
       </emu-alg>
     </emu-clause>
 
-    <emu-clause id="sec-to-big-uint64" aoid="ToBigUint64">
+    <emu-clause id="sec-tobiguint64" aoid="ToBigUint64">
       <h1>ToBigUint64 ( _argument_ )</h1>
       <p>The abstract operation ToBigUint64 converts _argument_ to one of 2<sup>64</sup> integer values in the range 0 through 2<sup>64</sup>-1, inclusive. This abstract operation functions as follows:</p>
       <emu-alg>
@@ -7484,8 +7484,7 @@
       <h1>GetGlobalObject ( )</h1>
       <p>The abstract operation GetGlobalObject returns the global object used by the currently running execution context. GetGlobalObject performs the following steps:</p>
       <emu-alg>
-        1. Let _ctx_ be the running execution context.
-        1. Let _currentRealm_ be _ctx_'s Realm.
+        1. Let _currentRealm_ be the current Realm Record.
         1. Return _currentRealm_.[[GlobalObject]].
       </emu-alg>
     </emu-clause>
@@ -9662,6 +9661,8 @@
           1. Assert: _binding_ is a ResolvedBinding Record.
           1. Let _targetModule_ be _binding_.[[Module]].
           1. Assert: _targetModule_ is not *undefined*.
+          1. If _binding_.[[BindingName]] is `"*namespace*"`, then
+            1. Return ? GetModuleNamespace(_targetModule_).
           1. Let _targetEnv_ be _targetModule_.[[Environment]].
           1. If _targetEnv_ is *undefined*, throw a *ReferenceError* exception.
           1. Let _targetEnvRec_ be _targetEnv_'s EnvironmentRecord.
@@ -12637,51 +12638,57 @@
           `...` AssignmentExpression[+In, ?Yield, ?Await]
       </emu-grammar>
 
-      <emu-clause id="sec-static-semantics-elisionwidth">
-        <h1>Static Semantics: ElisionWidth</h1>
-        <emu-grammar>Elision : `,`</emu-grammar>
-        <emu-alg>
-          1. Return the numeric value 1.
-        </emu-alg>
-        <emu-grammar>Elision : Elision `,`</emu-grammar>
-        <emu-alg>
-          1. Let _preceding_ be the ElisionWidth of |Elision|.
-          1. Return _preceding_ + 1.
-        </emu-alg>
-      </emu-clause>
-
       <emu-clause id="sec-runtime-semantics-arrayaccumulation">
         <h1>Runtime Semantics: ArrayAccumulation</h1>
         <p>With parameters _array_ and _nextIndex_.</p>
+        <emu-grammar>Elision : `,`</emu-grammar>
+        <emu-alg>
+          1. Let _len_ be _nextIndex_ + 1.
+          1. Perform ? Set(_array_, `"length"`, _len_, *true*).
+          1. NOTE: The above Set throws if _len_ exceeds 2<sup>32</sup>-1.
+          1. Return _len_.
+        </emu-alg>
+        <emu-grammar>Elision : Elision `,`</emu-grammar>
+        <emu-alg>
+          1. Return the result of performing ArrayAccumulation for |Elision| with arguments _array_ and _nextIndex_ + 1.
+        </emu-alg>
         <emu-grammar>ElementList : Elision? AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. If |Elision| is present, then
+            1. Set _nextIndex_ to the result of performing ArrayAccumulation for |Elision| with arguments _array_ and _nextIndex_.
+            1. ReturnIfAbrupt(_nextIndex_).
           1. Let _initResult_ be the result of evaluating |AssignmentExpression|.
           1. Let _initValue_ be ? GetValue(_initResult_).
-          1. Let _created_ be CreateDataProperty(_array_, ToString(ToUint32(_nextIndex_ + _padding_)), _initValue_).
-          1. Assert: _created_ is *true*.
-          1. Return _nextIndex_ + _padding_ + 1.
+          1. Let _created_ be ! CreateDataPropertyOrThrow(_array_, ! ToString(_nextIndex_), _initValue_).
+          1. Return _nextIndex_ + 1.
         </emu-alg>
         <emu-grammar>ElementList : Elision? SpreadElement</emu-grammar>
         <emu-alg>
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
-          1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _nextIndex_ + _padding_.
+          1. If |Elision| is present, then
+            1. Set _nextIndex_ to the result of performing ArrayAccumulation for |Elision| with arguments _array_ and _nextIndex_.
+            1. ReturnIfAbrupt(_nextIndex_).
+          1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _nextIndex_.
         </emu-alg>
         <emu-grammar>ElementList : ElementList `,` Elision? AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _postIndex_ be ? ArrayAccumulation of |ElementList| with arguments _array_ and _nextIndex_.
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Set _nextIndex_ to the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and _nextIndex_.
+          1. ReturnIfAbrupt(_nextIndex_).
+          1. If |Elision| is present, then
+            1. Set _nextIndex_ to the result of performing ArrayAccumulation for |Elision| with arguments _array_ and _nextIndex_.
+            1. ReturnIfAbrupt(_nextIndex_).
           1. Let _initResult_ be the result of evaluating |AssignmentExpression|.
           1. Let _initValue_ be ? GetValue(_initResult_).
-          1. Let _created_ be CreateDataProperty(_array_, ToString(ToUint32(_postIndex_ + _padding_)), _initValue_).
-          1. Assert: _created_ is *true*.
-          1. Return _postIndex_ + _padding_ + 1.
+          1. Let _created_ be ! CreateDataPropertyOrThrow(_array_, ! ToString(_nextIndex_), _initValue_).
+          1. Return _nextIndex_ + 1.
         </emu-alg>
         <emu-grammar>ElementList : ElementList `,` Elision? SpreadElement</emu-grammar>
         <emu-alg>
-          1. Let _postIndex_ be ? ArrayAccumulation of |ElementList| with arguments _array_ and _nextIndex_.
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
-          1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _postIndex_ + _padding_.
+          1. Set _nextIndex_ to the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and _nextIndex_.
+          1. ReturnIfAbrupt(_nextIndex_).
+          1. If |Elision| is present, then
+            1. Set _nextIndex_ to the result of performing ArrayAccumulation for |Elision| with arguments _array_ and _nextIndex_.
+            1. ReturnIfAbrupt(_nextIndex_).
+          1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _nextIndex_.
         </emu-alg>
         <emu-grammar>SpreadElement : `...` AssignmentExpression</emu-grammar>
         <emu-alg>
@@ -12692,8 +12699,7 @@
             1. Let _next_ be ? IteratorStep(_iteratorRecord_).
             1. If _next_ is *false*, return _nextIndex_.
             1. Let _nextValue_ be ? IteratorValue(_next_).
-            1. Let _status_ be CreateDataProperty(_array_, ToString(ToUint32(_nextIndex_)), _nextValue_).
-            1. Assert: _status_ is *true*.
+            1. Let _status_ be ! CreateDataPropertyOrThrow(_array_, ! ToString(_nextIndex_), _nextValue_).
             1. Set _nextIndex_ to _nextIndex_ + 1.
         </emu-alg>
         <emu-note>
@@ -12706,26 +12712,26 @@
         <emu-grammar>ArrayLiteral : `[` Elision? `]`</emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Let _pad_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
-          1. Perform Set(_array_, `"length"`, ToUint32(_pad_), *false*).
-          1. NOTE: The above Set cannot fail because of the nature of the object returned by ArrayCreate.
+          1. If |Elision| is present, then
+            1. Let _len_ be the result of performing ArrayAccumulation for |Elision| with arguments _array_ and 0.
+            1. ReturnIfAbrupt(_len_).
           1. Return _array_.
         </emu-alg>
         <emu-grammar>ArrayLiteral : `[` ElementList `]`</emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Let _len_ be ? ArrayAccumulation of |ElementList| with arguments _array_ and 0.
-          1. Perform Set(_array_, `"length"`, ToUint32(_len_), *false*).
-          1. NOTE: The above Set cannot fail because of the nature of the object returned by ArrayCreate.
+          1. Let _len_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and 0.
+          1. ReturnIfAbrupt(_len_).
           1. Return _array_.
         </emu-alg>
         <emu-grammar>ArrayLiteral : `[` ElementList `,` Elision? `]`</emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Let _len_ be ? ArrayAccumulation of |ElementList| with arguments _array_ and 0.
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
-          1. Perform Set(_array_, `"length"`, ToUint32(_padding_ + _len_), *false*).
-          1. NOTE: The above Set cannot fail because of the nature of the object returned by ArrayCreate.
+          1. Let _nextIndex_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and 0.
+          1. ReturnIfAbrupt(_nextIndex_).
+          1. If |Elision| is present, then
+            1. Let _len_ be the result of performing ArrayAccumulation for |Elision| with arguments _array_ and _nextIndex_.
+            1. ReturnIfAbrupt(_len_).
           1. Return _array_.
         </emu-alg>
       </emu-clause>
@@ -22575,7 +22581,7 @@
                 ResolveExport(_exportName_ [, _resolveSet_])
               </td>
               <td>
-                <p>Return the binding of a name exported by this module. Bindings are represented by a <dfn id="resolvedbinding-record">ResolvedBinding Record</dfn>, of the form { [[Module]]: Module Record, [[BindingName]]: String }. Return *null* if the name cannot be resolved, or `"ambiguous"` if multiple bindings were found.</p>
+                <p>Return the binding of a name exported by this module. Bindings are represented by a <dfn id="resolvedbinding-record">ResolvedBinding Record</dfn>, of the form { [[Module]]: Module Record, [[BindingName]]: String }. If the export is a Module Namespace Object without a direct binding in any module, [[BindingName]] will be set to `"*namespace*"`. Return *null* if the name cannot be resolved, or `"ambiguous"` if multiple bindings were found.</p>
                 <p>This operation must be idempotent if it completes normally. Each time it is called with a specific _exportName_, _resolveSet_ pair as arguments it must return the same result.</p>
               </td>
             </tr>
@@ -22695,7 +22701,7 @@
                   InitializeEnvironment()
                 </td>
                 <td>
-                  Initialize the Lexical Environment of the module, including resolving all imported bindings.
+                  Initialize the Lexical Environment of the module, including resolving all imported bindings, and create the module's execution context.
                 </td>
               </tr>
               <tr>
@@ -22703,7 +22709,7 @@
                   ExecuteModule()
                 </td>
                 <td>
-                  Initialize the execution context of the module and evaluate the module's code within it.
+                  Evaluate the module's code within its execution context.
                 </td>
               </tr>
             </tbody>
@@ -22931,6 +22937,17 @@
             </tr>
             <tr>
               <td>
+                [[Context]]
+              </td>
+              <td>
+                An ECMAScript execution context.
+              </td>
+              <td>
+                The execution context associated with this module.
+              </td>
+            </tr>
+            <tr>
+              <td>
                 [[ImportEntries]]
               </td>
               <td>
@@ -22959,7 +22976,7 @@
                 List of ExportEntry Records
               </td>
               <td>
-                A List of ExportEntry records derived from the code of this module that correspond to reexported imports that occur within the module.
+                A List of ExportEntry records derived from the code of this module that correspond to reexported imports that occur within the module or exports from `export * as namespace` declarations.
               </td>
             </tr>
             <tr>
@@ -22970,7 +22987,7 @@
                 List of ExportEntry Records
               </td>
               <td>
-                A List of ExportEntry records derived from the code of this module that correspond to export * declarations that occur within the module.
+                A List of ExportEntry records derived from the code of this module that correspond to `export *` declarations that occur within the module, not including `export * as namespace` declarations.
               </td>
             </tr>
             </tbody>
@@ -23351,6 +23368,23 @@
                   *null*
                 </td>
               </tr>
+              <tr>
+                <td>
+                  `export * as ns from "mod";`
+                </td>
+                <td>
+                  `"ns"`
+                </td>
+                <td>
+                  `"mod"`
+                </td>
+                <td>
+                  `"*"`
+                </td>
+                <td>
+                  *null*
+                </td>
+              </tr>
               </tbody>
             </table>
           </emu-table>
@@ -23383,11 +23417,11 @@
                   1. Else,
                     1. NOTE: This is a re-export of a single name.
                     1. Append the ExportEntry Record { [[ModuleRequest]]: _ie_.[[ModuleRequest]], [[ImportName]]: _ie_.[[ImportName]], [[LocalName]]: *null*, [[ExportName]]: _ee_.[[ExportName]] } to _indirectExportEntries_.
-              1. Else if _ee_.[[ImportName]] is `"*"`, then
+              1. Else if _ee_.[[ImportName]] is `"*"` and _ee_.[[ExportName]] is *null*, then
                 1. Append _ee_ to _starExportEntries_.
               1. Else,
                 1. Append _ee_ to _indirectExportEntries_.
-            1. Return Source Text Module Record { [[Realm]]: _realm_, [[Environment]]: *undefined*, [[Namespace]]: *undefined*, [[Status]]: `"unlinked"`, [[EvaluationError]]: *undefined*, [[HostDefined]]: _hostDefined_, [[ECMAScriptCode]]: _body_, [[RequestedModules]]: _requestedModules_, [[ImportEntries]]: _importEntries_, [[LocalExportEntries]]: _localExportEntries_, [[IndirectExportEntries]]: _indirectExportEntries_, [[StarExportEntries]]: _starExportEntries_, [[DFSIndex]]: *undefined*, [[DFSAncestorIndex]]: *undefined* }.
+            1. Return Source Text Module Record { [[Realm]]: _realm_, [[Environment]]: *undefined*, [[Namespace]]: *undefined*, [[Status]]: `"unlinked"`, [[EvaluationError]]: *undefined*, [[HostDefined]]: _hostDefined_, [[ECMAScriptCode]]: _body_, [[Context]]: ~empty~, [[RequestedModules]]: _requestedModules_, [[ImportEntries]]: _importEntries_, [[LocalExportEntries]]: _localExportEntries_, [[IndirectExportEntries]]: _indirectExportEntries_, [[StarExportEntries]]: _starExportEntries_, [[DFSIndex]]: *undefined*, [[DFSAncestorIndex]]: *undefined* }.
           </emu-alg>
           <emu-note>
             <p>An implementation may parse module source text and analyse it for Early Error conditions prior to the evaluation of ParseModule for that module source text. However, the reporting of any errors must be deferred until the point where this specification actually performs ParseModule upon that source text.</p>
@@ -23433,7 +23467,7 @@
 
           <p>ResolveExport attempts to resolve an imported binding to the actual defining module and local binding name. The defining module may be the module represented by the Module Record this method was invoked on or some other module that is imported by that module. The parameter _resolveSet_ is used to detect unresolved circular import/export paths. If a pair consisting of specific Module Record and _exportName_ is reached that is already in _resolveSet_, an import circularity has been encountered. Before recursively calling ResolveExport, a pair consisting of _module_ and _exportName_ is added to _resolveSet_.</p>
 
-          <p>If a defining module is found, a ResolvedBinding Record { [[Module]], [[BindingName]] } is returned. This record identifies the resolved binding of the originally requested export. If no definition was found or the request is found to be circular, *null* is returned. If the request is found to be ambiguous, the string `"ambiguous"` is returned.</p>
+          <p>If a defining module is found, a ResolvedBinding Record { [[Module]], [[BindingName]] } is returned. This record identifies the resolved binding of the originally requested export, unless this is the export of a namespace with no local binding. In this case, [[BindingName]] will be set to `"*namespace*"`. If no definition was found or the request is found to be circular, *null* is returned. If the request is found to be ambiguous, the string `"ambiguous"` is returned.</p>
 
           <p>This abstract method performs the following steps:</p>
 
@@ -23452,13 +23486,17 @@
                 1. Return ResolvedBinding Record { [[Module]]: _module_, [[BindingName]]: _e_.[[LocalName]] }.
             1. For each ExportEntry Record _e_ in _module_.[[IndirectExportEntries]], do
               1. If SameValue(_exportName_, _e_.[[ExportName]]) is *true*, then
-                1. Assert: _module_ imports a specific binding for this export.
                 1. Let _importedModule_ be ? HostResolveImportedModule(_module_, _e_.[[ModuleRequest]]).
-                1. Return _importedModule_.ResolveExport(_e_.[[ImportName]], _resolveSet_).
+                1. If _e_.[[ImportName]] is `"*"`, then
+                  1. Assert: _module_ does not provide the direct binding for this export.
+                  1. Return ResolvedBinding Record { [[Module]]: _importedModule_, [[BindingName]]: `"*namespace*"` }.
+                1. Else,
+                  1. Assert: _module_ imports a specific binding for this export.
+                  1. Return _importedModule_.ResolveExport(_e_.[[ImportName]], _resolveSet_).
             1. If SameValue(_exportName_, `"default"`) is *true*, then
               1. Assert: A `default` export was not explicitly defined by this module.
               1. Return *null*.
-              1. NOTE: A `default` export cannot be provided by an `export *`.
+              1. NOTE: A `default` export cannot be provided by an `export *` or `export * from "mod"` declaration.
             1. Let _starResolution_ be *null*.
             1. For each ExportEntry Record _e_ in _module_.[[StarExportEntries]], do
               1. Let _importedModule_ be ? HostResolveImportedModule(_module_, _e_.[[ModuleRequest]]).
@@ -23503,7 +23541,21 @@
               1. Else,
                 1. Let _resolution_ be ? _importedModule_.ResolveExport(_in_.[[ImportName]]).
                 1. If _resolution_ is *null* or `"ambiguous"`, throw a *SyntaxError* exception.
-                1. Call _envRec_.CreateImportBinding(_in_.[[LocalName]], _resolution_.[[Module]], _resolution_.[[BindingName]]).
+                1. If _resolution_.[[BindingName]] is `"*namespace*"`, then
+                  1. Let _namespace_ be ? GetModuleNamespace(_resolution_.[[Module]]).
+                  1. Perform ! _envRec_.CreateImmutableBinding(_in_.[[LocalName]], *true*).
+                  1. Call _envRec_.InitializeBinding(_in_.[[LocalName]], _namespace_).
+                1. Else,
+                  1. Call _envRec_.CreateImportBinding(_in_.[[LocalName]], _resolution_.[[Module]], _resolution_.[[BindingName]]).
+            1. Let _moduleCxt_ be a new ECMAScript code execution context.
+            1. Set the Function of _moduleCxt_ to *null*.
+            1. Assert: _module_.[[Realm]] is not *undefined*.
+            1. Set the Realm of _moduleCxt_ to _module_.[[Realm]].
+            1. Set the ScriptOrModule of _moduleCxt_ to _module_.
+            1. Set the VariableEnvironment of _moduleCxt_ to _module_.[[Environment]].
+            1. Set the LexicalEnvironment of _moduleCxt_ to _module_.[[Environment]].
+            1. Set _module_.[[Context]] to _moduleCxt_.
+            1. Push _moduleCxt_ onto the execution context stack; _moduleCxt_ is now the running execution context.
             1. Let _code_ be _module_.[[ECMAScriptCode]].
             1. Let _varDeclarations_ be the VarScopedDeclarations of _code_.
             1. Let _declaredVarNames_ be a new empty List.
@@ -23523,6 +23575,7 @@
                 1. If _d_ is a |FunctionDeclaration|, a |GeneratorDeclaration|, an |AsyncFunctionDeclaration|, or an |AsyncGeneratorDeclaration|, then
                   1. Let _fo_ be InstantiateFunctionObject of _d_ with argument _env_.
                   1. Call _envRec_.InitializeBinding(_dn_, _fo_).
+            1. Remove _moduleCxt_ from the execution context stack.
             1. Return NormalCompletion(~empty~).
           </emu-alg>
         </emu-clause>
@@ -23536,15 +23589,8 @@
 
           <emu-alg>
             1. Let _module_ be this Source Text Module Record.
-            1. Let _moduleCxt_ be a new ECMAScript code execution context.
-            1. Set the Function of _moduleCxt_ to *null*.
-            1. Assert: _module_.[[Realm]] is not *undefined*.
-            1. Set the Realm of _moduleCxt_ to _module_.[[Realm]].
-            1. Set the ScriptOrModule of _moduleCxt_ to _module_.
-            1. Assert: _module_ has been linked and declarations in its module environment have been instantiated.
-            1. Set the VariableEnvironment of _moduleCxt_ to _module_.[[Environment]].
-            1. Set the LexicalEnvironment of _moduleCxt_ to _module_.[[Environment]].
             1. Suspend the currently running execution context.
+            1. Let _moduleCxt_ be _module_.[[Context]].
             1. Push _moduleCxt_ onto the execution context stack; _moduleCxt_ is now the running execution context.
             1. Let _result_ be the result of evaluating _module_.[[ECMAScriptCode]].
             1. Suspend _moduleCxt_ and remove it from the execution context stack.
@@ -23896,16 +23942,20 @@
       <h2>Syntax</h2>
       <emu-grammar type="definition">
         ExportDeclaration :
-          `export` `*` FromClause `;`
-          `export` ExportClause FromClause `;`
-          `export` ExportClause `;`
+          `export` ExportFromClause FromClause `;`
+          `export` NamedExports `;`
           `export` VariableStatement[~Yield, ~Await]
           `export` Declaration[~Yield, ~Await]
           `export` `default` HoistableDeclaration[~Yield, ~Await, +Default]
           `export` `default` ClassDeclaration[~Yield, ~Await, +Default]
           `export` `default` [lookahead &lt;! {`function`, `async` [no |LineTerminator| here] `function`, `class`}] AssignmentExpression[+In, ~Yield, ~Await] `;`
 
-        ExportClause :
+        ExportFromClause :
+          `*`
+          `*` `as` IdentifierName
+          NamedExports
+
+        NamedExports :
           `{` `}`
           `{` ExportsList `}`
           `{` ExportsList `,` `}`
@@ -23921,14 +23971,14 @@
 
       <emu-clause id="sec-exports-static-semantics-early-errors">
         <h1>Static Semantics: Early Errors</h1>
-        <emu-grammar>ExportDeclaration : `export` ExportClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` NamedExports `;`</emu-grammar>
         <ul>
           <li>
-            For each |IdentifierName| _n_ in ReferencedBindings of |ExportClause|: It is a Syntax Error if StringValue of _n_ is a |ReservedWord| or if the StringValue of _n_ is one of: `"implements"`, `"interface"`, `"let"`, `"package"`, `"private"`, `"protected"`, `"public"`, or `"static"`.
+            For each |IdentifierName| _n_ in ReferencedBindings of |NamedExports|: It is a Syntax Error if StringValue of _n_ is a |ReservedWord| or if the StringValue of _n_ is one of: `"implements"`, `"interface"`, `"let"`, `"package"`, `"private"`, `"protected"`, `"public"`, or `"static"`.
           </li>
         </ul>
         <emu-note>
-          <p>The above rule means that each ReferencedBindings of |ExportClause| is treated as an |IdentifierReference|.</p>
+          <p>The above rule means that each ReferencedBindings of |NamedExports| is treated as an |IdentifierReference|.</p>
         </emu-note>
       </emu-clause>
 
@@ -23937,9 +23987,8 @@
         <emu-see-also-para op="BoundNames"></emu-see-also-para>
         <emu-grammar>
           ExportDeclaration :
-            `export` `*` FromClause `;`
-            `export` ExportClause FromClause `;`
-            `export` ExportClause `;`
+            `export` ExportFromClause FromClause `;`
+            `export` NamedExports `;`
         </emu-grammar>
         <emu-alg>
           1. Return a new empty List.
@@ -23975,15 +24024,14 @@
         <emu-see-also-para op="ExportedBindings"></emu-see-also-para>
         <emu-grammar>
           ExportDeclaration :
-            `export` `*` FromClause `;`
-            `export` ExportClause FromClause `;`
+            `export` ExportFromClause FromClause `;`
         </emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>ExportDeclaration : `export` ExportClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` NamedExports `;`</emu-grammar>
         <emu-alg>
-          1. Return the ExportedBindings of |ExportClause|.
+          1. Return the ExportedBindings of |NamedExports|.
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` VariableStatement</emu-grammar>
         <emu-alg>
@@ -24003,7 +24051,7 @@
         <emu-alg>
           1. Return the BoundNames of this |ExportDeclaration|.
         </emu-alg>
-        <emu-grammar>ExportClause : `{` `}`</emu-grammar>
+        <emu-grammar>NamedExports : `{` `}`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
@@ -24026,17 +24074,21 @@
       <emu-clause id="sec-exports-static-semantics-exportednames">
         <h1>Static Semantics: ExportedNames</h1>
         <emu-see-also-para op="ExportedNames"></emu-see-also-para>
-        <emu-grammar>ExportDeclaration : `export` `*` FromClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause `;`</emu-grammar>
+        <emu-alg>
+          1. Return the ExportedNames of |ExportFromClause|.
+        </emu-alg>
+        <emu-grammar>ExportFromClause : `*`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>
-          ExportDeclaration : `export` ExportClause FromClause `;`
-
-          ExportDeclaration : `export` ExportClause `;`
-        </emu-grammar>
+        <emu-grammar>ExportFromClause : `*` `as` IdentifierName </emu-grammar>
         <emu-alg>
-          1. Return the ExportedNames of |ExportClause|.
+          1. Return a List containing the StringValue of |IdentifierName|.
+        </emu-alg>
+        <emu-grammar>ExportFromClause : NamedExports</emu-grammar>
+        <emu-alg>
+          1. Return the ExportedNames of |NamedExports|.
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` VariableStatement</emu-grammar>
         <emu-alg>
@@ -24056,7 +24108,7 @@
         <emu-alg>
           1. Return &laquo; `"default"` &raquo;.
         </emu-alg>
-        <emu-grammar>ExportClause : `{` `}`</emu-grammar>
+        <emu-grammar>NamedExports : `{` `}`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
@@ -24079,20 +24131,14 @@
       <emu-clause id="sec-exports-static-semantics-exportentries">
         <h1>Static Semantics: ExportEntries</h1>
         <emu-see-also-para op="ExportEntries"></emu-see-also-para>
-        <emu-grammar>ExportDeclaration : `export` `*` FromClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause `;`</emu-grammar>
         <emu-alg>
           1. Let _module_ be the sole element of ModuleRequests of |FromClause|.
-          1. Let _entry_ be the ExportEntry Record { [[ModuleRequest]]: _module_, [[ImportName]]: `"*"`, [[LocalName]]: *null*, [[ExportName]]: *null* }.
-          1. Return a new List containing _entry_.
+          1. Return ExportEntriesForModule of |ExportFromClause| with argument _module_.
         </emu-alg>
-        <emu-grammar>ExportDeclaration : `export` ExportClause FromClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` NamedExports `;`</emu-grammar>
         <emu-alg>
-          1. Let _module_ be the sole element of ModuleRequests of |FromClause|.
-          1. Return ExportEntriesForModule of |ExportClause| with argument _module_.
-        </emu-alg>
-        <emu-grammar>ExportDeclaration : `export` ExportClause `;`</emu-grammar>
-        <emu-alg>
-          1. Return ExportEntriesForModule of |ExportClause| with argument *null*.
+          1. Return ExportEntriesForModule of |NamedExports| with argument *null*.
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` VariableStatement</emu-grammar>
         <emu-alg>
@@ -24135,7 +24181,18 @@
       <emu-clause id="sec-static-semantics-exportentriesformodule">
         <h1>Static Semantics: ExportEntriesForModule</h1>
         <p>With parameter _module_.</p>
-        <emu-grammar>ExportClause : `{` `}`</emu-grammar>
+        <emu-grammar>ExportFromClause : `*`</emu-grammar>
+        <emu-alg>
+          1. Let _entry_ be the ExportEntry Record { [[ModuleRequest]]: _module_, [[ImportName]]: `"*"`, [[LocalName]]: *null*, [[ExportName]]: *null* }.
+          1. Return a new List containing _entry_.
+        </emu-alg>
+        <emu-grammar>ExportFromClause : `*` `as` IdentifierName</emu-grammar>
+        <emu-alg>
+          1. Let _exportName_ be the StringValue of |IdentifierName|.
+          1. Let _entry_ be the ExportEntry Record { [[ModuleRequest]]: _module_, [[ImportName]]: `"*"`, [[LocalName]]: *null*, [[ExportName]]: _exportName_ }.
+          1. Return a new List containing _entry_.
+        </emu-alg>
+        <emu-grammar>NamedExports : `{` `}`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
@@ -24175,9 +24232,8 @@
         <emu-see-also-para op="IsConstantDeclaration"></emu-see-also-para>
         <emu-grammar>
           ExportDeclaration :
-            `export` `*` FromClause `;`
-            `export` ExportClause FromClause `;`
-            `export` ExportClause `;`
+            `export` ExportFromClause FromClause `;`
+            `export` NamedExports `;`
             `export` `default` AssignmentExpression `;`
         </emu-grammar>
         <emu-alg>
@@ -24193,9 +24249,8 @@
         <emu-see-also-para op="LexicallyScopedDeclarations"></emu-see-also-para>
         <emu-grammar>
           ExportDeclaration :
-            `export` `*` FromClause `;`
-            `export` ExportClause FromClause `;`
-            `export` ExportClause `;`
+            `export` ExportFromClause FromClause `;`
+            `export` NamedExports `;`
             `export` VariableStatement
         </emu-grammar>
         <emu-alg>
@@ -24223,16 +24278,14 @@
         <h1>Static Semantics: ModuleRequests</h1>
         <emu-see-also-para op="ModuleRequests"></emu-see-also-para>
         <emu-grammar>
-          ExportDeclaration : `export` `*` FromClause `;`
-
-          ExportDeclaration : `export` ExportClause FromClause `;`
+          ExportDeclaration : `export` ExportFromClause FromClause `;`
         </emu-grammar>
         <emu-alg>
           1. Return the ModuleRequests of |FromClause|.
         </emu-alg>
         <emu-grammar>
           ExportDeclaration :
-            `export` ExportClause `;`
+            `export` NamedExports `;`
             `export` VariableStatement
             `export` Declaration
             `export` `default` HoistableDeclaration
@@ -24246,7 +24299,7 @@
 
       <emu-clause id="sec-static-semantics-referencedbindings">
         <h1>Static Semantics: ReferencedBindings</h1>
-        <emu-grammar>ExportClause : `{` `}`</emu-grammar>
+        <emu-grammar>NamedExports : `{` `}`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
@@ -24270,9 +24323,8 @@
         <h1>Runtime Semantics: Evaluation</h1>
         <emu-grammar>
           ExportDeclaration :
-            `export` `*` FromClause `;`
-            `export` ExportClause FromClause `;`
-            `export` ExportClause `;`
+            `export` ExportFromClause FromClause `;`
+            `export` NamedExports `;`
         </emu-grammar>
         <emu-alg>
           1. Return NormalCompletion(~empty~).
@@ -24421,6 +24473,12 @@
 
   <emu-clause id="sec-value-properties-of-the-global-object">
     <h1>Value Properties of the Global Object</h1>
+
+    <emu-clause id="sec-globalthis">
+      <h1>globalThis</h1>
+      <p>The initial value of the `globalThis` property of the global object in a Realm Record _realm_ is _realm_.[[GlobalEnv]]'s EnvironmentRecord's [[GlobalThisValue]].</p>
+      <p>This property has the attributes { [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
+    </emu-clause>
 
     <emu-clause id="sec-value-properties-of-the-global-object-infinity">
       <h1>Infinity</h1>
@@ -26944,7 +27002,7 @@
           1. Otherwise, return ? ToBigInt(_value_).
         </emu-alg>
 
-        <emu-clause id="sec-number-to-bigint" aoid="NumberToBigInt">
+        <emu-clause id="sec-numbertobigint" aoid="NumberToBigInt">
           <h1>Runtime Semantics: NumberToBigInt ( _number_ )</h1>
           <emu-alg>
             1. Assert: Type(_number_) is Number.
@@ -36484,7 +36542,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-setvalueinbuffer" aoid="SetValueInBuffer">
         <h1>SetValueInBuffer ( _arrayBuffer_, _byteIndex_, _type_, _value_, _isTypedArray_, _order_ [ , _isLittleEndian_ ] )</h1>
-        <p>The abstract operation SetValueInBuffer takes seven parameters, an ArrayBuffer or SharedArrayBuffer _arrayBuffer_, an integer _byteIndex_, a String _type_, a Number _value_, a Boolean _isTypedArray_, a String _order_, and optionally a Boolean _isLittleEndian_. This operation performs the following steps:</p>
+        <p>The abstract operation SetValueInBuffer takes seven parameters, an ArrayBuffer or SharedArrayBuffer _arrayBuffer_, an integer _byteIndex_, a String _type_, a Number or BigInt _value_, a Boolean _isTypedArray_, a String _order_, and optionally a Boolean _isLittleEndian_. This operation performs the following steps:</p>
         <emu-alg>
           1. Assert: IsDetachedBuffer(_arrayBuffer_) is *false*.
           1. Assert: There are sufficient bytes in _arrayBuffer_ starting at _byteIndex_ to represent a value of _type_.
@@ -36506,7 +36564,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-getmodifysetvalueinbuffer" aoid="GetModifySetValueInBuffer">
         <h1>GetModifySetValueInBuffer ( _arrayBuffer_, _byteIndex_, _type_, _value_, _op_ [ , _isLittleEndian_ ] )</h1>
-        <p>The abstract operation GetModifySetValueInBuffer takes six parameters, a SharedArrayBuffer _arrayBuffer_, a nonnegative integer _byteIndex_, a String _type_, a Number _value_, a semantic function _op_, and optionally a Boolean _isLittleEndian_. This operation performs the following steps:</p>
+        <p>The abstract operation GetModifySetValueInBuffer takes six parameters, a SharedArrayBuffer _arrayBuffer_, a nonnegative integer _byteIndex_, a String _type_, a Number or BigInt _value_, a semantic function _op_, and optionally a Boolean _isLittleEndian_. This operation performs the following steps:</p>
         <emu-alg>
           1. Assert: IsSharedArrayBuffer(_arrayBuffer_) is *true*.
           1. Assert: There are sufficient bytes in _arrayBuffer_ starting at _byteIndex_ to represent a value of _type_.
@@ -36846,7 +36904,7 @@ THH:mm:ss.sss
           1. Assert: _view_ has a [[ViewedArrayBuffer]] internal slot.
           1. Let _getIndex_ be ? ToIndex(_requestIndex_).
           1. If ! IsBigIntElementType(_type_) is *true*, let _numberValue_ be ? ToBigInt(_value_).
-          1. Otherwise, let _numberValue_ be ? ToInteger(_value_).
+          1. Otherwise, let _numberValue_ be ? ToNumber(_value_).
           1. Set _isLittleEndian_ to ! ToBoolean(_isLittleEndian_).
           1. Let _buffer_ be _view_.[[ViewedArrayBuffer]].
           1. If IsDetachedBuffer(_buffer_) is *true*, throw a *TypeError* exception.
@@ -37231,9 +37289,10 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-getwaiterlist" aoid="GetWaiterList">
         <h1>GetWaiterList ( _block_, _i_ )</h1>
-        <p>A <dfn>WaiterList</dfn> is a semantic object that contains an ordered list of those agents that are waiting on a location (_block_, _i_) in shared memory; _block_ is a Shared Data Block and _i_ a byte offset into the memory of _block_.</p>
+        <p>A <dfn>WaiterList</dfn> is a semantic object that contains an ordered list of those agents that are waiting on a location (_block_, _i_) in shared memory; _block_ is a Shared Data Block and _i_ a byte offset into the memory of _block_. A WaiterList object also optionally contains a Synchronize event denoting the previous leaving of its critical section.</p>
+        <p>Initially a WaiterList object has an empty list and no Synchronize event.</p>
         <p>The agent cluster has a store of WaiterList objects; the store is indexed by (_block_, _i_). WaiterLists are agent-independent: a lookup in the store of WaiterLists by (_block_, _i_) will result in the same WaiterList object in any agent in the agent cluster.</p>
-        <p>Each WaiterList has a <dfn>critical section</dfn> that controls exclusive access to that WaiterList during evaluation. Only a single agent may enter a WaiterList's critical section at one time. Entering and leaving a WaiterList's critical section is controlled by the abstract operations EnterCriticalSection and LeaveCriticalSection. Operations on a WaiterList&mdash;adding and removing waiting agents, traversing the list of agents, suspending and notifying agents on the list&mdash;may only be performed by agents that have entered the WaiterList's critical section.</p>
+        <p>Each WaiterList has a <dfn>critical section</dfn> that controls exclusive access to that WaiterList during evaluation. Only a single agent may enter a WaiterList's critical section at one time. Entering and leaving a WaiterList's critical section is controlled by the abstract operations EnterCriticalSection and LeaveCriticalSection. Operations on a WaiterList&mdash;adding and removing waiting agents, traversing the list of agents, suspending and notifying agents on the list, setting and retrieving the Synchronize event&mdash;may only be performed by agents that have entered the WaiterList's critical section.</p>
         <p>The abstract operation GetWaiterList takes two arguments, a Shared Data Block _block_ and a nonnegative integer _i_. It performs the following steps:</p>
         <emu-alg>
           1. Assert: _block_ is a Shared Data Block.
@@ -37249,6 +37308,15 @@ THH:mm:ss.sss
         <emu-alg>
           1. Assert: The calling agent is not in the critical section for any WaiterList.
           1. Wait until no agent is in the critical section for _WL_, then enter the critical section for _WL_ (without allowing any other agent to enter).
+          1. If _WL_ has a Synchronize event, then
+            1. NOTE: A _WL_ whose critical section has been entered at least once has a Synchronize event set by LeaveCriticalSection.
+            1. Let _execution_ be the [[CandidateExecution]] field of the surrounding agent's Agent Record.
+            1. Let _eventsRecord_ be the Agent Events Record in _execution_.[[EventsRecords]] whose [[AgentSignifier]] is AgentSignifier().
+            1. Let _entererEventList_ be _eventsRecord_.[[EventList]].
+            1. Let _enterEvent_ be a new Synchronize event.
+            1. Append _enterEvent_ to _entererEventList_.
+            1. Let _leaveEvent_ be the Synchronize event in _WL_.
+            1. Append (_leaveEvent_, _enterEvent_) to _eventRecords_.[[AgentSynchronizesWith]].
         </emu-alg>
         <p>EnterCriticalSection has <dfn>contention</dfn> when an agent attempting to enter the critical section must wait for another agent to leave it. When there is no contention, FIFO order of EnterCriticalSection calls is observable. When there is contention, an implementation may choose an arbitrary order but may not cause an agent to wait indefinitely.</p>
       </emu-clause>
@@ -37258,6 +37326,12 @@ THH:mm:ss.sss
         <p>The abstract operation LeaveCriticalSection takes one argument, a WaiterList _WL_. It performs the following steps:</p>
         <emu-alg>
           1. Assert: The calling agent is in the critical section for _WL_.
+          1. Let _execution_ be the [[CandidateExecution]] field of the calling surrounding's Agent Record.
+          1. Let _eventsRecord_ be the Agent Events Record in _execution_.[[EventsRecords]] whose [[AgentSignifier]] is AgentSignifier().
+          1. Let _leaverEventList_ be _eventsRecord_.[[EventList]].
+          1. Let _leaveEvent_ be a new Synchronize event.
+          1. Append _leaveEvent_ to _leaverEventList_.
+          1. Set the Synchronize event in _WL_ to _leaveEvent_.
           1. Leave the critical section for _WL_.
         </emu-alg>
       </emu-clause>
@@ -37318,16 +37392,6 @@ THH:mm:ss.sss
         <p>The abstract operation NotifyWaiter takes two arguments, a WaiterList _WL_ and an agent signifier _W_. It performs the following steps:</p>
         <emu-alg>
           1. Assert: The calling agent is in the critical section for _WL_.
-          1. Assert: _W_ is on the list of waiters in _WL_.
-          1. Let _execution_ be the [[CandidateExecution]] field of the surrounding agent's Agent Record.
-          1. Let _eventsRecord_ be the Agent Events Record in _execution_.[[EventsRecords]] whose [[AgentSignifier]] is AgentSignifier().
-          1. Let _agentSynchronizesWith_ be _eventsRecord_.[[AgentSynchronizesWith]].
-          1. Let _notifierEventList_ be _eventsRecord_.[[EventList]].
-          1. Let _waiterEventList_ be the [[EventList]] field of the element in _execution_.[[EventsRecords]] whose [[AgentSignifier]] is _W_.
-          1. Let _notifyEvent_ and _waitEvent_ be new Synchronize events.
-          1. Append _notifyEvent_ to _notifierEventList_.
-          1. Append _waitEvent_ to _waiterEventList_.
-          1. Append (_notifyEvent_, _waitEvent_) to _agentSynchronizesWith_.
           1. Notify the agent _W_.
         </emu-alg>
         <emu-note>
@@ -40696,17 +40760,6 @@ THH:mm:ss.sss
       </emu-alg>
     </emu-clause>
 
-    <emu-clause id="sec-synchronizeeventset" aoid="SynchronizeEventSet">
-      <h1>SynchronizeEventSet ( _execution_ )</h1>
-      <p>The abstract operation SynchronizeEventSet takes one argument, a candidate execution _execution_. It performs the following steps:</p>
-      <emu-alg>
-        1. Let _events_ be an empty Set.
-        1. For each event _E_ in EventSet(_execution_), do
-          1. If _E_ is a Synchronize event, add _E_ to _events_.
-        1. Return _events_.
-      </emu-alg>
-    </emu-clause>
-
     <emu-clause id="sec-hosteventset" aoid="HostEventSet">
       <h1>HostEventSet ( _execution_ )</h1>
       <p>The abstract operation HostEventSet takes one argument, a candidate execution _execution_. It performs the following steps:</p>
@@ -41355,7 +41408,7 @@ THH:mm:ss.sss
     <emu-prodref name=ModuleSpecifier></emu-prodref>
     <emu-prodref name=ImportedBinding></emu-prodref>
     <emu-prodref name=ExportDeclaration></emu-prodref>
-    <emu-prodref name=ExportClause></emu-prodref>
+    <emu-prodref name=NamedExports></emu-prodref>
     <emu-prodref name=ExportsList></emu-prodref>
     <emu-prodref name=ExportSpecifier></emu-prodref>
   </emu-annex>
