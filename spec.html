@@ -154,7 +154,7 @@
   <emu-clause id="sec-ecmascript-overview">
     <h1>ECMAScript Overview</h1>
     <p>The following is an informal overview of ECMAScript&mdash;not all parts of the language are described. This overview is not part of the standard proper.</p>
-    <p>ECMAScript is object-based: basic language and host facilities are provided by objects, and an ECMAScript program is a cluster of communicating objects. In ECMAScript, an <em>object</em> is a collection of zero or more <em>properties</em> each with <em>attributes</em> that determine how each property can be used&mdash;for example, when the Writable attribute for a property is set to *false*, any attempt by executed ECMAScript code to assign a different value to the property fails. Properties are containers that hold other objects, <em>primitive values</em>, or <em>functions</em>. A primitive value is a member of one of the following built-in types: <b>Undefined</b>, <b>Null</b>, <b>Boolean</b>, <b>Number</b>, <b>String</b>, and <b>Symbol;</b> an object is a member of the built-in type <b>Object</b>; and a function is a callable object. A function that is associated with an object via a property is called a <em>method</em>.</p>
+    <p>ECMAScript is object-based: basic language and host facilities are provided by objects, and an ECMAScript program is a cluster of communicating objects. In ECMAScript, an <em>object</em> is a collection of zero or more <em>properties</em> each with <em>attributes</em> that determine how each property can be used&mdash;for example, when the Writable attribute for a property is set to *false*, any attempt by executed ECMAScript code to assign a different value to the property fails. Properties are containers that hold other objects, <em>primitive values</em>, or <em>functions</em>. A primitive value is a member of one of the following built-in types: <b>Undefined</b>, <b>Null</b>, <b>Boolean</b>, <b>Number</b>, <b>BigInt</b>, <b>String</b>, and <b>Symbol;</b> an object is a member of the built-in type <b>Object</b>; and a function is a callable object. A function that is associated with an object via a property is called a <em>method</em>.</p>
     <p>ECMAScript defines a collection of <em>built-in objects</em> that round out the definition of ECMAScript entities. These built-in objects include the global object; objects that are fundamental to the runtime semantics of the language including `Object`, `Function`, `Boolean`, `Symbol`, and various `Error` objects; objects that represent and manipulate numeric values including `Math`, `Number`, and `Date`; the text processing objects `String` and `RegExp`; objects that are indexed collections of values including `Array` and nine different kinds of Typed Arrays whose elements all have a specific numeric data representation; keyed collections including `Map` and `Set` objects; objects supporting structured data including the `JSON` object, `ArrayBuffer`, `SharedArrayBuffer`, and `DataView`; objects supporting control abstractions including generator functions and `Promise` objects; and reflection objects including `Proxy` and `Reflect`.</p>
     <p>ECMAScript also defines a set of built-in <em>operators</em>. ECMAScript operators include various unary operations, multiplicative operators, additive operators, bitwise shift operators, relational operators, equality operators, binary bitwise operators, binary logical operators, assignment operators, and the comma operator.</p>
     <p>Large ECMAScript programs are supported by <em>modules</em> which allow a program to be divided into multiple sequences of statements and declarations. Each module explicitly identifies declarations it uses that need to be provided by other modules and which of its declarations are available for use by other modules.</p>
@@ -193,7 +193,7 @@
 
     <emu-clause id="sec-primitive-value">
       <h1>primitive value</h1>
-      <p>member of one of the types Undefined, Null, Boolean, Number, Symbol, or String as defined in clause <emu-xref href="#sec-ecmascript-data-types-and-values"></emu-xref></p>
+      <p>member of one of the types Undefined, Null, Boolean, Number, BigInt, Symbol, or String as defined in clause <emu-xref href="#sec-ecmascript-data-types-and-values"></emu-xref></p>
       <emu-note>
         <p>A primitive value is a datum that is represented directly at the lowest level of the language implementation.</p>
       </emu-note>
@@ -340,6 +340,21 @@
     <emu-clause id="sec-terms-and-definitions-nan">
       <h1>NaN</h1>
       <p>number value that is an IEEE 754-2008 &ldquo;Not-a-Number&rdquo; value</p>
+    </emu-clause>
+
+    <emu-clause id="sec-terms-and-definitions-bigint-value">
+      <h1>BigInt value</h1>
+      <p>primitive value corresponding to an arbitrary-precision integer value</p>
+    </emu-clause>
+
+    <emu-clause id="sec-terms-and-definitions-bigint-type">
+      <h1>BigInt type</h1>
+      <p>set of all possible BigInt values</p>
+    </emu-clause>
+
+    <emu-clause id="sec-bigint-object">
+      <h1>BigInt object</h1>
+      <p>member of the Object type that is an instance of the standard built-in `BigInt` constructor</p>
     </emu-clause>
 
     <emu-clause id="sec-symbol-value">
@@ -8468,79 +8483,30 @@
       </emu-alg>
     </emu-clause>
 
-    <emu-clause id="sec-functionallocate" aoid="FunctionAllocate">
-      <h1>FunctionAllocate ( _functionPrototype_ )</h1>
-      <p>The abstract operation FunctionAllocate requires the argument _functionPrototype_. FunctionAllocate performs the following steps:</p>
+    <emu-clause id="sec-ordinaryfunctioncreate" aoid="OrdinaryFunctionCreate" oldids="sec-functionallocate,sec-functioninitialize,sec-functioncreate,sec-generatorfunctioncreate,sec-asyncgeneratorfunctioncreate,sec-async-functions-abstract-operations-async-function-create">
+      <h1>OrdinaryFunctionCreate ( _functionPrototype_, _ParameterList_, _Body_, _thisMode_, _Scope_ )</h1>
+      <p>The abstract operation OrdinaryFunctionCreate requires the arguments: an object _functionPrototype_, a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, _thisMode_ which is either ~lexical-this~ or ~non-lexical-this~, and a Lexical Environment specified by _Scope_. OrdinaryFunctionCreate performs the following steps:</p>
       <emu-alg>
         1. Assert: Type(_functionPrototype_) is Object.
         1. Let _F_ be a newly created ECMAScript function object with the internal slots listed in <emu-xref href="#table-27"></emu-xref>.
         1. Set _F_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
         1. Set _F_.[[Call]] to the definition specified in <emu-xref href="#sec-ecmascript-function-objects-call-thisargument-argumentslist"></emu-xref>.
-        1. Set _F_.[[IsClassConstructor]] to *false*.
         1. Set _F_.[[Prototype]] to _functionPrototype_.
         1. Set _F_.[[Extensible]] to *true*.
-        1. Set _F_.[[Realm]] to the current Realm Record.
-        1. Return _F_.
-      </emu-alg>
-    </emu-clause>
-
-    <emu-clause id="sec-functioninitialize" aoid="FunctionInitialize">
-      <h1>FunctionInitialize ( _F_, _kind_, _ParameterList_, _Body_, _Scope_ )</h1>
-      <p>The abstract operation FunctionInitialize requires the arguments: a function object _F_, _kind_ which is one of (~Normal~, ~Method~, ~Arrow~), a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, a Lexical Environment specified by _Scope_. FunctionInitialize performs the following steps:</p>
-      <emu-alg>
-        1. Let _len_ be the ExpectedArgumentCount of _ParameterList_.
-        1. Perform ! SetFunctionLength(_F_, _len_).
-        1. If the source text matching _Body_ is strict mode code, let _Strict_ be *true*; else let _Strict_ be *false*.
-        1. Set _F_.[[Strict]] to _Strict_.
-        1. Set _F_.[[Environment]] to _Scope_.
         1. Set _F_.[[FormalParameters]] to _ParameterList_.
         1. Set _F_.[[ECMAScriptCode]] to _Body_.
-        1. Set _F_.[[ScriptOrModule]] to GetActiveScriptOrModule().
-        1. If _kind_ is ~Arrow~, set _F_.[[ThisMode]] to ~lexical~.
+        1. If the source text matching _Body_ is strict mode code, let _Strict_ be *true*; else let _Strict_ be *false*.
+        1. Set _F_.[[Strict]] to _Strict_.
+        1. If _thisMode_ is ~lexical-this~, set _F_.[[ThisMode]] to ~lexical~.
         1. Else if _Strict_ is *true*, set _F_.[[ThisMode]] to ~strict~.
         1. Else, set _F_.[[ThisMode]] to ~global~.
+        1. Set _F_.[[IsClassConstructor]] to *false*.
+        1. Set _F_.[[Environment]] to _Scope_.
+        1. Set _F_.[[ScriptOrModule]] to GetActiveScriptOrModule().
+        1. Set _F_.[[Realm]] to the current Realm Record.
+        1. Let _len_ be the ExpectedArgumentCount of _ParameterList_.
+        1. Perform ! SetFunctionLength(_F_, _len_).
         1. Return _F_.
-      </emu-alg>
-    </emu-clause>
-
-    <emu-clause id="sec-functioncreate" aoid="FunctionCreate">
-      <h1>FunctionCreate ( _kind_, _ParameterList_, _Body_, _Scope_ [ , _prototype_ ] )</h1>
-      <p>The abstract operation FunctionCreate requires the arguments: _kind_ which is one of (~Normal~, ~Method~, ~Arrow~), a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, a Lexical Environment specified by _Scope_, and optionally, an object _prototype_. FunctionCreate performs the following steps:</p>
-      <emu-alg>
-        1. If _prototype_ is not present, then
-          1. Set _prototype_ to %Function.prototype%.
-        1. Let _F_ be FunctionAllocate(_prototype_).
-        1. Return FunctionInitialize(_F_, _kind_, _ParameterList_, _Body_, _Scope_).
-      </emu-alg>
-    </emu-clause>
-
-    <emu-clause id="sec-generatorfunctioncreate" aoid="GeneratorFunctionCreate">
-      <h1>GeneratorFunctionCreate ( _kind_, _ParameterList_, _Body_, _Scope_ )</h1>
-      <p>The abstract operation GeneratorFunctionCreate requires the arguments: _kind_ which is one of (~Normal~, ~Method~), a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, a Lexical Environment specified by _Scope_. GeneratorFunctionCreate performs the following steps:</p>
-      <emu-alg>
-        1. Let _functionPrototype_ be %Generator%.
-        1. Let _F_ be FunctionAllocate(_functionPrototype_).
-        1. Return FunctionInitialize(_F_, _kind_, _ParameterList_, _Body_, _Scope_).
-      </emu-alg>
-    </emu-clause>
-
-    <emu-clause id="sec-asyncgeneratorfunctioncreate" aoid="AsyncGeneratorFunctionCreate">
-      <h1>AsyncGeneratorFunctionCreate ( _kind_, _ParameterList_, _Body_, _Scope_ )</h1>
-      <p>The abstract operation AsyncGeneratorFunctionCreate requires the arguments: _kind_ which is one of (~Normal~, ~Method~), a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, a Lexical Environment specified by _Scope_. AsyncGeneratorFunctionCreate performs the following steps:</p>
-      <emu-alg>
-        1. Let _functionPrototype_ be %AsyncGenerator%.
-        1. Let _F_ be ! FunctionAllocate(_functionPrototype_).
-        1. Return ! FunctionInitialize(_F_, _kind_, _ParameterList_, _Body_, _Scope_).
-      </emu-alg>
-    </emu-clause>
-
-    <emu-clause id="sec-async-functions-abstract-operations-async-function-create" aoid="AsyncFunctionCreate">
-      <h1>AsyncFunctionCreate ( _kind_, _parameters_, _body_, _Scope_ )</h1>
-      <p>The abstract operation AsyncFunctionCreate requires the arguments: _kind_ which is one of (~Normal~, ~Method~, ~Arrow~), a parameter list Parse Node specified by _parameters_, a body Parse Node specified by _body_, a Lexical Environment specified by _Scope_. AsyncFunctionCreate performs the following steps:</p>
-      <emu-alg>
-        1. Let _functionPrototype_ be %AsyncFunction.prototype%.
-        2. Let _F_ be ! FunctionAllocate(_functionPrototype_).
-        3. Return ! FunctionInitialize(_F_, _kind_, _parameters_, _body_, _Scope_).
       </emu-alg>
     </emu-clause>
 
@@ -8781,7 +8747,7 @@
         1. Set the ScriptOrModule of _calleeContext_ to _F_.[[ScriptOrModule]].
         1. Perform any necessary implementation-defined initialization of _calleeContext_.
         1. Push _calleeContext_ onto the execution context stack; _calleeContext_ is now the running execution context.
-        1. Let _result_ be the Completion Record that is the result of evaluating _F_ in an implementation-defined manner that conforms to the specification of _F_. _thisArgument_ is the *this* value, _argumentsList_ provides the named parameters, and the NewTarget value is *undefined*.
+        1. Let _result_ be the Completion Record that is the result of evaluating _F_ in a manner that conforms to the specification of _F_. _thisArgument_ is the *this* value, _argumentsList_ provides the named parameters, and the NewTarget value is *undefined*.
         1. Remove _calleeContext_ from the execution context stack and restore _callerContext_ as the running execution context.
         1. Return _result_.
       </emu-alg>
@@ -8794,7 +8760,7 @@
       <h1>[[Construct]] ( _argumentsList_, _newTarget_ )</h1>
       <p>The [[Construct]] internal method for built-in function object _F_ is called with parameters _argumentsList_ and _newTarget_. The steps performed are the same as [[Call]] (see <emu-xref href="#sec-built-in-function-objects-call-thisargument-argumentslist"></emu-xref>) except that step 10 is replaced by:</p>
       <emu-alg>
-        10. Let _result_ be the Completion Record that is the result of evaluating _F_ in an implementation-defined manner that conforms to the specification of _F_. The *this* value is uninitialized, _argumentsList_ provides the named parameters, and _newTarget_ provides the NewTarget value.
+        10. Let _result_ be the Completion Record that is the result of evaluating _F_ in a manner that conforms to the specification of _F_. The *this* value is uninitialized, _argumentsList_ provides the named parameters, and _newTarget_ provides the NewTarget value.
       </emu-alg>
     </emu-clause>
 
@@ -12959,12 +12925,23 @@
         <emu-grammar>PrimaryExpression : RegularExpressionLiteral</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if BodyText of |RegularExpressionLiteral| cannot be recognized using the goal symbol |Pattern| of the ECMAScript RegExp grammar specified in <emu-xref href="#sec-patterns"></emu-xref>.
-          </li>
-          <li>
-            It is a Syntax Error if FlagText of |RegularExpressionLiteral| contains any code points other than `g`, `i`, `m`, `s`, `u`, or `y`, or if it contains the same code point more than once.
+            It is a Syntax Error if IsValidRegularExpressionLiteral(|RegularExpressionLiteral|) is *false*.
           </li>
         </ul>
+      </emu-clause>
+
+      <emu-clause id="sec-isvalidregularexpressionliteral" aoid="IsValidRegularExpressionLiteral">
+        <h1>Static Semantics: IsValidRegularExpressionLiteral ( _literal_ )</h1>
+        <p>The abstract operation IsValidRegularExpressionLiteral determines if its argument is a valid regular expression literal. The following steps are taken:</p>
+        <emu-alg>
+          1. Assert: _literal_ is a |RegularExpressionLiteral|.
+          1. If FlagText of _literal_ contains any code points other than `g`, `i`, `m`, `s`, `u`, or `y`, or if it contains the same code point more than once, return *false*.
+          1. Let _P_ be BodyText of _literal_.
+          1. If FlagText of _literal_ contains `u`, then
+            1. Parse _P_ using the grammars in <emu-xref href="#sec-patterns"></emu-xref>. The goal symbol for the parse is |Pattern[+U, +N]|. If _P_ did not conform to the grammar, if any elements of _P_ were not matched by the parse, or if any Early Error conditions exist, return *false*.
+            1. Otherwise, return *true*.
+          1. Parse _P_ using the grammars in <emu-xref href="#sec-patterns"></emu-xref>. The goal symbol for the parse is |Pattern[~U, ~N]|. If the result of parsing contains a |GroupName|, reparse with the goal symbol |Pattern[~U, +N]|. If _P_ did not conform to the grammar, if any elements of _P_ were not matched by the parse, or if any Early Error conditions exist, return *false*. Otherwise, return *true*.
+        </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-regular-expression-literals-runtime-semantics-evaluation">
@@ -19373,7 +19350,7 @@
       <emu-grammar>FunctionDeclaration : `function` BindingIdentifier `(` FormalParameters `)` `{` FunctionBody `}`</emu-grammar>
       <emu-alg>
         1. Let _name_ be StringValue of |BindingIdentifier|.
-        1. Let _F_ be FunctionCreate(~Normal~, |FormalParameters|, |FunctionBody|, _scope_).
+        1. Let _F_ be OrdinaryFunctionCreate(%Function.prototype%, |FormalParameters|, |FunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeConstructor(_F_).
         1. Perform SetFunctionName(_F_, _name_).
         1. Set _F_.[[SourceText]] to the source text matched by |FunctionDeclaration|.
@@ -19381,7 +19358,7 @@
       </emu-alg>
       <emu-grammar>FunctionDeclaration : `function` `(` FormalParameters `)` `{` FunctionBody `}`</emu-grammar>
       <emu-alg>
-        1. Let _F_ be FunctionCreate(~Normal~, |FormalParameters|, |FunctionBody|, _scope_).
+        1. Let _F_ be OrdinaryFunctionCreate(%Function.prototype%, |FormalParameters|, |FunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeConstructor(_F_).
         1. Perform SetFunctionName(_F_, *"default"*).
         1. Set _F_.[[SourceText]] to the source text matched by |FunctionDeclaration|.
@@ -19419,7 +19396,7 @@
       <emu-grammar>FunctionExpression : `function` `(` FormalParameters `)` `{` FunctionBody `}`</emu-grammar>
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _closure_ be FunctionCreate(~Normal~, |FormalParameters|, |FunctionBody|, _scope_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Function.prototype%, |FormalParameters|, |FunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeConstructor(_closure_).
         1. Set _closure_.[[SourceText]] to the source text matched by |FunctionExpression|.
         1. Return _closure_.
@@ -19431,7 +19408,7 @@
         1. Let _envRec_ be _funcEnv_'s EnvironmentRecord.
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Perform _envRec_.CreateImmutableBinding(_name_, *false*).
-        1. Let _closure_ be FunctionCreate(~Normal~, |FormalParameters|, |FunctionBody|, _funcEnv_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Function.prototype%, |FormalParameters|, |FunctionBody|, ~non-lexical-this~, _funcEnv_).
         1. Perform MakeConstructor(_closure_).
         1. Perform SetFunctionName(_closure_, _name_).
         1. Set _closure_.[[SourceText]] to the source text matched by |FunctionExpression|.
@@ -19694,7 +19671,7 @@
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
         1. Let _parameters_ be CoveredFormalsList of |ArrowParameters|.
-        1. Let _closure_ be FunctionCreate(~Arrow~, _parameters_, |ConciseBody|, _scope_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Function.prototype%, _parameters_, |ConciseBody|, ~lexical-this~, _scope_).
         1. Set _closure_.[[SourceText]] to the source text matched by |ArrowFunction|.
         1. Return _closure_.
       </emu-alg>
@@ -19831,12 +19808,10 @@
         1. ReturnIfAbrupt(_propKey_).
         1. Let _scope_ be the running execution context's LexicalEnvironment.
         1. If _functionPrototype_ is present as a parameter, then
-          1. Let _kind_ be ~Normal~.
           1. Let _prototype_ be _functionPrototype_.
         1. Else,
-          1. Let _kind_ be ~Method~.
           1. Let _prototype_ be %Function.prototype%.
-        1. Let _closure_ be FunctionCreate(_kind_, |UniqueFormalParameters|, |FunctionBody|, _scope_, _prototype_).
+        1. Let _closure_ be OrdinaryFunctionCreate(_prototype_, |UniqueFormalParameters|, |FunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeMethod(_closure_, _object_).
         1. Set _closure_.[[SourceText]] to the source text matched by |MethodDefinition|.
         1. Return the Record { [[Key]]: _propKey_, [[Closure]]: _closure_ }.
@@ -19860,7 +19835,7 @@
         1. ReturnIfAbrupt(_propKey_).
         1. Let _scope_ be the running execution context's LexicalEnvironment.
         1. Let _formalParameterList_ be an instance of the production <emu-grammar>FormalParameters : [empty]</emu-grammar>.
-        1. Let _closure_ be FunctionCreate(~Method~, _formalParameterList_, |FunctionBody|, _scope_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Function.prototype%, _formalParameterList_, |FunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeMethod(_closure_, _object_).
         1. Perform SetFunctionName(_closure_, _propKey_, *"get"*).
         1. Set _closure_.[[SourceText]] to the source text matched by |MethodDefinition|.
@@ -19872,7 +19847,7 @@
         1. Let _propKey_ be the result of evaluating |PropertyName|.
         1. ReturnIfAbrupt(_propKey_).
         1. Let _scope_ be the running execution context's LexicalEnvironment.
-        1. Let _closure_ be FunctionCreate(~Method~, |PropertySetParameterList|, |FunctionBody|, _scope_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Function.prototype%, |PropertySetParameterList|, |FunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeMethod(_closure_, _object_).
         1. Perform SetFunctionName(_closure_, _propKey_, *"set"*).
         1. Set _closure_.[[SourceText]] to the source text matched by |MethodDefinition|.
@@ -20088,7 +20063,7 @@
       <emu-grammar>GeneratorDeclaration : `function` `*` BindingIdentifier `(` FormalParameters `)` `{` GeneratorBody `}`</emu-grammar>
       <emu-alg>
         1. Let _name_ be StringValue of |BindingIdentifier|.
-        1. Let _F_ be GeneratorFunctionCreate(~Normal~, |FormalParameters|, |GeneratorBody|, _scope_).
+        1. Let _F_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
         1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_F_, _name_).
@@ -20097,7 +20072,7 @@
       </emu-alg>
       <emu-grammar>GeneratorDeclaration : `function` `*` `(` FormalParameters `)` `{` GeneratorBody `}`</emu-grammar>
       <emu-alg>
-        1. Let _F_ be GeneratorFunctionCreate(~Normal~, |FormalParameters|, |GeneratorBody|, _scope_).
+        1. Let _F_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
         1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_F_, *"default"*).
@@ -20118,7 +20093,7 @@
         1. Let _propKey_ be the result of evaluating |PropertyName|.
         1. ReturnIfAbrupt(_propKey_).
         1. Let _scope_ be the running execution context's LexicalEnvironment.
-        1. Let _closure_ be GeneratorFunctionCreate(~Method~, |UniqueFormalParameters|, |GeneratorBody|, _scope_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Generator%, |UniqueFormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeMethod(_closure_, _object_).
         1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
@@ -20145,7 +20120,7 @@
       <emu-grammar>GeneratorExpression : `function` `*` `(` FormalParameters `)` `{` GeneratorBody `}`</emu-grammar>
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _closure_ be GeneratorFunctionCreate(~Normal~, |FormalParameters|, |GeneratorBody|, _scope_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
         1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Set _closure_.[[SourceText]] to the source text matched by |GeneratorExpression|.
@@ -20158,7 +20133,7 @@
         1. Let _envRec_ be _funcEnv_'s EnvironmentRecord.
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Perform _envRec_.CreateImmutableBinding(_name_, *false*).
-        1. Let _closure_ be GeneratorFunctionCreate(~Normal~, |FormalParameters|, |GeneratorBody|, _funcEnv_).
+        1. Let _closure_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _funcEnv_).
         1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_closure_, _name_).
@@ -20415,7 +20390,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _name_ be StringValue of |BindingIdentifier|.
-        1. Let _F_ be ! AsyncGeneratorFunctionCreate(~Normal~, |FormalParameters|, |AsyncGeneratorBody|, _scope_).
+        1. Let _F_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
         1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform ! SetFunctionName(_F_, _name_).
@@ -20427,7 +20402,7 @@
         AsyncGeneratorDeclaration : `async` `function` `*` `(` FormalParameters `)` `{` AsyncGeneratorBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Let _F_ be AsyncGeneratorFunctionCreate(~Normal~, |FormalParameters|, |AsyncGeneratorBody|, _scope_).
+        1. Let _F_ be OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
         1. Let _prototype_ be ObjectCreate(%AsyncGenerator.prototype%).
         1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_F_, *"default"*).
@@ -20449,7 +20424,7 @@
         1. Let _propKey_ be the result of evaluating |PropertyName|.
         1. ReturnIfAbrupt(_propKey_).
         1. Let _scope_ be the running execution context's LexicalEnvironment.
-        1. Let _closure_ be ! AsyncGeneratorFunctionCreate(~Method~, |UniqueFormalParameters|, |AsyncGeneratorBody|, _scope_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |UniqueFormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
         1. Perform ! MakeMethod(_closure_, _object_).
         1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
@@ -20481,7 +20456,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _closure_ be ! AsyncGeneratorFunctionCreate(~Normal~, |FormalParameters|, |AsyncGeneratorBody|, _scope_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
         1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncGeneratorExpression|.
@@ -20497,7 +20472,7 @@
         1. Let _envRec_ be _funcEnv_'s EnvironmentRecord.
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Perform ! _envRec_.CreateImmutableBinding(_name_).
-        1. Let _closure_ be ! AsyncGeneratorFunctionCreate(~Normal~, |FormalParameters|, |AsyncGeneratorBody|, _funcEnv_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _funcEnv_).
         1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform ! SetFunctionName(_closure_, _name_).
@@ -21062,7 +21037,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _name_ be StringValue of |BindingIdentifier|.
-        1. Let _F_ be ! AsyncFunctionCreate(~Normal~, |FormalParameters|, |AsyncFunctionBody|, _scope_).
+        1. Let _F_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, |FormalParameters|, |AsyncFunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform ! SetFunctionName(_F_, _name_).
         1. Set _F_.[[SourceText]] to the source text matched by |AsyncFunctionDeclaration|.
         1. Return _F_.
@@ -21071,7 +21046,7 @@
         AsyncFunctionDeclaration : `async` `function` `(` FormalParameters `)` `{` AsyncFunctionBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Let _F_ be ! AsyncFunctionCreate(~Normal~, |FormalParameters|, |AsyncFunctionBody|, _scope_).
+        1. Let _F_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, |FormalParameters|, |AsyncFunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform ! SetFunctionName(_F_, *"default"*).
         1. Set _F_.[[SourceText]] to the source text matched by |AsyncFunctionDeclaration|.
         1. Return _F_.
@@ -21105,7 +21080,7 @@
         1. Let _propKey_ be the result of evaluating |PropertyName|.
         1. ReturnIfAbrupt(_propKey_).
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _closure_ be ! AsyncFunctionCreate(~Method~, |UniqueFormalParameters|, |AsyncFunctionBody|, _scope_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, |UniqueFormalParameters|, |AsyncFunctionBody|, ~non-lexical-this~, _scope_).
         1. Perform ! MakeMethod(_closure_, _object_).
         1. Perform ! SetFunctionName(_closure_, _propKey_).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncMethod|.
@@ -21148,7 +21123,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _closure_ be ! AsyncFunctionCreate(~Normal~, |FormalParameters|, |AsyncFunctionBody|, _scope_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, |FormalParameters|, |AsyncFunctionBody|, ~non-lexical-this~, _scope_).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncFunctionExpression|.
         1. Return _closure_.
       </emu-alg>
@@ -21162,7 +21137,7 @@
         1. Let _envRec_ be _funcEnv_'s EnvironmentRecord.
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Perform ! _envRec_.CreateImmutableBinding(_name_).
-        1. Let _closure_ be ! AsyncFunctionCreate(~Normal~, |FormalParameters|, |AsyncFunctionBody|, _funcEnv_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, |FormalParameters|, |AsyncFunctionBody|, ~non-lexical-this~, _funcEnv_).
         1. Perform ! SetFunctionName(_closure_, _name_).
         1. Perform ! _envRec_.InitializeBinding(_name_, _closure_).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncFunctionExpression|.
@@ -21435,7 +21410,7 @@
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
         1. Let _parameters_ be |AsyncArrowBindingIdentifier|.
-        1. Let _closure_ be ! AsyncFunctionCreate(~Arrow~, _parameters_, |AsyncConciseBody|, _scope_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, _parameters_, |AsyncConciseBody|, ~lexical-this~, _scope_).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncArrowFunction|.
         1. Return _closure_.
       </emu-alg>
@@ -21446,7 +21421,7 @@
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
         1. Let _head_ be CoveredAsyncArrowHead of |CoverCallExpressionAndAsyncArrowHead|.
         1. Let _parameters_ be the |ArrowFormalParameters| of _head_.
-        1. Let _closure_ be ! AsyncFunctionCreate(~Arrow~, _parameters_, |AsyncConciseBody|, _scope_).
+        1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncFunction.prototype%, _parameters_, |AsyncConciseBody|, ~lexical-this~, _scope_).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncArrowFunction|.
         1. Return _closure_.
       </emu-alg>
@@ -25264,7 +25239,7 @@
         <emu-alg>
           1. If NewTarget is neither *undefined* nor the active function, then
             1. Return ? OrdinaryCreateFromConstructor(NewTarget, *"%Object.prototype%"*).
-          1. If _value_ is *null*, *undefined* or not supplied, return ObjectCreate(%Object.prototype%).
+          1. If _value_ is *undefined* or *null*, return ObjectCreate(%Object.prototype%).
           1. Return ! ToObject(_value_).
         </emu-alg>
         <p>The *"length"* property of the `Object` constructor function is 1.</p>
@@ -25761,7 +25736,7 @@
                 1. Set _P_ to the string-concatenation of the previous value of _P_, *","* (a comma), and _nextArgString_.
                 1. Set _k_ to _k_ + 1.
               1. Let _bodyText_ be _args_[_k_].
-            1. Set _bodyText_ to ? ToString(_bodyText_).
+            1. Set _bodyText_ to the string-concatenation of 0x000A (LINE FEED), ? ToString(_bodyText_), and 0x000A (LINE FEED).
             1. Perform the following substeps in an implementation-dependent order, possibly interleaving parsing and error detection:
               1. Let _parameters_ be the result of parsing _P_, interpreted as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, using _parameterGoal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
               1. Let _body_ be the result of parsing _bodyText_, interpreted as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, using _goal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
@@ -25780,10 +25755,9 @@
               1. If _strict_ is *true*, then
                 1. If BoundNames of _parameters_ contains any duplicate elements, throw a *SyntaxError* exception.
             1. Let _proto_ be ? GetPrototypeFromConstructor(_newTarget_, _fallbackProto_).
-            1. Let _F_ be FunctionAllocate(_proto_).
-            1. Let _realmF_ be _F_.[[Realm]].
+            1. Let _realmF_ be the current Realm Record.
             1. Let _scope_ be _realmF_.[[GlobalEnv]].
-            1. Perform FunctionInitialize(_F_, ~Normal~, _parameters_, _body_, _scope_).
+            1. Let _F_ be ! OrdinaryFunctionCreate(_proto_, _parameters_, _body_, ~non-lexical-this~, _scope_).
             1. If _kind_ is ~generator~, then
               1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
               1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
@@ -25794,7 +25768,7 @@
             1. NOTE: Async functions are not constructable and do not have a [[Construct]] internal method or a *"prototype"* property.
             1. Perform SetFunctionName(_F_, *"anonymous"*).
             1. Let _prefix_ be the prefix associated with _kind_ in <emu-xref href="#table-dynamic-function-sourcetext-prefixes"></emu-xref>.
-            1. Let _sourceText_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, 0x000A (LINE FEED), _bodyText_, 0x000A (LINE FEED), and *"}"*.
+            1. Let _sourceText_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyText_, and *"}"*.
             1. Set _F_.[[SourceText]] to _sourceText_.
             1. Return _F_.
           </emu-alg>
@@ -26594,8 +26568,8 @@
         <h1>Number ( _value_ )</h1>
         <p>When `Number` is called with argument _value_, the following steps are taken:</p>
         <emu-alg>
-          1. If no arguments were passed to this function invocation, let _n_ be *+0*.
-          1. Else, let _n_ be ? ToNumber(_value_).
+          1. If _value_ is present, let _n_ be ? ToNumber(_value_).
+          1. Else, let _n_ be *+0*.
           1. If NewTarget is *undefined*, return _n_.
           1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Number.prototype%"*, &laquo; [[NumberData]] &raquo;).
           1. Set _O_.[[NumberData]] to _n_.
@@ -26891,13 +26865,12 @@
       <emu-clause id="sec-number.prototype.tostring">
         <h1>Number.prototype.toString ( [ _radix_ ] )</h1>
         <emu-note>
-          <p>The optional _radix_ should be an integer value in the inclusive range 2 to 36. If _radix_ is not present or is *undefined* the Number 10 is used as the value of _radix_.</p>
+          <p>The optional _radix_ should be an integer value in the inclusive range 2 to 36. If _radix_ is *undefined* the Number 10 is used as the value of _radix_.</p>
         </emu-note>
         <p>The following steps are performed:</p>
         <emu-alg>
           1. Let _x_ be ? thisNumberValue(*this* value).
-          1. If _radix_ is not present, let _radixNumber_ be 10.
-          1. Else if _radix_ is *undefined*, let _radixNumber_ be 10.
+          1. If _radix_ is *undefined*, let _radixNumber_ be 10.
           1. Else, let _radixNumber_ be ? ToInteger(_radix_).
           1. If _radixNumber_ &lt; 2 or _radixNumber_ &gt; 36, throw a *RangeError* exception.
           1. If _radixNumber_ = 10, return ! ToString(_x_).
@@ -29313,7 +29286,7 @@ THH:mm:ss.sss
         <h1>String ( _value_ )</h1>
         <p>When `String` is called with argument _value_, the following steps are taken:</p>
         <emu-alg>
-          1. If no arguments were passed to this function invocation, let _s_ be *""*.
+          1. If _value_ is not present, let _s_ be the empty String.
           1. Else,
             1. If NewTarget is *undefined* and Type(_value_) is Symbol, return SymbolDescriptiveString(_value_).
             1. Let _s_ be ? ToString(_value_).
@@ -29687,8 +29660,8 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be ? RequireObjectCoercible(*this* value).
           1. Let _S_ be ? ToString(_O_).
-          1. If _form_ is not present or _form_ is *undefined*, set _form_ to *"NFC"*.
-          1. Let _f_ be ? ToString(_form_).
+          1. If _form_ is *undefined*, let _f_ be *"NFC"*.
+          1. Else, let _f_ be ? ToString(_form_).
           1. If _f_ is not one of *"NFC"*, *"NFD"*, *"NFKC"*, or *"NFKD"*, throw a *RangeError* exception.
           1. Let _ns_ be the String value that is the result of normalizing _S_ into the normalization form named by _f_ as specified in <a href="https://unicode.org/reports/tr15/">https://unicode.org/reports/tr15/</a>.
           1. Return _ns_.
@@ -29781,7 +29754,7 @@ THH:mm:ss.sss
             1. Let _replStr_ be ? ToString(_replValue_).
           1. Else,
             1. Let _captures_ be a new empty List.
-            1. Let _replStr_ be GetSubstitution(_matched_, _string_, _pos_, _captures_, *undefined*, _replaceValue_).
+            1. Let _replStr_ be ! GetSubstitution(_matched_, _string_, _pos_, _captures_, *undefined*, _replaceValue_).
           1. Let _tailPos_ be _pos_ + the number of code units in _matched_.
           1. Let _newString_ be the string-concatenation of the first _pos_ code units of _string_, _replStr_, and the trailing substring of _string_ starting at index _tailPos_. If _pos_ is 0, the first element of the concatenation will be the empty String.
           1. Return _newString_.
@@ -29804,8 +29777,6 @@ THH:mm:ss.sss
             1. Assert: Type(_replacement_) is String.
             1. Let _tailPos_ be _position_ + _matchLength_.
             1. Let _m_ be the number of elements in _captures_.
-            1. If _namedCaptures_ is not *undefined*, then
-              1. Set _namedCaptures_ to ? ToObject(_namedCaptures_).
             1. Let _result_ be the String value derived from _replacement_ by copying code unit elements from _replacement_ to _result_ while performing replacements as specified in <emu-xref href="#table-45"></emu-xref>. These `$` replacements are done left-to-right, and, once such a replacement is performed, the new replacement text is not subject to further replacements.
             1. Return _result_.
           </emu-alg>
@@ -29912,6 +29883,7 @@ THH:mm:ss.sss
                   <emu-alg>
                     1. If _namedCaptures_ is *undefined*, the replacement text is the String *"$&lt;"*.
                     1. Else,
+                      1. Assert: Type(_namedCaptures_) is Object.
                       1. Scan until the next `>` U+003E (GREATER-THAN SIGN).
                       1. If none is found, the replacement text is the String *"$&lt;"*.
                       1. Else,
@@ -32400,7 +32372,9 @@ THH:mm:ss.sss
               1. Let _replValue_ be ? Call(_replaceValue_, *undefined*, _replacerArgs_).
               1. Let _replacement_ be ? ToString(_replValue_).
             1. Else,
-              1. Let _replacement_ be GetSubstitution(_matched_, _S_, _position_, _captures_, _namedCaptures_, _replaceValue_).
+              1. If _namedCaptures_ is not *undefined*, then
+                1. Set _namedCaptures_ to ? ToObject(_namedCaptures_).
+              1. Let _replacement_ be ? GetSubstitution(_matched_, _S_, _position_, _captures_, _namedCaptures_, _replaceValue_).
             1. If _position_ &ge; _nextSourcePosition_, then
               1. NOTE: _position_ should not normally move backwards. If it does, it is an indication of an ill-behaving RegExp subclass or use of an access triggered side-effect to change the global flag or other characteristics of _rx_. In such cases, the corresponding substitution is ignored.
               1. Set _accumulatedResult_ to the string-concatenation of the current value of _accumulatedResult_, the substring of _S_ consisting of the code units from _nextSourcePosition_ (inclusive) up to _position_ (exclusive), and _replacement_.
@@ -32772,7 +32746,6 @@ THH:mm:ss.sss
           1. If _mapfn_ is *undefined*, let _mapping_ be *false*.
           1. Else,
             1. If IsCallable(_mapfn_) is *false*, throw a *TypeError* exception.
-            1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
             1. Let _mapping_ be *true*.
           1. Let _usingIterator_ be ? GetMethod(_items_, @@iterator).
           1. If _usingIterator_ is not *undefined*, then
@@ -32793,7 +32766,7 @@ THH:mm:ss.sss
                 1. Return _A_.
               1. Let _nextValue_ be ? IteratorValue(_next_).
               1. If _mapping_ is *true*, then
-                1. Let _mappedValue_ be Call(_mapfn_, _T_, &laquo; _nextValue_, _k_ &raquo;).
+                1. Let _mappedValue_ be Call(_mapfn_, _thisArg_, &laquo; _nextValue_, _k_ &raquo;).
                 1. If _mappedValue_ is an abrupt completion, return ? IteratorClose(_iteratorRecord_, _mappedValue_).
                 1. Set _mappedValue_ to _mappedValue_.[[Value]].
               1. Else, let _mappedValue_ be _nextValue_.
@@ -32812,7 +32785,7 @@ THH:mm:ss.sss
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kValue_ be ? Get(_arrayLike_, _Pk_).
             1. If _mapping_ is *true*, then
-              1. Let _mappedValue_ be ? Call(_mapfn_, _T_, &laquo; _kValue_, _k_ &raquo;).
+              1. Let _mappedValue_ be ? Call(_mapfn_, _thisArg_, &laquo; _kValue_, _k_ &raquo;).
             1. Else, let _mappedValue_ be _kValue_.
             1. Perform ? CreateDataPropertyOrThrow(_A_, _Pk_, _mappedValue_).
             1. Set _k_ to _k_ + 1.
@@ -33016,14 +32989,13 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
               1. Let _kValue_ be ? Get(_O_, _Pk_).
-              1. Let _testResult_ be ! ToBoolean(? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;)).
+              1. Let _testResult_ be ! ToBoolean(? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;)).
               1. If _testResult_ is *false*, return *false*.
             1. Set _k_ to _k_ + 1.
           1. Return *true*.
@@ -33072,7 +33044,6 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _A_ be ? ArraySpeciesCreate(_O_, 0).
           1. Let _k_ be 0.
           1. Let _to_ be 0.
@@ -33081,7 +33052,7 @@ THH:mm:ss.sss
             1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
               1. Let _kValue_ be ? Get(_O_, _Pk_).
-              1. Let _selected_ be ! ToBoolean(? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;)).
+              1. Let _selected_ be ! ToBoolean(? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;)).
               1. If _selected_ is *true*, then
                 1. Perform ? CreateDataPropertyOrThrow(_A_, ! ToString(_to_), _kValue_).
                 1. Set _to_ to _to_ + 1.
@@ -33108,12 +33079,11 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_predicate_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kValue_ be ? Get(_O_, _Pk_).
-            1. Let _testResult_ be ! ToBoolean(? Call(_predicate_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;)).
+            1. Let _testResult_ be ! ToBoolean(? Call(_predicate_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;)).
             1. If _testResult_ is *true*, return _kValue_.
             1. Set _k_ to _k_ + 1.
           1. Return *undefined*.
@@ -33137,12 +33107,11 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_predicate_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kValue_ be ? Get(_O_, _Pk_).
-            1. Let _testResult_ be ! ToBoolean(? Call(_predicate_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;)).
+            1. Let _testResult_ be ! ToBoolean(? Call(_predicate_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;)).
             1. If _testResult_ is *true*, return _k_.
             1. Set _k_ to _k_ + 1.
           1. Return -1.
@@ -33227,14 +33196,13 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
               1. Let _kValue_ be ? Get(_O_, _Pk_).
-              1. Perform ? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;).
+              1. Perform ? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;).
             1. Set _k_ to _k_ + 1.
           1. Return *undefined*.
         </emu-alg>
@@ -33395,7 +33363,6 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _A_ be ? ArraySpeciesCreate(_O_, _len_).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
@@ -33403,7 +33370,7 @@ THH:mm:ss.sss
             1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
               1. Let _kValue_ be ? Get(_O_, _Pk_).
-              1. Let _mappedValue_ be ? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;).
+              1. Let _mappedValue_ be ? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;).
               1. Perform ? CreateDataPropertyOrThrow(_A_, _Pk_, _mappedValue_).
             1. Set _k_ to _k_ + 1.
           1. Return _A_.
@@ -33670,14 +33637,13 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
               1. Let _kValue_ be ? Get(_O_, _Pk_).
-              1. Let _testResult_ be ! ToBoolean(? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;)).
+              1. Let _testResult_ be ! ToBoolean(? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;)).
               1. If _testResult_ is *true*, return *true*.
             1. Set _k_ to _k_ + 1.
           1. Return *false*.
@@ -34420,11 +34386,10 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _C_ be the *this* value.
           1. If IsConstructor(_C_) is *false*, throw a *TypeError* exception.
-          1. If _mapfn_ is present and _mapfn_ is not *undefined*, then
+          1. If _mapfn_ is *undefined*, let _mapping_ be *false*.
+          1. Else,
             1. If IsCallable(_mapfn_) is *false*, throw a *TypeError* exception.
             1. Let _mapping_ be *true*.
-          1. Else, let _mapping_ be *false*.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _usingIterator_ be ? GetMethod(_source_, @@iterator).
           1. If _usingIterator_ is not *undefined*, then
             1. Let _values_ be ? IterableToList(_source_, _usingIterator_).
@@ -34435,7 +34400,7 @@ THH:mm:ss.sss
               1. Let _Pk_ be ! ToString(_k_).
               1. Let _kValue_ be the first element of _values_ and remove that element from _values_.
               1. If _mapping_ is *true*, then
-                1. Let _mappedValue_ be ? Call(_mapfn_, _T_, &laquo; _kValue_, _k_ &raquo;).
+                1. Let _mappedValue_ be ? Call(_mapfn_, _thisArg_, &laquo; _kValue_, _k_ &raquo;).
               1. Else, let _mappedValue_ be _kValue_.
               1. Perform ? Set(_targetObj_, _Pk_, _mappedValue_, *true*).
               1. Set _k_ to _k_ + 1.
@@ -34450,7 +34415,7 @@ THH:mm:ss.sss
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kValue_ be ? Get(_arrayLike_, _Pk_).
             1. If _mapping_ is *true*, then
-              1. Let _mappedValue_ be ? Call(_mapfn_, _T_, &laquo; _kValue_, _k_ &raquo;).
+              1. Let _mappedValue_ be ? Call(_mapfn_, _thisArg_, &laquo; _kValue_, _k_ &raquo;).
             1. Else, let _mappedValue_ be _kValue_.
             1. Perform ? Set(_targetObj_, _Pk_, _mappedValue_, *true*).
             1. Set _k_ to _k_ + 1.
@@ -34670,14 +34635,13 @@ THH:mm:ss.sss
           1. Perform ? ValidateTypedArray(_O_).
           1. Let _len_ be _O_.[[ArrayLength]].
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _kept_ be a new empty List.
           1. Let _k_ be 0.
           1. Let _captured_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kValue_ be ? Get(_O_, _Pk_).
-            1. Let _selected_ be ! ToBoolean(? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;)).
+            1. Let _selected_ be ! ToBoolean(? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;)).
             1. If _selected_ is *true*, then
               1. Append _kValue_ to the end of _kept_.
               1. Set _captured_ to _captured_ + 1.
@@ -34768,13 +34732,12 @@ THH:mm:ss.sss
           1. Perform ? ValidateTypedArray(_O_).
           1. Let _len_ be _O_.[[ArrayLength]].
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _A_ be ? TypedArraySpeciesCreate(_O_, &laquo; _len_ &raquo;).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_
             1. Let _Pk_ be ! ToString(_k_).
             1. Let _kValue_ be ? Get(_O_, _Pk_).
-            1. Let _mappedValue_ be ? Call(_callbackfn_, _T_, &laquo; _kValue_, _k_, _O_ &raquo;).
+            1. Let _mappedValue_ be ? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, _k_, _O_ &raquo;).
             1. Perform ? Set(_A_, _Pk_, _mappedValue_, *true*).
             1. Set _k_ to _k_ + 1.
           1. Return _A_.
@@ -35219,11 +35182,11 @@ THH:mm:ss.sss
           1. Let _elementSize_ be the Element Size value specified in <emu-xref href="#table-the-typedarray-constructors"></emu-xref> for _constructorName_.
           1. Let _offset_ be ? ToIndex(_byteOffset_).
           1. If _offset_ modulo _elementSize_ &ne; 0, throw a *RangeError* exception.
-          1. If _length_ is present and _length_ is not *undefined*, then
+          1. If _length_ is not *undefined*, then
             1. Let _newLength_ be ? ToIndex(_length_).
           1. If IsDetachedBuffer(_buffer_) is *true*, throw a *TypeError* exception.
           1. Let _bufferByteLength_ be _buffer_.[[ArrayBufferByteLength]].
-          1. If _length_ is either not present or *undefined*, then
+          1. If _length_ is *undefined*, then
             1. If _bufferByteLength_ modulo _elementSize_ &ne; 0, throw a *RangeError* exception.
             1. Let _newByteLength_ be _bufferByteLength_ - _offset_.
             1. If _newByteLength_ &lt; 0, throw a *RangeError* exception.
@@ -35341,7 +35304,7 @@ THH:mm:ss.sss
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
           1. Let _map_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Map.prototype%"*, &laquo; [[MapData]] &raquo;).
           1. Set _map_.[[MapData]] to a new empty List.
-          1. If _iterable_ is not present, or is either *undefined* or *null*, return _map_.
+          1. If _iterable_ is either *undefined* or *null*, return _map_.
           1. Let _adder_ be ? Get(_map_, *"set"*).
           1. Return ? AddEntriesFromIterable(_map_, _iterable_, _adder_).
         </emu-alg>
@@ -35471,11 +35434,10 @@ THH:mm:ss.sss
           1. Let _M_ be the *this* value.
           1. Perform ? RequireInternalSlot(_M_, [[MapData]]).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _entries_ be the List that is _M_.[[MapData]].
           1. For each Record { [[Key]], [[Value]] } _e_ that is an element of _entries_, in original key insertion order, do
             1. If _e_.[[Key]] is not ~empty~, then
-              1. Perform ? Call(_callbackfn_, _T_, &laquo; _e_.[[Value]], _e_.[[Key]], _M_ &raquo;).
+              1. Perform ? Call(_callbackfn_, _thisArg_, &laquo; _e_.[[Value]], _e_.[[Key]], _M_ &raquo;).
           1. Return *undefined*.
         </emu-alg>
         <emu-note>
@@ -35711,7 +35673,6 @@ THH:mm:ss.sss
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
           1. Let _set_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Set.prototype%"*, &laquo; [[SetData]] &raquo;).
           1. Set _set_.[[SetData]] to a new empty List.
-          1. If _iterable_ is not present, set _iterable_ to *undefined*.
           1. If _iterable_ is either *undefined* or *null*, return _set_.
           1. Let _adder_ be ? Get(_set_, *"add"*).
           1. If IsCallable(_adder_) is *false*, throw a *TypeError* exception.
@@ -35837,11 +35798,10 @@ THH:mm:ss.sss
           1. Let _S_ be the *this* value.
           1. Perform ? RequireInternalSlot(_S_, [[SetData]]).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. If _thisArg_ is present, let _T_ be _thisArg_; else let _T_ be *undefined*.
           1. Let _entries_ be the List that is _S_.[[SetData]].
           1. For each _e_ that is an element of _entries_, in original insertion order, do
             1. If _e_ is not ~empty~, then
-              1. Perform ? Call(_callbackfn_, _T_, &laquo; _e_, _e_, _S_ &raquo;).
+              1. Perform ? Call(_callbackfn_, _thisArg_, &laquo; _e_, _e_, _S_ &raquo;).
           1. Return *undefined*.
         </emu-alg>
         <emu-note>
@@ -36050,7 +36010,7 @@ THH:mm:ss.sss
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
           1. Let _map_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakMap.prototype%"*, &laquo; [[WeakMapData]] &raquo;).
           1. Set _map_.[[WeakMapData]] to a new empty List.
-          1. If _iterable_ is not present, or is either *undefined* or *null*, return _map_.
+          1. If _iterable_ is either *undefined* or *null*, return _map_.
           1. Let _adder_ be ? Get(_map_, *"set"*).
           1. Return ? AddEntriesFromIterable(_map_, _iterable_, _adder_).
         </emu-alg>
@@ -36196,7 +36156,6 @@ THH:mm:ss.sss
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
           1. Let _set_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakSet.prototype%"*, &laquo; [[WeakSetData]] &raquo;).
           1. Set _set_.[[WeakSetData]] to a new empty List.
-          1. If _iterable_ is not present, set _iterable_ to *undefined*.
           1. If _iterable_ is either *undefined* or *null*, return _set_.
           1. Let _adder_ be ? Get(_set_, *"add"*).
           1. If IsCallable(_adder_) is *false*, throw a *TypeError* exception.
@@ -36871,7 +36830,7 @@ THH:mm:ss.sss
           1. If IsDetachedBuffer(_buffer_) is *true*, throw a *TypeError* exception.
           1. Let _bufferByteLength_ be _buffer_.[[ArrayBufferByteLength]].
           1. If _offset_ &gt; _bufferByteLength_, throw a *RangeError* exception.
-          1. If _byteLength_ is either not present or *undefined*, then
+          1. If _byteLength_ is *undefined*, then
             1. Let _viewByteLength_ be _bufferByteLength_ - _offset_.
           1. Else,
             1. Let _viewByteLength_ be ? ToIndex(_byteLength_).
