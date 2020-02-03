@@ -960,7 +960,7 @@
           A code unit that is not a <emu-xref href="#leading-surrogate"></emu-xref> and not a <emu-xref href="#trailing-surrogate"></emu-xref> is interpreted as a code point with the same value.
         </li>
         <li>
-          A sequence of two code units, where the first code unit _c1_ is a <emu-xref href="#leading-surrogate"></emu-xref> and the second code unit _c2_ a <emu-xref href="#trailing-surrogate"></emu-xref>, is a <dfn id="surrogate-pair">surrogate pair</dfn> and is interpreted as a code point with the value (_c1_ - 0xD800) &times; 0x400 + (_c2_ - 0xDC00) + 0x10000. (See <emu-xref href="#sec-utf16decode"></emu-xref>)
+          A sequence of two code units, where the first code unit _c1_ is a <emu-xref href="#leading-surrogate"></emu-xref> and the second code unit _c2_ a <emu-xref href="#trailing-surrogate"></emu-xref>, is a <dfn id="surrogate-pair">surrogate pair</dfn> and is interpreted as a code point with the value (_c1_ - 0xD800) &times; 0x400 + (_c2_ - 0xDC00) + 0x10000. (See <emu-xref href="#sec-utf16decodesurrogatepair"></emu-xref>)
         </li>
         <li>
           A code unit that is a <emu-xref href="#leading-surrogate"></emu-xref> or <emu-xref href="#trailing-surrogate"></emu-xref>, but is not part of a <emu-xref href="#surrogate-pair"></emu-xref>, is interpreted as a code point with the same value.
@@ -2055,7 +2055,7 @@
       <p>Properties are identified using key values. A property key value is either an ECMAScript String value or a Symbol value. All String and Symbol values, including the empty String, are valid as property keys. A <dfn id="property-name">property name</dfn> is a property key that is a String value.</p>
       <p>An <dfn id="integer-index">integer index</dfn> is a String-valued property key that is a canonical numeric String (see <emu-xref href="#sec-canonicalnumericindexstring"></emu-xref>) and whose numeric value is either *+0* or a positive integer &le; 2<sup>53</sup> - 1. An <dfn id="array-index">array index</dfn> is an integer index whose numeric value _i_ is in the range <emu-eqn>+0 &le; _i_ &lt; 2<sup>32</sup> - 1</emu-eqn>.</p>
       <p>Property keys are used to access properties and their values. There are two kinds of access for properties: <em>get</em> and <em>set</em>, corresponding to value retrieval and assignment, respectively. The properties accessible via get and set access includes both <em>own properties</em> that are a direct part of an object and <em>inherited properties</em> which are provided by another associated object via a property inheritance relationship. Inherited properties may be either own or inherited properties of the associated object. Each own property of an object must each have a key value that is distinct from the key values of the other own properties of that object.</p>
-      <p>All objects are logically collections of properties, but there are multiple forms of objects that differ in their semantics for accessing and manipulating their properties. <dfn id="ordinary-objects">Ordinary objects</dfn> are the most common form of objects and have the default object semantics. An <dfn id="exotic-object">exotic object</dfn> is any form of object whose property semantics differ in any way from the default semantics.</p>
+      <p>All objects are logically collections of properties, but there are multiple forms of objects that differ in their semantics for accessing and manipulating their properties. Please see <emu-xref href="#sec-object-internal-methods-and-internal-slots"></emu-xref> for definitions of the multiple forms of objects.</p>
 
       <emu-clause id="sec-property-attributes">
         <h1>Property Attributes</h1>
@@ -2255,6 +2255,20 @@
         <p>Internal slots correspond to internal state that is associated with objects and used by various ECMAScript specification algorithms. Internal slots are not object properties and they are not inherited. Depending upon the specific internal slot specification, such state may consist of values of any ECMAScript language type or of specific ECMAScript specification type values. Unless explicitly specified otherwise, internal slots are allocated as part of the process of creating an object and may not be dynamically added to an object. Unless specified otherwise, the initial value of an internal slot is the value *undefined*. Various algorithms within this specification create objects that have internal slots. However, the ECMAScript language provides no direct way to associate internal slots with an object.</p>
         <p>Internal methods and internal slots are identified within this specification using names enclosed in double square brackets [[ ]].</p>
         <p><emu-xref href="#table-5"></emu-xref> summarizes the <em>essential internal methods</em> used by this specification that are applicable to all objects created or manipulated by ECMAScript code. Every object must have algorithms for all of the essential internal methods. However, all objects do not necessarily use the same algorithms for those methods.</p>
+        <p>An <dfn id="ordinary-object">ordinary object</dfn> is an object that satisfies all of the following criteria:</p>
+        <ul>
+          <li>
+            For the internal methods listed in <emu-xref href="#table-5"></emu-xref>, the object use those defined in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
+          </li>
+          <li>
+            If the object has a [[Call]] internal method, it uses the one defined in <emu-xref href="#sec-ecmascript-function-objects-call-thisargument-argumentslist"></emu-xref>.
+          </li>
+          <li>
+            If the object has a [[Construct]] internal method, it uses the one defined in <emu-xref href="#sec-ecmascript-function-objects-construct-argumentslist-newtarget"></emu-xref>.
+          </li>
+        </ul>
+        <p>An <dfn id="exotic-object">exotic object</dfn> is an object that is not an ordinary object.</p>
+        <p>This specification recognizes different kinds of exotic objects by those objects' internal methods. An object that is behaviourally equivalent to a particular kind of exotic object (such as an Array exotic object or a bound function exotic object), but does not have the same collection of internal methods specified for that kind, is not recognized as that kind of exotic object.</p>
         <p>The &ldquo;Signature&rdquo; column of <emu-xref href="#table-5"></emu-xref> and other similar tables describes the invocation pattern for each internal method. The invocation pattern always includes a parenthesized list of descriptive parameter names. If a parameter name is the same as an ECMAScript type name then the name describes the required type of the parameter value. If an internal method explicitly returns a value, its parameter list is followed by the symbol &ldquo;&rarr;&rdquo; and the type name of the returned value. The type names used in signatures refer to the types defined in clause <emu-xref href="#sec-ecmascript-data-types-and-values"></emu-xref> augmented by the following additional names. &ldquo;<em>any</em>&rdquo; means the value may be any ECMAScript language type.</p>
         <p>In addition to its parameters, an internal method always has access to the object that is the target of the method invocation.</p>
         <p>An internal method implicitly returns a Completion Record, either a normal completion that wraps a value of the return type shown in its invocation pattern, or a throw completion.</p>
@@ -2529,7 +2543,7 @@
           </li>
         </ul>
         <emu-note>
-          <p>As a consequence of the third invariant, if a property is described as a data property and it may return different values over time, then either or both of the [[Writable]] and [[Configurable]] attributes must be *true* even if no mechanism to change the value is exposed via the other internal methods.</p>
+          <p>As a consequence of the third invariant, if a property is described as a data property and it may return different values over time, then either or both of the [[Writable]] and [[Configurable]] attributes must be *true* even if no mechanism to change the value is exposed via the other essential internal methods.</p>
         </emu-note>
         <h2>[[DefineOwnProperty]] ( _P_, _Desc_ )</h2>
         <ul>
@@ -4299,7 +4313,7 @@
         <p>When the abstract operation FromPropertyDescriptor is called with Property Descriptor _Desc_, the following steps are taken:</p>
         <emu-alg>
           1. If _Desc_ is *undefined*, return *undefined*.
-          1. Let _obj_ be ObjectCreate(%Object.prototype%).
+          1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Assert: _obj_ is an extensible ordinary object with no own properties.
           1. If _Desc_ has a [[Value]] field, then
             1. Perform ! CreateDataPropertyOrThrow(_obj_, *"value"*, _Desc_.[[Value]]).
@@ -5606,6 +5620,25 @@
   <emu-clause id="sec-operations-on-objects">
     <h1>Operations on Objects</h1>
 
+    <emu-clause id="sec-makebasicobject" aoid="MakeBasicObject">
+      <h1>MakeBasicObject ( _internalSlotsList_ )</h1>
+      <p>The abstract operation MakeBasicObject is the source of all ECMAScript objects that are created algorithmically, including both ordinary objects and exotic objects. It factors out common steps used in creating all objects, and centralizes object creation.</p>
+
+      <emu-alg>
+        1. Assert: _internalSlotsList_ is a List of internal slot names.
+        1. Let _obj_ be a newly created object with an internal slot for each name in _internalSlotsList_.
+        1. Set _obj_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
+        1. Assert: If the caller will not be overriding both _obj_'s [[GetPrototypeOf]] and [[SetPrototypeOf]] essential internal methods, then _internalSlotsList_ contains [[Prototype]].
+        1. Assert: If the caller will not be overriding all of _obj_'s [[SetPrototypeOf]], [[IsExtensible]], and [[PreventExtensions]] essential internal methods, then _internalSlotsList_ contains [[Extensible]].
+        1. If _internalSlotsList_ contains [[Extensible]], then set _obj_.[[Extensible]] to *true*.
+        1. Return _obj_.
+      </emu-alg>
+
+      <emu-note>
+        <p>Within this specification, exotic objects are created in abstract operations such as ArrayCreate and BoundFunctionCreate by first calling MakeBasicObject to obtain a basic, foundational object, and then overriding some or all of that object's internal methods. In order to encapsulate exotic object creation, the object's essential internal methods are never modified outside those operations.</p>
+      </emu-note>
+    </emu-clause>
+
     <emu-clause id="sec-get-o-p" aoid="Get">
       <h1>Get ( _O_, _P_ )</h1>
       <p>The abstract operation Get is used to retrieve the value of a specific property of an object. The operation is called with arguments _O_ and _P_ where _O_ is the object and _P_ is the property key. This abstract operation performs the following steps:</p>
@@ -5935,7 +5968,7 @@
         1. Assert: ! IsCallable(_obj_) is *true*.
         1. If _obj_ has a [[Realm]] internal slot, then
           1. Return _obj_.[[Realm]].
-        1. If _obj_ is a Bound Function exotic object, then
+        1. If _obj_ is a bound function exotic object, then
           1. Let _target_ be _obj_.[[BoundTargetFunction]].
           1. Return ? GetFunctionRealm(_target_).
         1. If _obj_ is a Proxy exotic object, then
@@ -6085,7 +6118,7 @@
       <p>The abstract operation CreateIterResultObject with arguments _value_ and _done_ creates an object that supports the IteratorResult interface by performing the following steps:</p>
       <emu-alg>
         1. Assert: Type(_done_) is Boolean.
-        1. Let _obj_ be ObjectCreate(%Object.prototype%).
+        1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
         1. Perform ! CreateDataPropertyOrThrow(_obj_, *"value"*, _value_).
         1. Perform ! CreateDataPropertyOrThrow(_obj_, *"done"*, _done_).
         1. Return _obj_.
@@ -6096,7 +6129,7 @@
       <h1>CreateListIteratorRecord ( _list_ )</h1>
       <p>The abstract operation CreateListIteratorRecord with argument _list_ creates an Iterator (<emu-xref href="#sec-iterator-interface"></emu-xref>) object record whose next method returns the successive elements of _list_. It performs the following steps:</p>
       <emu-alg>
-        1. Let _iterator_ be ObjectCreate(%IteratorPrototype%, &laquo; [[IteratedList]], [[ListNextIndex]] &raquo;).
+        1. Let _iterator_ be OrdinaryObjectCreate(%IteratorPrototype%, &laquo; [[IteratedList]], [[ListNextIndex]] &raquo;).
         1. Set _iterator_.[[IteratedList]] to _list_.
         1. Set _iterator_.[[ListNextIndex]] to 0.
         1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-listiteratornext-functions" title></emu-xref>.
@@ -7330,7 +7363,7 @@
       <emu-alg>
         1. If _globalObj_ is *undefined*, then
           1. Let _intrinsics_ be _realmRec_.[[Intrinsics]].
-          1. Set _globalObj_ to ObjectCreate(_intrinsics_.[[%Object.prototype%]]).
+          1. Set _globalObj_ to OrdinaryObjectCreate(_intrinsics_.[[%Object.prototype%]]).
         1. Assert: Type(_globalObj_) is Object.
         1. If _thisValue_ is *undefined*, set _thisValue_ to _globalObj_.
         1. Set _realmRec_.[[GlobalObject]] to _globalObj_.
@@ -8223,17 +8256,20 @@
       </emu-clause>
     </emu-clause>
 
-    <emu-clause id="sec-objectcreate" aoid="ObjectCreate">
-      <h1>ObjectCreate ( _proto_ [ , _internalSlotsList_ ] )</h1>
-      <p>The abstract operation ObjectCreate with argument _proto_ (an object or null) is used to specify the runtime creation of new ordinary objects. The optional argument _internalSlotsList_ is a List of the names of additional internal slots that must be defined as part of the object. If the list is not provided, a new empty List is used. This abstract operation performs the following steps:</p>
+    <emu-clause id="sec-ordinaryobjectcreate" aoid="OrdinaryObjectCreate" oldids="sec-objectcreate">
+      <h1>OrdinaryObjectCreate ( _proto_ [ , _additionalInternalSlotsList_ ] )</h1>
+      <p>The abstract operation OrdinaryObjectCreate with argument _proto_ (an object or *null*) is used to specify the runtime creation of new ordinary objects. The optional argument _additionalInternalSlotsList_ is a List of the names of additional internal slots that must be defined as part of the object, beyond [[Prototype]] and [[Extensible]]. If the list is not provided, a new empty List is used. This abstract operation performs the following steps:</p>
       <emu-alg>
-        1. If _internalSlotsList_ is not present, set _internalSlotsList_ to a new empty List.
-        1. Let _obj_ be a newly created object with an internal slot for each name in _internalSlotsList_.
-        1. Set _obj_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
-        1. Set _obj_.[[Prototype]] to _proto_.
-        1. Set _obj_.[[Extensible]] to *true*.
-        1. Return _obj_.
+        1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]] &raquo;.
+        1. If _additionalInternalSlotsList_ is present, append each of its elements to _internalSlotsList_.
+        1. Let _O_ be ! MakeBasicObject(_internalSlotsList_).
+        1. Set _O_.[[Prototype]] to _proto_.
+        1. Return _O_.
       </emu-alg>
+
+      <emu-note>
+        <p>Although OrdinaryObjectCreate does little more than call MakeBasicObject, its use communicates the intention to create an ordinary object, and not an exotic one. Thus, within this specification, it is not called by any algorithm that subsequently modifies the internal methods of the object in ways that would make the result non-ordinary. Operations that create exotic objects invoke MakeBasicObject directly.</p>
+      </emu-note>
     </emu-clause>
 
     <emu-clause id="sec-ordinarycreatefromconstructor" aoid="OrdinaryCreateFromConstructor">
@@ -8242,7 +8278,7 @@
       <emu-alg>
         1. Assert: _intrinsicDefaultProto_ is a String value that is this specification's name of an intrinsic object. The corresponding object must be an intrinsic that is intended to be used as the [[Prototype]] value of an object.
         1. Let _proto_ be ? GetPrototypeFromConstructor(_constructor_, _intrinsicDefaultProto_).
-        1. Return ObjectCreate(_proto_, _internalSlotsList_).
+        1. Return OrdinaryObjectCreate(_proto_, _internalSlotsList_).
       </emu-alg>
     </emu-clause>
 
@@ -8276,7 +8312,7 @@
   <emu-clause id="sec-ecmascript-function-objects">
     <h1>ECMAScript Function Objects</h1>
     <p>ECMAScript function objects encapsulate parameterized ECMAScript code closed over a lexical environment and support the dynamic evaluation of that code. An ECMAScript function object is an ordinary object and has the same internal slots and the same internal methods as other ordinary objects. The code of an ECMAScript function object may be either strict mode code (<emu-xref href="#sec-strict-mode-code"></emu-xref>) or non-strict code. An ECMAScript function object whose code is strict mode code is called a <dfn id="strict-function">strict function</dfn>. One whose code is not strict mode code is called a <dfn id="non-strict-function">non-strict function</dfn>.</p>
-    <p>ECMAScript function objects have the additional internal slots listed in <emu-xref href="#table-27"></emu-xref>.</p>
+    <p>In addition to [[Extensible]] and [[Prototype]], ECMAScript function objects also have the internal slots listed in <emu-xref href="#table-27"></emu-xref>.</p>
     <emu-table id="table-27" caption="Internal Slots of ECMAScript Function Objects">
       <table>
         <tbody>
@@ -8523,11 +8559,9 @@
       <p>The abstract operation OrdinaryFunctionCreate requires the arguments: an object _functionPrototype_, a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, _thisMode_ which is either ~lexical-this~ or ~non-lexical-this~, and a Lexical Environment specified by _Scope_. OrdinaryFunctionCreate performs the following steps:</p>
       <emu-alg>
         1. Assert: Type(_functionPrototype_) is Object.
-        1. Let _F_ be a newly created ECMAScript function object with the internal slots listed in <emu-xref href="#table-27"></emu-xref>.
-        1. Set _F_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
+        1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-27"></emu-xref>.
+        1. Let _F_ be ! OrdinaryObjectCreate(_functionPrototype_, _internalSlotsList_).
         1. Set _F_.[[Call]] to the definition specified in <emu-xref href="#sec-ecmascript-function-objects-call-thisargument-argumentslist"></emu-xref>.
-        1. Set _F_.[[Prototype]] to _functionPrototype_.
-        1. Set _F_.[[Extensible]] to *true*.
         1. Set _F_.[[FormalParameters]] to _ParameterList_.
         1. Set _F_.[[ECMAScriptCode]] to _Body_.
         1. If the source text matching _Body_ is strict mode code, let _Strict_ be *true*; else let _Strict_ be *false*.
@@ -8539,6 +8573,7 @@
         1. Set _F_.[[Environment]] to _Scope_.
         1. Set _F_.[[ScriptOrModule]] to GetActiveScriptOrModule().
         1. Set _F_.[[Realm]] to the current Realm Record.
+        1. Set _F_.[[HomeObject]] to *undefined*.
         1. Let _len_ be the ExpectedArgumentCount of _ParameterList_.
         1. Perform ! SetFunctionLength(_F_, _len_).
         1. Return _F_.
@@ -8577,7 +8612,7 @@
         1. Set _F_.[[ConstructorKind]] to ~base~.
         1. If _writablePrototype_ is not present, set _writablePrototype_ to *true*.
         1. If _prototype_ is not present, then
-          1. Set _prototype_ to ObjectCreate(%Object.prototype%).
+          1. Set _prototype_ to OrdinaryObjectCreate(%Object.prototype%).
           1. Perform ! DefinePropertyOrThrow(_prototype_, *"constructor"*, PropertyDescriptor { [[Value]]: _F_, [[Writable]]: _writablePrototype_, [[Enumerable]]: *false*, [[Configurable]]: *true* }).
         1. Perform ! DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: _writablePrototype_, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Return NormalCompletion(*undefined*).
@@ -8833,8 +8868,11 @@
 
     <emu-clause id="sec-bound-function-exotic-objects">
       <h1>Bound Function Exotic Objects</h1>
-      <p>A <dfn>bound function</dfn> is an exotic object that wraps another function object. A bound function is callable (it has a [[Call]] internal method and may have a [[Construct]] internal method). Calling a bound function generally results in a call of its wrapped function.</p>
-      <p>Bound function objects do not have the internal slots of ECMAScript function objects defined in <emu-xref href="#table-27"></emu-xref>. Instead they have the internal slots defined in <emu-xref href="#table-28"></emu-xref>.</p>
+      <p>A bound function exotic object is an exotic object that wraps another function object. A bound function exotic object is callable (it has a [[Call]] internal method and may have a [[Construct]] internal method). Calling a bound function exotic object generally results in a call of its wrapped function.</p>
+
+      <p>An object is a <dfn id="bound-function-exotic-object">bound function exotic object</dfn> if its [[Call]] and (if applicable) [[Construct]] internal methods use the following implementations, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed in BoundFunctionCreate.</p>
+
+      <p>Bound function exotic objects do not have the internal slots of ECMAScript function objects listed in <emu-xref href="#table-27"></emu-xref>. Instead they have the internal slots listed in <emu-xref href="#table-28"></emu-xref>, in addition to [[Prototype]] and [[Extensible]].</p>
       <emu-table id="table-28" caption="Internal Slots of Bound Function Exotic Objects">
         <table>
           <tbody>
@@ -8885,7 +8923,6 @@
           </tbody>
         </table>
       </emu-table>
-      <p>Bound function objects provide all of the essential internal methods as specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. However, they use the following definitions for the essential internal methods of function objects.</p>
 
       <emu-clause id="sec-bound-function-exotic-objects-call-thisargument-argumentslist">
         <h1>[[Call]] ( _thisArgument_, _argumentsList_ )</h1>
@@ -8914,17 +8951,16 @@
 
       <emu-clause id="sec-boundfunctioncreate" aoid="BoundFunctionCreate">
         <h1>BoundFunctionCreate ( _targetFunction_, _boundThis_, _boundArgs_ )</h1>
-        <p>The abstract operation BoundFunctionCreate with arguments _targetFunction_, _boundThis_ and _boundArgs_ is used to specify the creation of new Bound Function exotic objects. It performs the following steps:</p>
+        <p>The abstract operation BoundFunctionCreate with arguments _targetFunction_, _boundThis_, and _boundArgs_ is used to specify the creation of new bound function exotic objects. It performs the following steps:</p>
         <emu-alg>
           1. Assert: Type(_targetFunction_) is Object.
           1. Let _proto_ be ? _targetFunction_.[[GetPrototypeOf]]().
-          1. Let _obj_ be a newly created bound function exotic object with the internal slots listed in <emu-xref href="#table-28"></emu-xref>.
-          1. Set _obj_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
+          1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-28"></emu-xref>, plus [[Prototype]] and [[Extensible]].
+          1. Let _obj_ be ! MakeBasicObject(_internalSlotsList_).
+          1. Set _obj_.[[Prototype]] to _proto_.
           1. Set _obj_.[[Call]] as described in <emu-xref href="#sec-bound-function-exotic-objects-call-thisargument-argumentslist"></emu-xref>.
           1. If IsConstructor(_targetFunction_) is *true*, then
             1. Set _obj_.[[Construct]] as described in <emu-xref href="#sec-bound-function-exotic-objects-construct-argumentslist-newtarget"></emu-xref>.
-          1. Set _obj_.[[Prototype]] to _proto_.
-          1. Set _obj_.[[Extensible]] to *true*.
           1. Set _obj_.[[BoundTargetFunction]] to _targetFunction_.
           1. Set _obj_.[[BoundThis]] to _boundThis_.
           1. Set _obj_.[[BoundArguments]] to _boundArgs_.
@@ -8935,11 +8971,12 @@
 
     <emu-clause id="sec-array-exotic-objects">
       <h1>Array Exotic Objects</h1>
-      <p>An <em>Array object</em> is an exotic object that gives special treatment to array index property keys (see <emu-xref href="#sec-object-type"></emu-xref>). A property whose property name is an array index is also called an <em>element</em>. Every Array object has a non-configurable *"length"* property whose value is always a nonnegative integer less than 2<sup>32</sup>. The value of the *"length"* property is numerically greater than the name of every own property whose name is an array index; whenever an own property of an Array object is created or changed, other properties are adjusted as necessary to maintain this invariant. Specifically, whenever an own property is added whose name is an array index, the value of the *"length"* property is changed, if necessary, to be one more than the numeric value of that array index; and whenever the value of the *"length"* property is changed, every own property whose name is an array index whose value is not smaller than the new length is deleted. This constraint applies only to own properties of an Array object and is unaffected by *"length"* or array index properties that may be inherited from its prototypes.</p>
+      <p>An Array object is an exotic object that gives special treatment to array index property keys (see <emu-xref href="#sec-object-type"></emu-xref>). A property whose property name is an array index is also called an <em>element</em>. Every Array object has a non-configurable *"length"* property whose value is always a nonnegative integer less than 2<sup>32</sup>. The value of the *"length"* property is numerically greater than the name of every own property whose name is an array index; whenever an own property of an Array object is created or changed, other properties are adjusted as necessary to maintain this invariant. Specifically, whenever an own property is added whose name is an array index, the value of the *"length"* property is changed, if necessary, to be one more than the numeric value of that array index; and whenever the value of the *"length"* property is changed, every own property whose name is an array index whose value is not smaller than the new length is deleted. This constraint applies only to own properties of an Array object and is unaffected by *"length"* or array index properties that may be inherited from its prototypes.</p>
       <emu-note>
         <p>A String property name _P_ is an <em>array index</em> if and only if ToString(ToUint32(_P_)) is equal to _P_ and ToUint32(_P_) is not equal to <emu-eqn>2<sup>32</sup> - 1</emu-eqn>.</p>
       </emu-note>
-      <p>Array exotic objects provide an alternative definition for the [[DefineOwnProperty]] internal method. Except for that internal method, Array exotic objects provide all of the other essential internal methods as specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.</p>
+
+      <p>An object is an <dfn id="array-exotic-object">Array exotic object</dfn> (or simply, an Array object) if its [[DefineOwnProperty]] internal method uses the following implementation, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed in ArrayCreate.</p>
 
       <emu-clause id="sec-array-exotic-objects-defineownproperty-p-desc">
         <h1>[[DefineOwnProperty]] ( _P_, _Desc_ )</h1>
@@ -8952,6 +8989,7 @@
             1. Let _oldLenDesc_ be OrdinaryGetOwnProperty(_A_, *"length"*).
             1. Assert: _oldLenDesc_ will never be *undefined* or an accessor descriptor because Array objects are created with a length data property that cannot be deleted or reconfigured.
             1. Let _oldLen_ be _oldLenDesc_.[[Value]].
+            1. Assert: IsNonNegativeInteger(_oldLen_) is *true*.
             1. Let _index_ be ! ToUint32(_P_).
             1. If _index_ &ge; _oldLen_ and _oldLenDesc_.[[Writable]] is *false*, return *false*.
             1. Let _succeeded_ be ! OrdinaryDefineOwnProperty(_A_, _P_, _Desc_).
@@ -8973,11 +9011,9 @@
           1. If _length_ is *-0*, set _length_ to *+0*.
           1. If _length_ &gt; 2<sup>32</sup> - 1, throw a *RangeError* exception.
           1. If _proto_ is not present, set _proto_ to %Array.prototype%.
-          1. Let _A_ be a newly created Array exotic object.
-          1. Set _A_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
-          1. Set _A_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-array-exotic-objects-defineownproperty-p-desc"></emu-xref>.
+          1. Let _A_ be ! MakeBasicObject(&laquo; [[Prototype]], [[Extensible]] &raquo;).
           1. Set _A_.[[Prototype]] to _proto_.
-          1. Set _A_.[[Extensible]] to *true*.
+          1. Set _A_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-array-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Perform ! OrdinaryDefineOwnProperty(_A_, *"length"*, PropertyDescriptor { [[Value]]: _length_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
           1. Return _A_.
         </emu-alg>
@@ -9052,9 +9088,11 @@
 
     <emu-clause id="sec-string-exotic-objects">
       <h1>String Exotic Objects</h1>
-      <p>A <em>String object</em> is an exotic object that encapsulates a String value and exposes virtual integer-indexed data properties corresponding to the individual code unit elements of the String value. String exotic objects always have a data property named *"length"* whose value is the number of code unit elements in the encapsulated String value. Both the code unit data properties and the *"length"* property are non-writable and non-configurable.</p>
+      <p>A String object is an exotic object that encapsulates a String value and exposes virtual integer-indexed data properties corresponding to the individual code unit elements of the String value. String exotic objects always have a data property named *"length"* whose value is the number of code unit elements in the encapsulated String value. Both the code unit data properties and the *"length"* property are non-writable and non-configurable.</p>
+
+      <p>An object is a <dfn id="string-exotic-object">String exotic object</dfn> (or simply, a String object) if its [[GetOwnProperty]], [[DefineOwnProperty]], and [[OwnPropertyKeys]] internal methods use the following implementations, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed in StringCreate.</p>
+
       <p>String exotic objects have the same internal slots as ordinary objects. They also have a [[StringData]] internal slot.</p>
-      <p>String exotic objects provide alternative definitions for the following internal methods. All of the other String exotic object essential internal methods that are not defined below are as specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.</p>
 
       <emu-clause id="sec-string-exotic-objects-getownproperty-p">
         <h1>[[GetOwnProperty]] ( _P_ )</h1>
@@ -9105,14 +9143,12 @@
         <p>The abstract operation StringCreate with arguments _value_ and _prototype_ is used to specify the creation of new String exotic objects. It performs the following steps:</p>
         <emu-alg>
           1. Assert: Type(_value_) is String.
-          1. Let _S_ be a newly created String exotic object with a [[StringData]] internal slot.
+          1. Let _S_ be ! MakeBasicObject(&laquo; [[Prototype]], [[Extensible]], [[StringData]] &raquo;).
+          1. Set _S_.[[Prototype]] to _prototype_.
           1. Set _S_.[[StringData]] to _value_.
-          1. Set _S_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
           1. Set _S_.[[GetOwnProperty]] as specified in <emu-xref href="#sec-string-exotic-objects-getownproperty-p"></emu-xref>.
           1. Set _S_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-string-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Set _S_.[[OwnPropertyKeys]] as specified in <emu-xref href="#sec-string-exotic-objects-ownpropertykeys"></emu-xref>.
-          1. Set _S_.[[Prototype]] to _prototype_.
-          1. Set _S_.[[Extensible]] to *true*.
           1. Let _length_ be the number of code unit elements in _value_.
           1. Perform ! DefinePropertyOrThrow(_S_, *"length"*, PropertyDescriptor { [[Value]]: _length_, [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
           1. Return _S_.
@@ -9142,9 +9178,17 @@
 
     <emu-clause id="sec-arguments-exotic-objects">
       <h1>Arguments Exotic Objects</h1>
-      <p>Most ECMAScript functions make an arguments object available to their code. Depending upon the characteristics of the function definition, its arguments object is either an ordinary object or an <em>arguments exotic object</em>. An arguments exotic object is an exotic object whose array index properties map to the formal parameters bindings of an invocation of its associated ECMAScript function.</p>
+
+      <p>Most ECMAScript functions make an arguments object available to their code. Depending upon the characteristics of the function definition, its arguments object is either an ordinary object or an arguments exotic object. An arguments exotic object is an exotic object whose array index properties map to the formal parameters bindings of an invocation of its associated ECMAScript function.</p>
+
+      <p>An object is an <dfn id="arguments-exotic-object">arguments exotic object</dfn> if its internal methods use the following implementations, with the ones not specified here using those found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed in CreateMappedArgumentsObject.</p>
+
+      <emu-note>
+        <p>While CreateUnmappedArgumentsObject is grouped into this clause, it creates an ordinary object, not an arguments exotic object.</p>
+      </emu-note>
+
       <p>Arguments exotic objects have the same internal slots as ordinary objects. They also have a [[ParameterMap]] internal slot. Ordinary arguments objects also have a [[ParameterMap]] internal slot whose value is always undefined. For ordinary argument objects the [[ParameterMap]] internal slot is only used by `Object.prototype.toString` (<emu-xref href="#sec-object.prototype.tostring"></emu-xref>) to identify them as such.</p>
-      <p>Arguments exotic objects provide alternative definitions for the following internal methods. All of the other arguments exotic object essential internal methods that are not defined below are as specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref></p>
+
       <emu-note>
         <p>The integer-indexed data properties of an arguments exotic object whose numeric name values are less than the number of formal parameters of the corresponding function object initially share their values with the corresponding argument bindings in the function's execution context. This means that changing the property changes the corresponding value of the argument binding and vice-versa. This correspondence is broken if such a property is deleted and then redefined or if the property is changed into an accessor property. If the arguments object is an ordinary object, the values of its properties are simply a copy of the arguments passed to the function and there is no dynamic linkage between the property values and the formal parameter values.</p>
       </emu-note>
@@ -9251,7 +9295,7 @@
         <p>The abstract operation CreateUnmappedArgumentsObject called with an argument _argumentsList_ performs the following steps:</p>
         <emu-alg>
           1. Let _len_ be the number of elements in _argumentsList_.
-          1. Let _obj_ be ObjectCreate(%Object.prototype%, &laquo; [[ParameterMap]] &raquo;).
+          1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%, &laquo; [[ParameterMap]] &raquo;).
           1. Set _obj_.[[ParameterMap]] to *undefined*.
           1. Perform DefinePropertyOrThrow(_obj_, *"length"*, PropertyDescriptor { [[Value]]: _len_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }).
           1. Let _index_ be 0.
@@ -9271,16 +9315,14 @@
         <emu-alg>
           1. Assert: _formals_ does not contain a rest parameter, any binding patterns, or any initializers. It may contain duplicate identifiers.
           1. Let _len_ be the number of elements in _argumentsList_.
-          1. Let _obj_ be a newly created arguments exotic object with a [[ParameterMap]] internal slot.
-          1. Set _obj_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
+          1. Let _obj_ be ! MakeBasicObject(&laquo; [[Prototype]], [[Extensible]], [[ParameterMap]] &raquo;).
           1. Set _obj_.[[GetOwnProperty]] as specified in <emu-xref href="#sec-arguments-exotic-objects-getownproperty-p"></emu-xref>.
           1. Set _obj_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-arguments-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Set _obj_.[[Get]] as specified in <emu-xref href="#sec-arguments-exotic-objects-get-p-receiver"></emu-xref>.
           1. Set _obj_.[[Set]] as specified in <emu-xref href="#sec-arguments-exotic-objects-set-p-v-receiver"></emu-xref>.
           1. Set _obj_.[[Delete]] as specified in <emu-xref href="#sec-arguments-exotic-objects-delete-p"></emu-xref>.
           1. Set _obj_.[[Prototype]] to %Object.prototype%.
-          1. Set _obj_.[[Extensible]] to *true*.
-          1. Let _map_ be ObjectCreate(*null*).
+          1. Let _map_ be OrdinaryObjectCreate(*null*).
           1. Set _obj_.[[ParameterMap]] to _map_.
           1. Let _parameterNames_ be the BoundNames of _formals_.
           1. Let _numberOfParameters_ be the number of elements in _parameterNames_.
@@ -9354,9 +9396,9 @@
 
     <emu-clause id="sec-integer-indexed-exotic-objects">
       <h1>Integer-Indexed Exotic Objects</h1>
-      <p>An <dfn id="integer-indexed-exotic-object">Integer-Indexed exotic object</dfn> is an exotic object that performs special handling of integer index property keys.</p>
+      <p>An Integer-Indexed exotic object is an exotic object that performs special handling of integer index property keys.</p>
       <p><emu-xref href="#integer-indexed-exotic-object">Integer-Indexed exotic objects</emu-xref> have the same internal slots as ordinary objects and additionally [[ViewedArrayBuffer]], [[ArrayLength]], [[ByteOffset]], [[ContentType]], and [[TypedArrayName]] internal slots.</p>
-      <p><emu-xref href="#integer-indexed-exotic-object">Integer-Indexed exotic objects</emu-xref> provide alternative definitions for the following internal methods. All of the other Integer-Indexed exotic object essential internal methods that are not defined below are as specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.</p>
+      <p>An object is an <dfn id="integer-indexed-exotic-object">Integer-Indexed exotic object</dfn> if its [[GetOwnProperty]], [[HasProperty]], [[DefineOwnProperty]], [[Get]], [[Set]], and [[OwnPropertyKeys]] internal methods use the definitions in this section, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed by IntegerIndexedObjectCreate.</p>
 
       <emu-clause id="sec-integer-indexed-exotic-objects-getownproperty-p">
         <h1>[[GetOwnProperty]] ( _P_ )</h1>
@@ -9457,12 +9499,11 @@
       </emu-clause>
 
       <emu-clause id="sec-integerindexedobjectcreate" aoid="IntegerIndexedObjectCreate">
-        <h1>IntegerIndexedObjectCreate ( _prototype_, _internalSlotsList_ )</h1>
-        <p>The abstract operation IntegerIndexedObjectCreate with arguments _prototype_ and _internalSlotsList_ is used to specify the creation of new <emu-xref href="#integer-indexed-exotic-object">Integer-Indexed exotic objects</emu-xref>. The argument _internalSlotsList_ is a List of the names of additional internal slots that must be defined as part of the object. IntegerIndexedObjectCreate performs the following steps:</p>
+        <h1>IntegerIndexedObjectCreate ( _prototype_ )</h1>
+        <p>The abstract operation IntegerIndexedObjectCreate is used to specify the creation of new <emu-xref href="#integer-indexed-exotic-object">Integer-Indexed exotic objects</emu-xref>. IntegerIndexedObjectCreate performs the following steps:</p>
         <emu-alg>
-          1. Assert: _internalSlotsList_ contains the names [[ViewedArrayBuffer]], [[ArrayLength]], [[ByteOffset]], [[ContentType]], and [[TypedArrayName]].
-          1. Let _A_ be a newly created Integer-Indexed exotic object with an internal slot for each name in _internalSlotsList_.
-          1. Set _A_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
+          1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]], [[ViewedArrayBuffer]], [[TypedArrayName]], [[ContentType]], [[ByteLength]], [[ByteOffset]], [[ArrayLength]] &raquo;.
+          1. Let _A_ be ! MakeBasicObject(_internalSlotsList_).
           1. Set _A_.[[GetOwnProperty]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-getownproperty-p"></emu-xref>.
           1. Set _A_.[[HasProperty]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-hasproperty-p"></emu-xref>.
           1. Set _A_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-defineownproperty-p-desc"></emu-xref>.
@@ -9470,7 +9511,6 @@
           1. Set _A_.[[Set]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-set-p-v-receiver"></emu-xref>.
           1. Set _A_.[[OwnPropertyKeys]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-ownpropertykeys"></emu-xref>.
           1. Set _A_.[[Prototype]] to _prototype_.
-          1. Set _A_.[[Extensible]] to *true*.
           1. Return _A_.
         </emu-alg>
       </emu-clause>
@@ -9530,8 +9570,9 @@
 
     <emu-clause id="sec-module-namespace-exotic-objects">
       <h1>Module Namespace Exotic Objects</h1>
-      <p>A <em>module namespace object</em> is an exotic object that exposes the bindings exported from an ECMAScript |Module| (See <emu-xref href="#sec-exports"></emu-xref>). There is a one-to-one correspondence between the String-keyed own properties of a module namespace exotic object and the binding names exported by the |Module|. The exported bindings include any bindings that are indirectly exported using `export *` export items. Each String-valued own property key is the StringValue of the corresponding exported binding name. These are the only String-keyed properties of a module namespace exotic object. Each such property has the attributes { [[Writable]]: *true*, [[Enumerable]]: *true*, [[Configurable]]: *false* }. Module namespace objects are not extensible.</p>
-      <p>Module namespace objects have the internal slots defined in <emu-xref href="#table-29"></emu-xref>.</p>
+      <p>A module namespace exotic object is an exotic object that exposes the bindings exported from an ECMAScript |Module| (See <emu-xref href="#sec-exports"></emu-xref>). There is a one-to-one correspondence between the String-keyed own properties of a module namespace exotic object and the binding names exported by the |Module|. The exported bindings include any bindings that are indirectly exported using `export *` export items. Each String-valued own property key is the StringValue of the corresponding exported binding name. These are the only String-keyed properties of a module namespace exotic object. Each such property has the attributes { [[Writable]]: *true*, [[Enumerable]]: *true*, [[Configurable]]: *false* }. Module namespace exotic objects are not extensible.</p>
+      <p>An object is a <dfn id="module-namespace-exotic-object">module namespace exotic object</dfn> if its [[SetPrototypeOf]], [[IsExtensible]], [[PreventExtensions]], [[GetOwnProperty]], [[DefineOwnProperty]], [[HasProperty]], [[Get]], [[Set]], [[Delete]], and [[OwnPropertyKeys]] internal methods use the definitions in this section, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed by ModuleNamespaceCreate.</p>
+      <p>Module namespace exotic objects have the internal slots defined in <emu-xref href="#table-29"></emu-xref>.</p>
       <emu-table id="table-29" caption="Internal Slots of Module Namespace Exotic Objects">
         <table>
           <tbody>
@@ -9712,8 +9753,10 @@
           1. Assert: _module_ is a Module Record.
           1. Assert: _module_.[[Namespace]] is *undefined*.
           1. Assert: _exports_ is a List of String values.
-          1. Let _M_ be a newly created module namespace exotic object with the internal slots listed in <emu-xref href="#table-29"></emu-xref>.
+          1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-29"></emu-xref>.
+          1. Let _M_ be ! MakeBasicObject(_internalSlotsList_).
           1. Set _M_'s essential internal methods to the definitions specified in <emu-xref href="#sec-module-namespace-exotic-objects"></emu-xref>.
+          1. Set _M_.[[Prototype]] to *null*.
           1. Set _M_.[[Module]] to _module_.
           1. Let _sortedExports_ be a new List containing the same values as the list _exports_ where the values are ordered as if an Array of the same values had been sorted using `Array.prototype.sort` using *undefined* as _comparefn_.
           1. Set _M_.[[Exports]] to _sortedExports_.
@@ -9726,9 +9769,13 @@
 
     <emu-clause id="sec-immutable-prototype-exotic-objects">
       <h1>Immutable Prototype Exotic Objects</h1>
-      <p>An <dfn>immutable prototype exotic object</dfn> is an exotic object that has a [[Prototype]] internal slot that will not change once it is initialized.</p>
+      <p>An immutable prototype exotic object is an exotic object that has a [[Prototype]] internal slot that will not change once it is initialized.</p>
 
-      <p>Immutable prototype exotic objects have the same internal slots as ordinary objects. They are exotic only in the following internal methods. All other internal methods of immutable prototype exotic objects that are not explicitly defined below are instead defined as in <a href="#sec-ordinary-object-internal-methods-and-internal-slots">ordinary objects.</a></p>
+      <p>An object is an <dfn id="immutable-prototype-exotic-object">immutable prototype exotic object</dfn> if its [[SetPrototypeOf]] internal method uses the following implementation. (Its other essential internal methods may use any implementation, depending on the specific immutable prototype exotic object in question.)</p>
+
+      <emu-note>
+        <p>Unlike other exotic objects, there is not a dedicated creation abstract operation provided for immutable prototype exotic objects. This is because they are only used by %ObjectPrototype% and by host environments, and in host environments, the relevant objects are potentially exotic in other ways and thus need their own dedicated creation operation.</p>
+      </emu-note>
 
       <emu-clause id="sec-immutable-prototype-exotic-objects-setprototypeof-v">
         <h1>[[SetPrototypeOf]] ( _V_ )</h1>
@@ -9754,6 +9801,9 @@
   <emu-clause id="sec-proxy-object-internal-methods-and-internal-slots">
     <h1>Proxy Object Internal Methods and Internal Slots</h1>
     <p>A proxy object is an exotic object whose essential internal methods are partially implemented using ECMAScript code. Every proxy object has an internal slot called [[ProxyHandler]]. The value of [[ProxyHandler]] is an object, called the proxy's <em>handler object</em>, or *null*. Methods (see <emu-xref href="#table-30"></emu-xref>) of a handler object may be used to augment the implementation for one or more of the proxy object's internal methods. Every proxy object also has an internal slot called [[ProxyTarget]] whose value is either an object or the *null* value. This object is called the proxy's <em>target object</em>.</p>
+
+    <p>An object is a <dfn id="proxy-exotic-object">Proxy exotic object</dfn> if its essential internal methods (including [[Call]] and [[Construct]], if applicable) use the definitions in this section. These internal methods are installed in ProxyCreate.</p>
+
     <emu-table id="table-30" caption="Proxy Handler Methods">
       <table>
         <tbody>
@@ -10375,8 +10425,8 @@
         1. If _target_ is a Proxy exotic object and _target_.[[ProxyHandler]] is *null*, throw a *TypeError* exception.
         1. If Type(_handler_) is not Object, throw a *TypeError* exception.
         1. If _handler_ is a Proxy exotic object and _handler_.[[ProxyHandler]] is *null*, throw a *TypeError* exception.
-        1. Let _P_ be a newly created Proxy exotic object with internal slots [[ProxyTarget]] and [[ProxyHandler]].
-        1. Set _P_'s essential internal methods (except for [[Call]] and [[Construct]]) to the definitions specified in <emu-xref href="#sec-proxy-object-internal-methods-and-internal-slots"></emu-xref>.
+        1. Let _P_ be ! MakeBasicObject(&laquo; [[ProxyHandler]], [[ProxyTarget]] &raquo;).
+        1. Set _P_'s essential internal methods, except for [[Call]] and [[Construct]], to the definitions specified in <emu-xref href="#sec-proxy-object-internal-methods-and-internal-slots"></emu-xref>.
         1. If IsCallable(_target_) is *true*, then
           1. Set _P_.[[Call]] as specified in <emu-xref href="#sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist"></emu-xref>.
           1. If IsConstructor(_target_) is *true*, then
@@ -10418,8 +10468,16 @@
       </emu-alg>
     </emu-clause>
 
-    <emu-clause id="sec-utf16decode" aoid="UTF16Decode">
-      <h1>Static Semantics: UTF16Decode ( _lead_, _trail_ )</h1>
+    <emu-clause id="sec-utf16encode" aoid="UTF16Encode">
+      <h1>Static Semantics: UTF16Encode ( _text_ )</h1>
+      <p>This abstract operation converts _text_, a sequence of Unicode code points, into a String value, as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>.</p>
+      <emu-alg>
+        1. Return the string-concatenation of the code units that are the UTF16Encoding of each code point in _text_, in order.
+      </emu-alg>
+    </emu-clause>
+
+    <emu-clause id="sec-utf16decodesurrogatepair" aoid="UTF16DecodeSurrogatePair" oldids="sec-utf16decode">
+      <h1>Static Semantics: UTF16DecodeSurrogatePair ( _lead_, _trail_ )</h1>
       <p>Two code units, _lead_ and _trail_, that form a UTF-16 <emu-xref href="#surrogate-pair"></emu-xref> are converted to a code point by performing the following steps:</p>
       <emu-alg>
         1. Assert: _lead_ is a <emu-xref href="#leading-surrogate"></emu-xref> and _trail_ is a <emu-xref href="#trailing-surrogate"></emu-xref>.
@@ -10443,8 +10501,23 @@
         1. Let _second_ be the code unit at index _position_ + 1 within _string_.
         1. If _second_ is not a <emu-xref href="#trailing-surrogate"></emu-xref>, then
           1. Return the Record { [[CodePoint]]: _cp_, [[CodeUnitCount]]: 1, [[IsUnpairedSurrogate]]: *true* }.
-        1. Set _cp_ to ! UTF16Decode(_first_, _second_).
+        1. Set _cp_ to ! UTF16DecodeSurrogatePair(_first_, _second_).
         1. Return the Record { [[CodePoint]]: _cp_, [[CodeUnitCount]]: 2, [[IsUnpairedSurrogate]]: *false* }.
+      </emu-alg>
+    </emu-clause>
+
+    <emu-clause id="sec-utf16decodestring" aoid="UTF16DecodeString">
+      <h1>Static Semantics: UTF16DecodeString ( _string_ )</h1>
+      <p>This abstract operation accepts a String value _string_ and returns the sequence of Unicode code points that results from interpreting it as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>.</p>
+      <emu-alg>
+        1. Let _codePoints_ be a new empty List.
+        1. Let _size_ be the length of _string_.
+        1. Let _position_ be 0.
+        1. Repeat, while _position_ &lt; _size_,
+          1. Let _cp_ be ! CodePointAt(_string_, _position_).
+          1. Append _cp_.[[CodePoint]] to _codePoints_.
+          1. Set _position_ to _position_ + _cp_.[[CodeUnitCount]].
+        1. Return _codePoints_.
       </emu-alg>
     </emu-clause>
   </emu-clause>
@@ -10959,7 +11032,9 @@
             IdentifierName IdentifierPart
         </emu-grammar>
         <emu-alg>
-          1. Return the String value consisting of the sequence of code units corresponding to |IdentifierName|. In determining the sequence any occurrences of `\\` |UnicodeEscapeSequence| are first replaced with the code point represented by the |UnicodeEscapeSequence| and then the code points of the entire |IdentifierName| are converted to code units by UTF16Encoding each code point.
+          1. Let _idText_ be the source text matched by |IdentifierName|.
+          1. Let _idTextUnescaped_ be the result of replacing any occurrences of `\\` |UnicodeEscapeSequence| in _idText_ with the code point represented by the |UnicodeEscapeSequence|.
+          1. Return ! UTF16Encode(_idTextUnescaped_).
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -12934,7 +13009,7 @@
         <h1>Runtime Semantics: Evaluation</h1>
         <emu-grammar>ObjectLiteral : `{` `}`</emu-grammar>
         <emu-alg>
-          1. Return ObjectCreate(%Object.prototype%).
+          1. Return OrdinaryObjectCreate(%Object.prototype%).
         </emu-alg>
         <emu-grammar>
           ObjectLiteral :
@@ -12942,7 +13017,7 @@
             `{` PropertyDefinitionList `,` `}`
         </emu-grammar>
         <emu-alg>
-          1. Let _obj_ be ObjectCreate(%Object.prototype%).
+          1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Perform ? PropertyDefinitionEvaluation of |PropertyDefinitionList| with arguments _obj_ and *true*.
           1. Return _obj_.
         </emu-alg>
@@ -13052,8 +13127,8 @@
         <h1>Runtime Semantics: Evaluation</h1>
         <emu-grammar>PrimaryExpression : RegularExpressionLiteral</emu-grammar>
         <emu-alg>
-          1. Let _pattern_ be the String value consisting of the UTF16Encoding of each code point of BodyText of |RegularExpressionLiteral|.
-          1. Let _flags_ be the String value consisting of the UTF16Encoding of each code point of FlagText of |RegularExpressionLiteral|.
+          1. Let _pattern_ be ! UTF16Encode(BodyText of |RegularExpressionLiteral|).
+          1. Let _flags_ be ! UTF16Encode(FlagText of |RegularExpressionLiteral|).
           1. Return RegExpCreate(_pattern_, _flags_).
         </emu-alg>
       </emu-clause>
@@ -13809,10 +13884,10 @@
             1. If SameValue(_func_, %eval%) is *true*, then
               1. Let _argList_ be ? ArgumentListEvaluation of _arguments_.
               1. If _argList_ has no elements, return *undefined*.
-              1. Let _evalText_ be the first element of _argList_.
+              1. Let _evalArg_ be the first element of _argList_.
               1. If the source code matching this |CallExpression| is strict mode code, let _strictCaller_ be *true*. Otherwise let _strictCaller_ be *false*.
               1. Let _evalRealm_ be the current Realm Record.
-              1. Return ? PerformEval(_evalText_, _evalRealm_, _strictCaller_, *true*).
+              1. Return ? PerformEval(_evalArg_, _evalRealm_, _strictCaller_, *true*).
           1. Let _thisCall_ be this |CallExpression|.
           1. Let _tailCall_ be IsInTailPosition(_thisCall_).
           1. Return ? EvaluateCall(_func_, _ref_, _arguments_, _tailCall_).
@@ -15609,7 +15684,7 @@
         <emu-alg>
           1. Let _lref_ be the result of evaluating |DestructuringAssignmentTarget|.
           1. ReturnIfAbrupt(_lref_).
-          1. Let _restObj_ be ObjectCreate(%Object.prototype%).
+          1. Let _restObj_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Perform ? CopyDataProperties(_restObj_, _value_, _excludedNames_).
           1. Return PutValue(_lref_, _restObj_).
         </emu-alg>
@@ -16873,7 +16948,7 @@
         <emu-grammar>BindingRestProperty : `...` BindingIdentifier</emu-grammar>
         <emu-alg>
           1. Let _lhs_ be ? ResolveBinding(StringValue of |BindingIdentifier|, _environment_).
-          1. Let _restObj_ be ObjectCreate(%Object.prototype%).
+          1. Let _restObj_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Perform ? CopyDataProperties(_restObj_, _value_, _excludedNames_).
           1. If _environment_ is *undefined*, return PutValue(_lhs_, _restObj_).
           1. Return InitializeReferencedBinding(_lhs_, _restObj_).
@@ -18034,7 +18109,7 @@
         </emu-alg>
         <p>The iterator's `throw` and `return` methods are *null* and are never invoked. The iterator's `next` method processes object properties to determine whether the property key should be returned as an iterator value. Returned property keys do not include keys that are Symbols. Properties of the target object may be deleted during enumeration. A property that is deleted before it is processed by the iterator's `next` method is ignored. If new properties are added to the target object during enumeration, the newly added properties are not guaranteed to be processed in the active enumeration. A property name will be returned by the iterator's `next` method at most once in any enumeration.</p>
         <p>Enumerating the properties of the target object includes enumerating properties of its prototype, and the prototype of the prototype, and so on, recursively; but a property of a prototype is not processed if it has the same name as a property that has already been processed by the iterator's `next` method. The values of [[Enumerable]] attributes are not considered when determining if a property of a prototype object has already been processed. The enumerable property names of prototype objects must be obtained by invoking EnumerateObjectProperties passing the prototype object as the argument. EnumerateObjectProperties must obtain the own property keys of the target object by calling its [[OwnPropertyKeys]] internal method. Property attributes of the target object must be obtained by calling its [[GetOwnProperty]] internal method.</p>
-        <p>In addition, if neither _O_ nor any object in its prototype chain is a Proxy exotic object, Integer-Indexed exotic object, Module Namespace exotic object, or implementation provided exotic object, then the iterator must behave as would the iterator given by CreateForInIterator(_O_) until one of the following occurs:</p>
+        <p>In addition, if neither _O_ nor any object in its prototype chain is a Proxy exotic object, Integer-Indexed exotic object, module namespace exotic object, or implementation provided exotic object, then the iterator must behave as would the iterator given by CreateForInIterator(_O_) until one of the following occurs:</p>
         <ul>
           <li>the value of the [[Prototype]] internal slot of _O_ or an object in its prototype chain changes,</li>
           <li>a property is removed from _O_ or an object in its prototype chain,</li>
@@ -18043,7 +18118,7 @@
         </ul>
 
         <emu-note>
-          <p>Hosts are not required to implement the algorithm in <emu-xref href="#sec-%foriniteratorprototype%.next"></emu-xref> directly. They may choose any implementation whose behavior will not deviate from that algorithm unless one of the constraints in the previous paragraph is violated.</p>
+          <p>Hosts are not required to implement the algorithm in <emu-xref href="#sec-%foriniteratorprototype%.next"></emu-xref> directly. They may choose any implementation whose behaviour will not deviate from that algorithm unless one of the constraints in the previous paragraph is violated.</p>
           <p>The following is an informative definition of an ECMAScript generator function that conforms to these rules:</p>
           <pre><code class="javascript">
             function* EnumerateObjectProperties(obj) {
@@ -18065,20 +18140,20 @@
           </code></pre>
         </emu-note>
         <emu-note>
-          The list of exotic objects for which implementations are not required to match CreateForInIterator was chosen because implementations historically differed in behavior for those cases, and agreed in all others.
+          The list of exotic objects for which implementations are not required to match CreateForInIterator was chosen because implementations historically differed in behaviour for those cases, and agreed in all others.
         </emu-note>
       </emu-clause>
 
       <emu-clause id="sec-for-in-iterator-objects">
         <h1>For-In Iterator Objects</h1>
-        <p>A For-In Iterator is an object that represents a specific iteration over some specific object. For-In Iterator objects are never directly accessible to ECMAScript code; they exist soley to illustrate the behavior of EnumerateObjectProperties.</p>
+        <p>A For-In Iterator is an object that represents a specific iteration over some specific object. For-In Iterator objects are never directly accessible to ECMAScript code; they exist solely to illustrate the behaviour of EnumerateObjectProperties.</p>
 
         <emu-clause id="sec-createforiniterator" aoid="CreateForInIterator">
           <h1>CreateForInIterator ( _object_ )</h1>
           <p>The abstract operation CreateForInIterator with argument _object_ is used to create a For-In Iterator object which iterates over the own and inherited enumerable string properties of _object_ in a specific order. It performs the following steps:</p>
           <emu-alg>
             1. Assert: Type(_object_) is Object.
-            1. Let _iterator_ be ObjectCreate(%ForInIteratorPrototype%, &laquo; [[Object]], [[ObjectWasVisited]], [[VisitedKeys]], [[RemainingKeys]] &raquo;).
+            1. Let _iterator_ be OrdinaryObjectCreate(%ForInIteratorPrototype%, &laquo; [[Object]], [[ObjectWasVisited]], [[VisitedKeys]], [[RemainingKeys]] &raquo;).
             1. Set _iterator_.[[Object]] to _object_.
             1. Set _iterator_.[[ObjectWasVisited]] to *false*.
             1. Set _iterator_.[[VisitedKeys]] to a new empty List.
@@ -20474,7 +20549,7 @@
       <emu-alg>
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Let _F_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
-        1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
+        1. Let _prototype_ be OrdinaryObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_F_, _name_).
         1. Set _F_.[[SourceText]] to the source text matched by |GeneratorDeclaration|.
@@ -20483,7 +20558,7 @@
       <emu-grammar>GeneratorDeclaration : `function` `*` `(` FormalParameters `)` `{` GeneratorBody `}`</emu-grammar>
       <emu-alg>
         1. Let _F_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
-        1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
+        1. Let _prototype_ be OrdinaryObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_F_, *"default"*).
         1. Set _F_.[[SourceText]] to the source text matched by |GeneratorDeclaration|.
@@ -20505,7 +20580,7 @@
         1. Let _scope_ be the running execution context's LexicalEnvironment.
         1. Let _closure_ be OrdinaryFunctionCreate(%Generator%, |UniqueFormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
         1. Perform MakeMethod(_closure_, _object_).
-        1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
+        1. Let _prototype_ be OrdinaryObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_closure_, _propKey_).
         1. Set _closure_.[[SourceText]] to the source text matched by |GeneratorMethod|.
@@ -20531,7 +20606,7 @@
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
         1. Let _closure_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _scope_).
-        1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
+        1. Let _prototype_ be OrdinaryObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Set _closure_.[[SourceText]] to the source text matched by |GeneratorExpression|.
         1. Return _closure_.
@@ -20544,7 +20619,7 @@
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Perform _envRec_.CreateImmutableBinding(_name_, *false*).
         1. Let _closure_ be OrdinaryFunctionCreate(%Generator%, |FormalParameters|, |GeneratorBody|, ~non-lexical-this~, _funcEnv_).
-        1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
+        1. Let _prototype_ be OrdinaryObjectCreate(%Generator.prototype%).
         1. Perform DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_closure_, _name_).
         1. Perform _envRec_.InitializeBinding(_name_, _closure_).
@@ -20801,7 +20876,7 @@
       <emu-alg>
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Let _F_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
-        1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
+        1. Let _prototype_ be ! OrdinaryObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform ! SetFunctionName(_F_, _name_).
         1. Set _F_.[[SourceText]] to the source text matched by |AsyncGeneratorDeclaration|.
@@ -20813,7 +20888,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _F_ be OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
-        1. Let _prototype_ be ObjectCreate(%AsyncGenerator.prototype%).
+        1. Let _prototype_ be OrdinaryObjectCreate(%AsyncGenerator.prototype%).
         1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform SetFunctionName(_F_, *"default"*).
         1. Set _F_.[[SourceText]] to the source text matched by |AsyncGeneratorDeclaration|.
@@ -20836,7 +20911,7 @@
         1. Let _scope_ be the running execution context's LexicalEnvironment.
         1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |UniqueFormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
         1. Perform ! MakeMethod(_closure_, _object_).
-        1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
+        1. Let _prototype_ be ! OrdinaryObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform ! SetFunctionName(_closure_, _propKey_).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncGeneratorMethod|.
@@ -20867,7 +20942,7 @@
       <emu-alg>
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
         1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _scope_).
-        1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
+        1. Let _prototype_ be ! OrdinaryObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Set _closure_.[[SourceText]] to the source text matched by |AsyncGeneratorExpression|.
         1. Return _closure_.
@@ -20883,7 +20958,7 @@
         1. Let _name_ be StringValue of |BindingIdentifier|.
         1. Perform ! _envRec_.CreateImmutableBinding(_name_).
         1. Let _closure_ be ! OrdinaryFunctionCreate(%AsyncGenerator%, |FormalParameters|, |AsyncGeneratorBody|, ~non-lexical-this~, _funcEnv_).
-        1. Let _prototype_ be ! ObjectCreate(%AsyncGenerator.prototype%).
+        1. Let _prototype_ be ! OrdinaryObjectCreate(%AsyncGenerator.prototype%).
         1. Perform ! DefinePropertyOrThrow(_closure_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
         1. Perform ! SetFunctionName(_closure_, _name_).
         1. Perform ! _envRec_.InitializeBinding(_name_, _closure_).
@@ -21160,7 +21235,7 @@
             1. Let _protoParent_ be ? Get(_superclass_, *"prototype"*).
             1. If Type(_protoParent_) is neither Object nor Null, throw a *TypeError* exception.
             1. Let _constructorParent_ be _superclass_.
-        1. Let _proto_ be ObjectCreate(_protoParent_).
+        1. Let _proto_ be OrdinaryObjectCreate(_protoParent_).
         1. If |ClassBody_opt| is not present, let _constructor_ be ~empty~.
         1. Else, let _constructor_ be ConstructorMethod of |ClassBody|.
         1. If _constructor_ is ~empty~, then
@@ -24018,7 +24093,7 @@
       <emu-clause id="sec-getmodulenamespace" aoid="GetModuleNamespace">
         <h1>Runtime Semantics: GetModuleNamespace ( _module_ )</h1>
 
-        <p>The GetModuleNamespace abstract operation retrieves the Module Namespace Exotic object representing _module_'s exports, lazily creating it the first time it was requested, and storing it in _module_.[[Namespace]] for future retrieval.</p>
+        <p>The GetModuleNamespace abstract operation retrieves the Module Namespace Object representing _module_'s exports, lazily creating it the first time it was requested, and storing it in _module_.[[Namespace]] for future retrieval.</p>
 
         <p>This abstract operation performs the following steps:</p>
 
@@ -24853,7 +24928,7 @@
             1. Let _inMethod_ be *false*.
             1. Let _inDerivedConstructor_ be *false*.
           1. Perform the following substeps in an implementation-dependent order, possibly interleaving parsing and error detection:
-            1. Let _script_ be the ECMAScript code that is the result of parsing _x_, interpreted as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, for the goal symbol |Script|. If the parse fails, throw a *SyntaxError* exception. If any early errors are detected, throw a *SyntaxError* exception (but see also clause <emu-xref href="#sec-error-handling-and-language-extensions"></emu-xref>).
+            1. Let _script_ be the ECMAScript code that is the result of parsing ! UTF16DecodeString(_x_), for the goal symbol |Script|. If the parse fails, throw a *SyntaxError* exception. If any early errors are detected, throw a *SyntaxError* exception (but see also clause <emu-xref href="#sec-error-handling-and-language-extensions"></emu-xref>).
             1. If _script_ Contains |ScriptBody| is *false*, return *undefined*.
             1. Let _body_ be the |ScriptBody| of _script_.
             1. If _inFunction_ is *false*, and _body_ Contains |NewTarget|, throw a *SyntaxError* exception.
@@ -25663,7 +25738,7 @@
         <emu-alg>
           1. If NewTarget is neither *undefined* nor the active function, then
             1. Return ? OrdinaryCreateFromConstructor(NewTarget, *"%Object.prototype%"*).
-          1. If _value_ is *undefined* or *null*, return ObjectCreate(%Object.prototype%).
+          1. If _value_ is *undefined* or *null*, return OrdinaryObjectCreate(%Object.prototype%).
           1. Return ! ToObject(_value_).
         </emu-alg>
         <p>The *"length"* property of the `Object` constructor function is 1.</p>
@@ -25705,7 +25780,7 @@
         <p>The `create` function creates a new object with a specified prototype. When the `create` function is called, the following steps are taken:</p>
         <emu-alg>
           1. If Type(_O_) is neither Object nor Null, throw a *TypeError* exception.
-          1. Let _obj_ be ObjectCreate(_O_).
+          1. Let _obj_ be OrdinaryObjectCreate(_O_).
           1. If _Properties_ is not *undefined*, then
             1. Return ? ObjectDefineProperties(_obj_, _Properties_).
           1. Return _obj_.
@@ -25780,7 +25855,7 @@
         <p>When the `fromEntries` method is called with argument _iterable_, the following steps are taken:</p>
         <emu-alg>
           1. Perform ? RequireObjectCoercible(_iterable_).
-          1. Let _obj_ be ObjectCreate(%Object.prototype%).
+          1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Assert: _obj_ is an extensible ordinary object with no own properties.
           1. Let _stepsDefine_ be the algorithm steps defined in <emu-xref href="#sec-create-data-property-on-object-functions" title></emu-xref>.
           1. Let _adder_ be ! CreateBuiltinFunction(_stepsDefine_, &laquo; &raquo;).
@@ -25821,7 +25896,7 @@
         <emu-alg>
           1. Let _obj_ be ? ToObject(_O_).
           1. Let _ownKeys_ be ? _obj_.[[OwnPropertyKeys]]().
-          1. Let _descriptors_ be ! ObjectCreate(%Object.prototype%).
+          1. Let _descriptors_ be ! OrdinaryObjectCreate(%Object.prototype%).
           1. For each element _key_ of _ownKeys_ in List order, do
             1. Let _desc_ be ? _obj_.[[GetOwnProperty]](_key_).
             1. Let _descriptor_ be ! FromPropertyDescriptor(_desc_).
@@ -25971,7 +26046,8 @@
       <p>The Object prototype object:</p>
       <ul>
         <li>is the intrinsic object <dfn>%ObjectPrototype%</dfn>.</li>
-        <li>is an immutable prototype exotic object.</li>
+        <li>has an [[Extensible]] internal slot whose value is *true*.</li>
+        <li>has the internal methods defined for ordinary objects, except for the [[SetPrototypeOf]] method, which is as defined in <emu-xref href="#sec-immutable-prototype-exotic-objects-setprototypeof-v"></emu-xref>. (Thus, it is an immutable prototype exotic object.)</li>
         <li>has a [[Prototype]] internal slot whose value is *null*.</li>
       </ul>
 
@@ -26147,8 +26223,8 @@
               1. Let _fallbackProto_ be *"%AsyncGenerator%"*.
             1. Let _argCount_ be the number of elements in _args_.
             1. Let _P_ be the empty String.
-            1. If _argCount_ = 0, let _bodyText_ be the empty String.
-            1. Else if _argCount_ = 1, let _bodyText_ be _args_[0].
+            1. If _argCount_ = 0, let _bodyArg_ be the empty String.
+            1. Else if _argCount_ = 1, let _bodyArg_ be _args_[0].
             1. Else,
               1. Assert: _argCount_ &gt; 1.
               1. Let _firstArg_ be _args_[0].
@@ -26159,11 +26235,11 @@
                 1. Let _nextArgString_ be ? ToString(_nextArg_).
                 1. Set _P_ to the string-concatenation of the previous value of _P_, *","* (a comma), and _nextArgString_.
                 1. Set _k_ to _k_ + 1.
-              1. Let _bodyText_ be _args_[_k_].
-            1. Set _bodyText_ to the string-concatenation of 0x000A (LINE FEED), ? ToString(_bodyText_), and 0x000A (LINE FEED).
+              1. Let _bodyArg_ be _args_[_k_].
+            1. Let _bodyString_ be the string-concatenation of 0x000A (LINE FEED), ? ToString(_bodyArg_), and 0x000A (LINE FEED).
             1. Perform the following substeps in an implementation-dependent order, possibly interleaving parsing and error detection:
-              1. Let _parameters_ be the result of parsing _P_, interpreted as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, using _parameterGoal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
-              1. Let _body_ be the result of parsing _bodyText_, interpreted as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, using _goal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
+              1. Let _parameters_ be the result of parsing ! UTF16DecodeString(_P_), using _parameterGoal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
+              1. Let _body_ be the result of parsing ! UTF16DecodeString(_bodyString_), using _goal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
               1. Let _strict_ be ContainsUseStrict of _body_.
               1. If any static semantics errors are detected for _parameters_ or _body_, throw a *SyntaxError* exception. If _strict_ is *true*, the Early Error rules for <emu-grammar>UniqueFormalParameters : FormalParameters</emu-grammar> are applied.
               1. If _strict_ is *true* and IsSimpleParameterList of _parameters_ is *false*, throw a *SyntaxError* exception.
@@ -26183,17 +26259,17 @@
             1. Let _scope_ be _realmF_.[[GlobalEnv]].
             1. Let _F_ be ! OrdinaryFunctionCreate(_proto_, _parameters_, _body_, ~non-lexical-this~, _scope_).
             1. If _kind_ is ~generator~, then
-              1. Let _prototype_ be ObjectCreate(%Generator.prototype%).
+              1. Let _prototype_ be OrdinaryObjectCreate(%Generator.prototype%).
               1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
             1. Else if _kind_ is ~asyncGenerator~, then
-              1. Let _prototype_ be ObjectCreate(%AsyncGenerator.prototype%).
+              1. Let _prototype_ be OrdinaryObjectCreate(%AsyncGenerator.prototype%).
               1. Perform DefinePropertyOrThrow(_F_, *"prototype"*, PropertyDescriptor { [[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
             1. Else if _kind_ is ~normal~, perform MakeConstructor(_F_).
             1. NOTE: Async functions are not constructable and do not have a [[Construct]] internal method or a *"prototype"* property.
             1. Perform SetFunctionName(_F_, *"anonymous"*).
             1. Let _prefix_ be the prefix associated with _kind_ in <emu-xref href="#table-dynamic-function-sourcetext-prefixes"></emu-xref>.
-            1. Let _sourceText_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyText_, and *"}"*.
-            1. Set _F_.[[SourceText]] to _sourceText_.
+            1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyString_, and *"}"*.
+            1. Set _F_.[[SourceText]] to _sourceString_.
             1. Return _F_.
           </emu-alg>
           <emu-note>
@@ -26270,7 +26346,7 @@
           <p>The _thisArg_ value is passed without modification as the *this* value. This is a change from Edition 3, where an *undefined* or *null* _thisArg_ is replaced with the global object and ToObject is applied to all other values and that result is passed as the *this* value. Even though the _thisArg_ is passed without modification, non-strict functions still perform these transformations upon entry to the function.</p>
         </emu-note>
         <emu-note>
-          <p>If _func_ is an arrow function or a bound function then the _thisArg_ will be ignored by the function [[Call]] in step 6.</p>
+          <p>If _func_ is an arrow function or a bound function exotic object then the _thisArg_ will be ignored by the function [[Call]] in step 6.</p>
         </emu-note>
       </emu-clause>
 
@@ -26300,7 +26376,7 @@
           <p>Function objects created using `Function.prototype.bind` are exotic objects. They also do not have a *"prototype"* property.</p>
         </emu-note>
         <emu-note>
-          <p>If _Target_ is an arrow function or a bound function then the _thisArg_ passed to this method will not be used by subsequent calls to _F_.</p>
+          <p>If _Target_ is an arrow function or a bound function exotic object then the _thisArg_ passed to this method will not be used by subsequent calls to _F_.</p>
         </emu-note>
       </emu-clause>
 
@@ -26319,7 +26395,7 @@
           <p>The _thisArg_ value is passed without modification as the *this* value. This is a change from Edition 3, where an *undefined* or *null* _thisArg_ is replaced with the global object and ToObject is applied to all other values and that result is passed as the *this* value. Even though the _thisArg_ is passed without modification, non-strict functions still perform these transformations upon entry to the function.</p>
         </emu-note>
         <emu-note>
-          <p>If _func_ is an arrow function or a bound function then the _thisArg_ will be ignored by the function [[Call]] in step 6.</p>
+          <p>If _func_ is an arrow function or a bound function exotic object then the _thisArg_ will be ignored by the function [[Call]] in step 6.</p>
         </emu-note>
       </emu-clause>
 
@@ -26333,7 +26409,7 @@
         <p>When the `toString` method is called, the following steps are taken:</p>
         <emu-alg>
           1. Let _func_ be the *this* value.
-          1. If _func_ is a <emu-xref href="#sec-bound-function-exotic-objects">Bound Function exotic object</emu-xref> or a <emu-xref href="#sec-built-in-function-objects">built-in function object</emu-xref>, then return an implementation-dependent String source code representation of _func_. The representation must have the syntax of a |NativeFunction|. Additionally, if _func_ is a <emu-xref href="#sec-well-known-intrinsic-objects">Well-known Intrinsic Object</emu-xref> and is not identified as an anonymous function, the portion of the returned String that would be matched by |PropertyName| must be the initial value of the *"name"* property of _func_.
+          1. If _func_ is a <emu-xref href="#sec-bound-function-exotic-objects">bound function exotic object</emu-xref> or a <emu-xref href="#sec-built-in-function-objects">built-in function object</emu-xref>, then return an implementation-dependent String source code representation of _func_. The representation must have the syntax of a |NativeFunction|. Additionally, if _func_ is a <emu-xref href="#sec-well-known-intrinsic-objects">Well-known Intrinsic Object</emu-xref> and is not identified as an anonymous function, the portion of the returned String that would be matched by |PropertyName| must be the initial value of the *"name"* property of _func_.
           1. If Type(_func_) is Object and _func_ has a [[SourceText]] internal slot and Type(_func_.[[SourceText]]) is String and ! HostHasSourceTextAvailable(_func_) is *true*, then return _func_.[[SourceText]].
           1. If Type(_func_) is Object and IsCallable(_func_) is *true*, then return an implementation-dependent String source code representation of _func_. The representation must have the syntax of a |NativeFunction|.
           1. Throw a *TypeError* exception.
@@ -28670,7 +28746,7 @@ THH:mm:ss.sss
 
         <emu-clause id="sec-expanded-years" oldids="sec-extended-years">
           <h1>Expanded Years</h1>
-          <p>Covering the full time value range of approximately 273,790 years forward or backward from 01 January, 1970 (<emu-xref href="#sec-time-values-and-time-range"></emu-xref>) requires representing years before 0 or after 9999. ISO 8601 permits expansion of the year representation, but only by mutual agreement of the partners in information interchange. In the simplified ECMAScript format, such an expanded year representation shall have 6 digits and is always prefixed with a + or - sign. The year 0 is considered positive and hence prefixed with a + sign. Strings matching the <emu-xref href="#sec-date-time-string-format">Date Time String Format</emu-xref> with expanded years representing instants in time outside the range of a time value are treated as unrecognizable by <emu-xref href="#sec-date.parse">`Date.parse`</emu-xref> and cause that function to return *NaN* without falling back to implementation-specific behavior or heuristics.</p>
+          <p>Covering the full time value range of approximately 273,790 years forward or backward from 01 January, 1970 (<emu-xref href="#sec-time-values-and-time-range"></emu-xref>) requires representing years before 0 or after 9999. ISO 8601 permits expansion of the year representation, but only by mutual agreement of the partners in information interchange. In the simplified ECMAScript format, such an expanded year representation shall have 6 digits and is always prefixed with a + or - sign. The year 0 is considered positive and hence prefixed with a + sign. Strings matching the <emu-xref href="#sec-date-time-string-format">Date Time String Format</emu-xref> with expanded years representing instants in time outside the range of a time value are treated as unrecognizable by <emu-xref href="#sec-date.parse">`Date.parse`</emu-xref> and cause that function to return *NaN* without falling back to implementation-specific behaviour or heuristics.</p>
           <emu-note>
             <p>Examples of date-time values with expanded years:</p>
             <figure>
@@ -30523,9 +30599,9 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be ? RequireObjectCoercible(*this* value).
           1. Let _S_ be ? ToString(_O_).
-          1. Let _cpList_ be a List containing in order the code points as defined in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref> of _S_, starting at the first element of _S_.
-          1. Let _cuList_ be a List where the elements are the result of toLowercase(_cpList_), according to the Unicode Default Case Conversion algorithm.
-          1. Let _L_ be the String value whose code units are the UTF16Encoding of the code points of _cuList_.
+          1. Let _sText_ be ! UTF16DecodeString(_S_).
+          1. Let _lowerText_ be the result of toLowercase(_sText_), according to the Unicode Default Case Conversion algorithm.
+          1. Let _L_ be ! UTF16Encode(_lowerText_).
           1. Return _L_.
         </emu-alg>
         <p>The result must be derived according to the locale-insensitive case mappings in the Unicode Character Database (this explicitly includes not only the UnicodeData.txt file, but also all locale-insensitive mappings in the SpecialCasings.txt file that accompanies it).</p>
@@ -30653,7 +30729,7 @@ THH:mm:ss.sss
         <p>Several methods of String objects return Iterator objects. The abstract operation CreateStringIterator with argument _string_ is used to create such iterator objects. It performs the following steps:</p>
         <emu-alg>
           1. Assert: Type(_string_) is String.
-          1. Let _iterator_ be ObjectCreate(%StringIteratorPrototype%, &laquo; [[IteratedString]], [[StringNextIndex]] &raquo;).
+          1. Let _iterator_ be OrdinaryObjectCreate(%StringIteratorPrototype%, &laquo; [[IteratedString]], [[StringNextIndex]] &raquo;).
           1. Set _iterator_.[[IteratedString]] to _string_.
           1. Set _iterator_.[[StringNextIndex]] to 0.
           1. Return _iterator_.
@@ -31212,7 +31288,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _lead_ be the CharacterValue of |LeadSurrogate|.
           1. Let _trail_ be the CharacterValue of |TrailSurrogate|.
-          1. Let _cp_ be UTF16Decode(_lead_, _trail_).
+          1. Let _cp_ be UTF16DecodeSurrogatePair(_lead_, _trail_).
           1. Return the code point value of _cp_.
         </emu-alg>
         <emu-grammar>RegExpUnicodeEscapeSequence :: `u` LeadSurrogate</emu-grammar>
@@ -31273,7 +31349,9 @@ THH:mm:ss.sss
             RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
         </emu-grammar>
         <emu-alg>
-          1. Return the String value consisting of the sequence of code units corresponding to |RegExpIdentifierName|. In determining the sequence any occurrences of `\\` |RegExpUnicodeEscapeSequence| are first replaced with the code point represented by the |RegExpUnicodeEscapeSequence| and then the code points of the entire |RegExpIdentifierName| are converted to code units by UTF16Encoding each code point.
+          1. Let _idText_ be the source text matched by |RegExpIdentifierName|.
+          1. Let _idTextUnescaped_ be the result of replacing any occurrences of `\\` |RegExpUnicodeEscapeSequence| in _idText_ with the code point represented by the |RegExpUnicodeEscapeSequence|.
+          1. Return ! UTF16Encode(_idTextUnescaped_).
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -31285,7 +31363,7 @@ THH:mm:ss.sss
       <p>The syntax and semantics of |Pattern| is defined as if the source code for the |Pattern| was a List of |SourceCharacter| values where each |SourceCharacter| corresponds to a Unicode code point. If a BMP pattern contains a non-BMP |SourceCharacter| the entire pattern is encoded using UTF-16 and the individual code units of that encoding are used as the elements of the List.</p>
       <emu-note>
         <p>For example, consider a pattern expressed in source text as the single non-BMP character U+1D11E (MUSICAL SYMBOL G CLEF). Interpreted as a Unicode pattern, it would be a single element (character) List consisting of the single code point 0x1D11E. However, interpreted as a BMP pattern, it is first UTF-16 encoded to produce a two element List consisting of the code units 0xD834 and 0xDD1E.</p>
-        <p>Patterns are passed to the RegExp constructor as ECMAScript String values in which non-BMP characters are UTF-16 encoded. For example, the single character MUSICAL SYMBOL G CLEF pattern, expressed as a String value, is a String of length 2 whose elements were the code units 0xD834 and 0xDD1E. So no further translation of the string would be necessary to process it as a BMP pattern consisting of two pattern characters. However, to process it as a Unicode pattern UTF16Decode must be used in producing a List consisting of a single pattern character, the code point U+1D11E.</p>
+        <p>Patterns are passed to the RegExp constructor as ECMAScript String values in which non-BMP characters are UTF-16 encoded. For example, the single character MUSICAL SYMBOL G CLEF pattern, expressed as a String value, is a String of length 2 whose elements were the code units 0xD834 and 0xDD1E. So no further translation of the string would be necessary to process it as a BMP pattern consisting of two pattern characters. However, to process it as a Unicode pattern UTF16DecodeSurrogatePair must be used in producing a List consisting of a single pattern character, the code point U+1D11E.</p>
         <p>An implementation may not actually perform such translations to or from UTF-16, but the semantics of this specification requires that the result of pattern matching be as if such translations were performed.</p>
       </emu-note>
 
@@ -31345,7 +31423,7 @@ THH:mm:ss.sss
           1. Evaluate |Disjunction| with +1 as its _direction_ argument to obtain a Matcher _m_.
           1. Return an internal closure that takes two arguments, a String _str_ and an integer _index_, and performs the following steps:
             1. Assert: _index_ &le; the length of _str_.
-            1. If _Unicode_ is *true*, let _Input_ be a List consisting of the sequence of code points of _str_ interpreted as a UTF-16 encoded (<emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>) Unicode string. Otherwise, let _Input_ be a List consisting of the sequence of code units that are the elements of _str_. _Input_ will be used throughout the algorithms in <emu-xref href="#sec-pattern-semantics"></emu-xref>. Each element of _Input_ is considered to be a character.
+            1. If _Unicode_ is *true*, let _Input_ be a List consisting of the sequence of code points of ! UTF16DecodeString(_str_). Otherwise, let _Input_ be a List consisting of the sequence of code units that are the elements of _str_. _Input_ will be used throughout the algorithms in <emu-xref href="#sec-pattern-semantics"></emu-xref>. Each element of _Input_ is considered to be a character.
             1. Let _InputLength_ be the number of characters contained in _Input_. This variable will be used throughout the algorithms in <emu-xref href="#sec-pattern-semantics"></emu-xref>.
             1. Let _listIndex_ be the index into _Input_ of the character that was obtained from element _index_ of _str_.
             1. Let _c_ be a Continuation that always returns its State argument as a successful MatchResult.
@@ -32394,14 +32472,16 @@ THH:mm:ss.sss
             1. If _F_ contains any code unit other than *"g"*, *"i"*, *"m"*, *"s"*, *"u"*, or *"y"* or if it contains the same code unit more than once, throw a *SyntaxError* exception.
             1. If _F_ contains *"u"*, let _BMP_ be *false*; else let _BMP_ be *true*.
             1. If _BMP_ is *true*, then
-              1. Parse _P_ using the grammars in <emu-xref href="#sec-patterns"></emu-xref> and interpreting each of its 16-bit elements as a Unicode BMP code point. UTF-16 decoding is not applied to the elements. The goal symbol for the parse is |Pattern[~U, ~N]|. If the result of parsing contains a |GroupName|, reparse with the goal symbol |Pattern[~U, +N]| and use this result instead. Throw a *SyntaxError* exception if _P_ did not conform to the grammar, if any elements of _P_ were not matched by the parse, or if any Early Error conditions exist.
+              1. Let _pText_ be the sequence of code points resulting from interpreting each of the 16-bit elements of _P_ as a Unicode BMP code point. UTF-16 decoding is not applied to the elements.
+              1. Parse _pText_ using the grammars in <emu-xref href="#sec-patterns"></emu-xref>. The goal symbol for the parse is |Pattern[~U, ~N]|. If the result of parsing contains a |GroupName|, reparse with the goal symbol |Pattern[~U, +N]| and use this result instead. Throw a *SyntaxError* exception if _pText_ did not conform to the grammar, if any elements of _pText_ were not matched by the parse, or if any Early Error conditions exist.
               1. Let _patternCharacters_ be a List whose elements are the code unit elements of _P_.
             1. Else,
-              1. Parse _P_ using the grammars in <emu-xref href="#sec-patterns"></emu-xref> and interpreting _P_ as UTF-16 encoded Unicode code points (<emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>). The goal symbol for the parse is |Pattern[+U, +N]|. Throw a *SyntaxError* exception if _P_ did not conform to the grammar, if any elements of _P_ were not matched by the parse, or if any Early Error conditions exist.
-              1. Let _patternCharacters_ be a List whose elements are the code points resulting from applying UTF-16 decoding to _P_'s sequence of elements.
+              1. Let _pText_ be ! UTF16DecodeString(_P_).
+              1. Parse _pText_ using the grammars in <emu-xref href="#sec-patterns"></emu-xref>. The goal symbol for the parse is |Pattern[+U, +N]|. Throw a *SyntaxError* exception if _pText_ did not conform to the grammar, if any elements of _pText_ were not matched by the parse, or if any Early Error conditions exist.
+              1. Let _patternCharacters_ be a List whose elements are the code points of _pText_.
             1. Set _obj_.[[OriginalSource]] to _P_.
             1. Set _obj_.[[OriginalFlags]] to _F_.
-            1. Set _obj_.[[RegExpMatcher]] to the internal procedure that evaluates the above parse of _P_ by applying the semantics provided in <emu-xref href="#sec-pattern-semantics"></emu-xref> using _patternCharacters_ as the pattern's List of |SourceCharacter| values and _F_ as the flag parameters.
+            1. Set _obj_.[[RegExpMatcher]] to the internal procedure that evaluates the above parse by applying the semantics provided in <emu-xref href="#sec-pattern-semantics"></emu-xref> using _patternCharacters_ as the pattern's List of |SourceCharacter| values and _F_ as the flag parameters.
             1. Perform ? Set(_obj_, *"lastIndex"*, 0, *true*).
             1. Return _obj_.
           </emu-alg>
@@ -32547,7 +32627,7 @@ THH:mm:ss.sss
             1. Let _matchedSubstr_ be the matched substring (i.e. the portion of _S_ between offset _lastIndex_ inclusive and offset _e_ exclusive).
             1. Perform ! CreateDataPropertyOrThrow(_A_, *"0"*, _matchedSubstr_).
             1. If _R_ contains any |GroupName|, then
-              1. Let _groups_ be ObjectCreate(*null*).
+              1. Let _groups_ be OrdinaryObjectCreate(*null*).
             1. Else,
               1. Let _groups_ be *undefined*.
             1. Perform ! CreateDataPropertyOrThrow(_A_, *"groups"*, _groups_).
@@ -32556,7 +32636,7 @@ THH:mm:ss.sss
               1. If _captureI_ is *undefined*, let _capturedValue_ be *undefined*.
               1. Else if _fullUnicode_ is *true*, then
                 1. Assert: _captureI_ is a List of code points.
-                1. Let _capturedValue_ be the String value whose code units are the UTF16Encoding of the code points of _captureI_.
+                1. Let _capturedValue_ be ! UTF16Encode(_captureI_).
               1. Else,
                 1. Assert: _fullUnicode_ is *false*.
                 1. Assert: _captureI_ is a List of code units.
@@ -32718,7 +32798,7 @@ THH:mm:ss.sss
             1. Assert: Type(_S_) is String.
             1. Assert: Type(_global_) is Boolean.
             1. Assert: Type(_fullUnicode_) is Boolean.
-            1. Let _iterator_ be ObjectCreate(%RegExpStringIteratorPrototype%, &laquo; [[IteratingRegExp]], [[IteratedString]], [[Global]], [[Unicode]], [[Done]] &raquo;).
+            1. Let _iterator_ be OrdinaryObjectCreate(%RegExpStringIteratorPrototype%, &laquo; [[IteratingRegExp]], [[IteratedString]], [[Global]], [[Unicode]], [[Done]] &raquo;).
             1. Set _iterator_.[[IteratingRegExp]] to _R_.
             1. Set _iterator_.[[IteratedString]] to _S_.
             1. Set _iterator_.[[Global]] to _global_.
@@ -34398,7 +34478,7 @@ THH:mm:ss.sss
         <h1>Array.prototype [ @@unscopables ]</h1>
         <p>The initial value of the @@unscopables data property is an object created by the following steps:</p>
         <emu-alg>
-          1. Let _unscopableList_ be ObjectCreate(*null*).
+          1. Let _unscopableList_ be OrdinaryObjectCreate(*null*).
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"copyWithin"*, *true*).
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"entries"*, *true*).
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"fill"*, *true*).
@@ -34443,7 +34523,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Assert: Type(_array_) is Object.
           1. Assert: _kind_ is ~key+value~, ~key~, or ~value~.
-          1. Let _iterator_ be ObjectCreate(%ArrayIteratorPrototype%, &laquo; [[IteratedArrayLike]], [[ArrayLikeNextIndex]], [[ArrayLikeIterationKind]] &raquo;).
+          1. Let _iterator_ be OrdinaryObjectCreate(%ArrayIteratorPrototype%, &laquo; [[IteratedArrayLike]], [[ArrayLikeNextIndex]], [[ArrayLikeIterationKind]] &raquo;).
           1. Set _iterator_.[[IteratedArrayLike]] to _array_.
           1. Set _iterator_.[[ArrayLikeNextIndex]] to 0.
           1. Set _iterator_.[[ArrayLikeIterationKind]] to _kind_.
@@ -35481,7 +35561,7 @@ THH:mm:ss.sss
           <p>The abstract operation AllocateTypedArray with arguments _constructorName_, _newTarget_, _defaultProto_ and optional argument _length_ is used to validate and create an instance of a TypedArray constructor. _constructorName_ is required to be the name of a TypedArray constructor in <emu-xref href="#table-the-typedarray-constructors"></emu-xref>. If the _length_ argument is passed, an ArrayBuffer of that length is also allocated and associated with the new TypedArray instance. AllocateTypedArray provides common semantics that is used by all of the _TypedArray_ overloads. AllocateTypedArray performs the following steps:</p>
           <emu-alg>
             1. Let _proto_ be ? GetPrototypeFromConstructor(_newTarget_, _defaultProto_).
-            1. Let _obj_ be IntegerIndexedObjectCreate(_proto_, &laquo; [[ViewedArrayBuffer]], [[TypedArrayName]], [[ContentType]], [[ByteLength]], [[ByteOffset]], [[ArrayLength]] &raquo;).
+            1. Let _obj_ be ! IntegerIndexedObjectCreate(_proto_).
             1. Assert: _obj_.[[ViewedArrayBuffer]] is *undefined*.
             1. Set _obj_.[[TypedArrayName]] to _constructorName_.
             1. If _constructorName_ is *"BigInt64Array"* or *"BigUint64Array"*, set _obj_.[[ContentType]] to ~BigInt~.
@@ -35979,7 +36059,7 @@ THH:mm:ss.sss
         <p>Several methods of Map objects return Iterator objects. The abstract operation CreateMapIterator with arguments _map_ and _kind_ is used to create such iterator objects. It performs the following steps:</p>
         <emu-alg>
           1. Perform ? RequireInternalSlot(_map_, [[MapData]]).
-          1. Let _iterator_ be ObjectCreate(%MapIteratorPrototype%, &laquo; [[IteratedMap]], [[MapNextIndex]], [[MapIterationKind]] &raquo;).
+          1. Let _iterator_ be OrdinaryObjectCreate(%MapIteratorPrototype%, &laquo; [[IteratedMap]], [[MapNextIndex]], [[MapIterationKind]] &raquo;).
           1. Set _iterator_.[[IteratedMap]] to _map_.
           1. Set _iterator_.[[MapNextIndex]] to 0.
           1. Set _iterator_.[[MapIterationKind]] to _kind_.
@@ -36313,7 +36393,7 @@ THH:mm:ss.sss
         <p>Several methods of Set objects return Iterator objects. The abstract operation CreateSetIterator with arguments _set_ and _kind_ is used to create such iterator objects. It performs the following steps:</p>
         <emu-alg>
           1. Perform ? RequireInternalSlot(_set_, [[SetData]]).
-          1. Let _iterator_ be ObjectCreate(%SetIteratorPrototype%, &laquo; [[IteratedSet]], [[SetNextIndex]], [[SetIterationKind]] &raquo;).
+          1. Let _iterator_ be OrdinaryObjectCreate(%SetIteratorPrototype%, &laquo; [[IteratedSet]], [[SetNextIndex]], [[SetIterationKind]] &raquo;).
           1. Set _iterator_.[[IteratedSet]] to _set_.
           1. Set _iterator_.[[SetNextIndex]] to 0.
           1. Set _iterator_.[[SetIterationKind]] to _kind_.
@@ -37966,14 +38046,14 @@ THH:mm:ss.sss
       <p>The `parse` function parses a JSON text (a JSON-formatted String) and produces an ECMAScript value. The JSON format represents literals, arrays, and objects with a syntax similar to the syntax for ECMAScript literals, Array Initializers, and Object Initializers. After parsing, JSON objects are realized as ECMAScript objects. JSON arrays are realized as ECMAScript Array instances. JSON strings, numbers, booleans, and null are realized as ECMAScript Strings, Numbers, Booleans, and *null*.</p>
       <p>The optional _reviver_ parameter is a function that takes two parameters, _key_ and _value_. It can filter and transform the results. It is called with each of the _key_/_value_ pairs produced by the parse, and its return value is used instead of the original value. If it returns what it received, the structure is not modified. If it returns *undefined* then the property is deleted from the result.</p>
       <emu-alg>
-        1. Let _JText_ be ? ToString(_text_).
-        1. Parse _JText_ interpreted as UTF-16 encoded Unicode points (<emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>) as a JSON text as specified in ECMA-404. Throw a *SyntaxError* exception if _JText_ is not a valid JSON text as defined in that specification.
-        1. Let _scriptText_ be the string-concatenation of *"("*, _JText_, and *");"*.
-        1. Let _completion_ be the result of parsing and evaluating _scriptText_ as if it was the source text of an ECMAScript |Script|. The extended PropertyDefinitionEvaluation semantics defined in <emu-xref href="#sec-__proto__-property-names-in-object-initializers"></emu-xref> must not be used during the evaluation.
+        1. Let _jsonString_ be ? ToString(_text_).
+        1. Parse ! UTF16DecodeString(_jsonString_) as a JSON text as specified in ECMA-404. Throw a *SyntaxError* exception if it is not a valid JSON text as defined in that specification.
+        1. Let _scriptString_ be the string-concatenation of *"("*, _jsonString_, and *");"*.
+        1. Let _completion_ be the result of parsing and evaluating ! UTF16DecodeString(_scriptString_) as if it was the source text of an ECMAScript |Script|. The extended PropertyDefinitionEvaluation semantics defined in <emu-xref href="#sec-__proto__-property-names-in-object-initializers"></emu-xref> must not be used during the evaluation.
         1. Let _unfiltered_ be _completion_.[[Value]].
         1. Assert: _unfiltered_ is either a String, Number, Boolean, Null, or an Object that is defined by either an |ArrayLiteral| or an |ObjectLiteral|.
         1. If IsCallable(_reviver_) is *true*, then
-          1. Let _root_ be ObjectCreate(%Object.prototype%).
+          1. Let _root_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Let _rootName_ be the empty String.
           1. Perform ! CreateDataPropertyOrThrow(_root_, _rootName_, _unfiltered_).
           1. Return ? InternalizeJSONProperty(_root_, _rootName_).
@@ -37983,7 +38063,7 @@ THH:mm:ss.sss
       <p>This function is the <dfn>%JSONParse%</dfn> intrinsic object.</p>
       <p>The *"length"* property of the `parse` function is 2.</p>
       <emu-note>
-        <p>Valid JSON text is a subset of the ECMAScript |PrimaryExpression| syntax as modified by Step 4 above. Step 2 verifies that _JText_ conforms to that subset, and step 6 verifies that that parsing and evaluation returns a value of an appropriate type.</p>
+        <p>Valid JSON text is a subset of the ECMAScript |PrimaryExpression| syntax as modified by Step 4 above. Step 2 verifies that _jsonString_ conforms to that subset, and step 6 verifies that that parsing and evaluation returns a value of an appropriate type.</p>
       </emu-note>
 
       <emu-clause id="sec-internalizejsonproperty" aoid="InternalizeJSONProperty">
@@ -38062,7 +38142,7 @@ THH:mm:ss.sss
           1. If the length of _space_ is 10 or less, let _gap_ be _space_; otherwise let _gap_ be the String value consisting of the first 10 code units of _space_.
         1. Else,
           1. Let _gap_ be the empty String.
-        1. Let _wrapper_ be ObjectCreate(%Object.prototype%).
+        1. Let _wrapper_ be OrdinaryObjectCreate(%Object.prototype%).
         1. Perform ! CreateDataPropertyOrThrow(_wrapper_, the empty String, _value_).
         1. Return ? SerializeJSONProperty(the empty String, _wrapper_).
       </emu-alg>
@@ -38148,8 +38228,7 @@ THH:mm:ss.sss
         <p>This operation interprets a String value as a sequence of UTF-16 encoded code points, as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>.</p>
         <emu-alg>
           1. Let _product_ be the String value consisting solely of the code unit 0x0022 (QUOTATION MARK).
-          1. Let _cpList_ be a List containing in order the code points of _value_ when interpreted as a sequence of UTF-16 encoded code points as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>.
-          1. For each code point _C_ in _cpList_, do
+          1. For each code point _C_ in ! UTF16DecodeString(_value_), do
             1. If _C_ is listed in the &ldquo;Code Point&rdquo; column of <emu-xref href="#table-json-single-character-escapes"></emu-xref>, then
               1. Set _product_ to the string-concatenation of _product_ and the escape sequence for _C_ as specified in the &ldquo;Escape Sequence&rdquo; column of the corresponding row.
             1. Else if _C_ has a numeric value less than 0x0020 (SPACE), or if _C_ has the same numeric value as a <emu-xref href="#leading-surrogate"></emu-xref> or <emu-xref href="#trailing-surrogate"></emu-xref>, then
@@ -38652,7 +38731,7 @@ THH:mm:ss.sss
         <h1>CreateAsyncFromSyncIterator ( _syncIteratorRecord_ )</h1>
         <p>The abstract operation CreateAsyncFromSyncIterator is used to create an async iterator Record from a synchronous iterator Record. It performs the following steps:</p>
         <emu-alg>
-          1. Let _asyncIterator_ be ! ObjectCreate(%AsyncFromSyncIteratorPrototype%, &laquo; [[SyncIteratorRecord]] &raquo;).
+          1. Let _asyncIterator_ be ! OrdinaryObjectCreate(%AsyncFromSyncIteratorPrototype%, &laquo; [[SyncIteratorRecord]] &raquo;).
           1. Set _asyncIterator_.[[SyncIteratorRecord]] to _syncIteratorRecord_.
           1. Let _nextMethod_ be ! Get(_asyncIterator_, *"next"*).
           1. Let _iteratorRecord_ be the Record { [[Iterator]]: _asyncIterator_, [[NextMethod]]: _nextMethod_, [[Done]]: *false* }.
@@ -40079,7 +40158,7 @@ THH:mm:ss.sss
             1. Let _values_ be _F_.[[Values]].
             1. Let _promiseCapability_ be _F_.[[Capability]].
             1. Let _remainingElementsCount_ be _F_.[[RemainingElements]].
-            1. Let _obj_ be ! ObjectCreate(%Object.prototype%).
+            1. Let _obj_ be ! OrdinaryObjectCreate(%Object.prototype%).
             1. Perform ! CreateDataPropertyOrThrow(_obj_, *"status"*, *"fulfilled"*).
             1. Perform ! CreateDataPropertyOrThrow(_obj_, *"value"*, _x_).
             1. Set _values_[_index_] to _obj_.
@@ -40105,7 +40184,7 @@ THH:mm:ss.sss
             1. Let _values_ be _F_.[[Values]].
             1. Let _promiseCapability_ be _F_.[[Capability]].
             1. Let _remainingElementsCount_ be _F_.[[RemainingElements]].
-            1. Let _obj_ be ! ObjectCreate(%Object.prototype%).
+            1. Let _obj_ be ! OrdinaryObjectCreate(%Object.prototype%).
             1. Perform ! CreateDataPropertyOrThrow(_obj_, *"status"*, *"rejected"*).
             1. Perform ! CreateDataPropertyOrThrow(_obj_, *"reason"*, _x_).
             1. Set _values_[_index_] to _obj_.
@@ -40747,7 +40826,7 @@ THH:mm:ss.sss
           1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-proxy-revocation-functions" title></emu-xref>.
           1. Let _revoker_ be ! CreateBuiltinFunction(_steps_, &laquo; [[RevocableProxy]] &raquo;).
           1. Set _revoker_.[[RevocableProxy]] to _p_.
-          1. Let _result_ be ObjectCreate(%Object.prototype%).
+          1. Let _result_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Perform ! CreateDataPropertyOrThrow(_result_, *"proxy"*, _p_).
           1. Perform ! CreateDataPropertyOrThrow(_result_, *"revoke"*, _revoker_).
           1. Return _result_.
