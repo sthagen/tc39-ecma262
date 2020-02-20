@@ -89,7 +89,7 @@
   </ul>
   <p>Refer to the <emu-xref href="#sec-colophon">colophon</emu-xref> for more information on how this document is created.</p>
   <h1>About this Specification</h1>
-  <p>This document at <a href=".">https://tc39.es/ecma262/</a> is the most accurate up-to-date ECMAScript specification. It contains the content of the most recent yearly snapshot plus any <a href="https://github.com/tc39/proposals/blob/master/finished-proposals.md">finished proposals</a> (those that have reached Stage&nbsp;4 in the <a href="https://tc39.es/process-document/">proposal process</a> and thus are implemented in several implementations and will be in the next practical revision) since that snapshot was taken.</p>
+  <p>This document at <a href=".">https://tc39.es/ecma262/</a> is the most accurate and up-to-date ECMAScript specification. It contains the content of the most recent yearly snapshot plus any <a href="https://github.com/tc39/proposals/blob/master/finished-proposals.md">finished proposals</a> (those that have reached Stage&nbsp;4 in the <a href="https://tc39.es/process-document/">proposal process</a> and thus are implemented in several implementations and will be in the next practical revision) since that snapshot was taken.</p>
 </div>
 <emu-intro id="sec-intro">
   <h1>Introduction</h1>
@@ -4830,7 +4830,7 @@
       <emu-alg>
         1. Let _number_ be ? ToNumber(_argument_).
         1. If _number_ is *NaN*, *+0*, or *-0*, return *+0*.
-        1. If _number_ is *+&infin;*, or *-&infin;*, return _number_.
+        1. If _number_ is *+&infin;* or *-&infin;*, return _number_.
         1. Let _integer_ be the Number value that is the same sign as _number_ and whose magnitude is floor(abs(_number_)).
         1. If _integer_ is *-0*, return *+0*.
         1. Return _integer_.
@@ -10903,7 +10903,7 @@
 
       LineTerminatorSequence ::
         &lt;LF&gt;
-        &lt;CR&gt; [lookahead != &lt;LF&gt; ]
+        &lt;CR&gt; [lookahead != &lt;LF&gt;]
         &lt;LS&gt;
         &lt;PS&gt;
         &lt;CR&gt; &lt;LF&gt;
@@ -11014,13 +11014,13 @@
         <emu-grammar>IdentifierStart :: `\` UnicodeEscapeSequence</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if SV(|UnicodeEscapeSequence|) is none of *"$"*, or *"_"*, or the UTF16Encoding of a code point matched by the |UnicodeIDStart| lexical grammar production.
+            It is a Syntax Error if the SV of |UnicodeEscapeSequence| is none of *"$"*, or *"_"*, or the UTF16Encoding of a code point matched by the |UnicodeIDStart| lexical grammar production.
           </li>
         </ul>
         <emu-grammar>IdentifierPart :: `\` UnicodeEscapeSequence</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if SV(|UnicodeEscapeSequence|) is none of *"$"*, or *"_"*, or the UTF16Encoding of either &lt;ZWNJ&gt; or &lt;ZWJ&gt;, or the UTF16Encoding of a Unicode code point that would be matched by the |UnicodeIDContinue| lexical grammar production.
+            It is a Syntax Error if the SV of |UnicodeEscapeSequence| is none of *"$"*, or *"_"*, or the UTF16Encoding of either &lt;ZWNJ&gt; or &lt;ZWJ&gt;, or the UTF16Encoding of a Unicode code point that would be matched by the |UnicodeIDContinue| lexical grammar production.
           </li>
         </ul>
       </emu-clause>
@@ -11100,9 +11100,12 @@
     <h1>Punctuators</h1>
     <h2>Syntax</h2>
     <emu-grammar type="definition">
+      Punctuator ::
+        OptionalChainingPunctuator
+        OtherPunctuator
+
       OptionalChainingPunctuator ::
         `?.` [lookahead &lt;! DecimalDigit]
-        OtherPunctuator
 
       OtherPunctuator :: one of
         `{` `(` `)` `[` `]`
@@ -11118,10 +11121,6 @@
         `?` `:`
         `=` `+=` `-=` `*=` `%=` `**=` `&lt;&lt;=` `&gt;&gt;=` `&gt;&gt;&gt;=` `&amp;=` `|=` `^=`
         `=&gt;`
-
-      Punctuator ::
-        OptionalChainingPunctuator
-        OtherPunctuator
 
       DivPunctuator ::
         `/`
@@ -11395,6 +11394,9 @@
           </li>
           <li>
             The MV of <emu-grammar>HexDigits :: HexDigits HexDigit</emu-grammar> is (the MV of |HexDigits| &times; 16<sub>ℝ</sub>) plus the MV of |HexDigit|.
+          </li>
+          <li>
+            The MV of <emu-grammar>Hex4Digits :: HexDigit HexDigit HexDigit HexDigit</emu-grammar> is (0x1000<sub>ℝ</sub> times the MV of the first |HexDigit|) plus (0x100<sub>ℝ</sub> times the MV of the second |HexDigit|) plus (0x10<sub>ℝ</sub> times the MV of the third |HexDigit|) plus the MV of the fourth |HexDigit|.
           </li>
         </ul>
       </emu-clause>
@@ -11761,7 +11763,7 @@
             The SV of <emu-grammar>UnicodeEscapeSequence :: `u` Hex4Digits</emu-grammar> is the SV of |Hex4Digits|.
           </li>
           <li>
-            The SV of <emu-grammar>Hex4Digits :: HexDigit HexDigit HexDigit HexDigit</emu-grammar> is the code unit whose value is (0x1000<sub>ℝ</sub> times the MV of the first |HexDigit|) plus (0x100<sub>ℝ</sub> times the MV of the second |HexDigit|) plus (0x10<sub>ℝ</sub> times the MV of the third |HexDigit|) plus the MV of the fourth |HexDigit|.
+            The SV of <emu-grammar>Hex4Digits :: HexDigit HexDigit HexDigit HexDigit</emu-grammar> is the code unit whose value is the MV of |Hex4Digits|.
           </li>
           <li>
             The SV of <emu-grammar>UnicodeEscapeSequence :: `u{` CodePoint `}`</emu-grammar> is the UTF16Encoding of the MV of |CodePoint|.
@@ -11879,7 +11881,7 @@
           TemplateCharacter TemplateCharacters?
 
         TemplateCharacter ::
-          `$` [lookahead != `{` ]
+          `$` [lookahead != `{`]
           `\` EscapeSequence
           `\` NotEscapeSequence
           LineContinuation
@@ -11900,10 +11902,10 @@
           `u` `{` CodePoint [lookahead &lt;! HexDigit] [lookahead != `}`]
 
         NotCodePoint ::
-          HexDigits [> but only if MV of |HexDigits| &gt; 0x10FFFF ]
+          HexDigits [> but only if MV of |HexDigits| &gt; 0x10FFFF]
 
         CodePoint ::
-          HexDigits [> but only if MV of |HexDigits| &le; 0x10FFFF ]
+          HexDigits [> but only if MV of |HexDigits| &le; 0x10FFFF]
       </emu-grammar>
       <p>A conforming implementation must not use the extended definition of |EscapeSequence| described in <emu-xref href="#sec-additional-syntax-string-literals"></emu-xref> when parsing a |TemplateCharacter|.</p>
       <emu-note>
@@ -12044,7 +12046,7 @@
             The TRV of <emu-grammar>NotEscapeSequence :: `u` `{` CodePoint [lookahead &lt;! HexDigit] [lookahead != `}`]</emu-grammar> is the sequence consisting of the code unit 0x0075 (LATIN SMALL LETTER U) followed by the code unit 0x007B (LEFT CURLY BRACKET) followed by the code units of the TRV of |CodePoint|.
           </li>
           <li>
-            The TRV of <emu-grammar>DecimalDigit :: one of `0` `1` `2` `3` `4` `5` `6` `7` `8` `9`</emu-grammar> is the SV of the |SourceCharacter| that is that single code point.
+            The TRV of <emu-grammar>DecimalDigit :: one of `0` `1` `2` `3` `4` `5` `6` `7` `8` `9`</emu-grammar> is the UTF16Encoding of the single code point matched by this production.
           </li>
           <li>
             The TRV of <emu-grammar>CharacterEscapeSequence :: SingleEscapeCharacter</emu-grammar> is the TRV of |SingleEscapeCharacter|.
@@ -12053,7 +12055,7 @@
             The TRV of <emu-grammar>CharacterEscapeSequence :: NonEscapeCharacter</emu-grammar> is the SV of |NonEscapeCharacter|.
           </li>
           <li>
-            The TRV of <emu-grammar>SingleEscapeCharacter :: one of `'` `"` `\` `b` `f` `n` `r` `t` `v`</emu-grammar> is the SV of the |SourceCharacter| that is that single code point.
+            The TRV of <emu-grammar>SingleEscapeCharacter :: one of `'` `"` `\` `b` `f` `n` `r` `t` `v`</emu-grammar> is the UTF16Encoding of the single code point matched by this production.
           </li>
           <li>
             The TRV of <emu-grammar>HexEscapeSequence :: `x` HexDigit HexDigit</emu-grammar> is the sequence consisting of the code unit 0x0078 (LATIN SMALL LETTER X) followed by TRV of the first |HexDigit| followed by the TRV of the second |HexDigit|.
@@ -12074,7 +12076,7 @@
             The TRV of <emu-grammar>HexDigits :: HexDigits HexDigit</emu-grammar> is the sequence consisting of TRV of |HexDigits| followed by TRV of |HexDigit|.
           </li>
           <li>
-            The TRV of a |HexDigit| is the SV of the |SourceCharacter| that is that |HexDigit|.
+            The TRV of <emu-grammar>HexDigit :: one of `0` `1` `2` `3` `4` `5` `6` `7` `8` `9` `a` `b` `c` `d` `e` `f` `A` `B` `C` `D` `E` `F`</emu-grammar> is the UTF16Encoding of the single code point matched by this production.
           </li>
           <li>
             The TRV of <emu-grammar>LineContinuation :: `\` LineTerminatorSequence</emu-grammar> is the sequence consisting of the code unit 0x005C (REVERSE SOLIDUS) followed by the code units of TRV of |LineTerminatorSequence|.
@@ -12092,7 +12094,7 @@
             The TRV of <emu-grammar>LineTerminatorSequence :: &lt;PS&gt;</emu-grammar> is the code unit 0x2029 (PARAGRAPH SEPARATOR).
           </li>
           <li>
-            The TRV of <emu-grammar>LineTerminatorSequence :: &lt;CR&gt;&lt;LF&gt;</emu-grammar> is the sequence consisting of the code unit 0x000A (LINE FEED).
+            The TRV of <emu-grammar>LineTerminatorSequence :: &lt;CR&gt; &lt;LF&gt;</emu-grammar> is the sequence consisting of the code unit 0x000A (LINE FEED).
           </li>
         </ul>
         <emu-note>
@@ -12258,7 +12260,7 @@
 
     <p>As new syntactic features are added to ECMAScript, additional grammar productions could be added that cause lines relying on automatic semicolon insertion preceding them to change grammar productions when parsed.</p>
 
-    <p>The interesting cases of automatic semicolon insertion are places where a semicolon may or may not be inserted depending on preceding source text according to the rules above. These places are considered interesting if changes outside of an existing source text grammar production could change the grammar production of the existing source text depending on automatic semicolon insertion. The rest of this section describes a number of interesting cases of automatic semicolon insertion in this version of ECMAScript.</p>
+    <p>For the purposes of this section, a case of automatic semicolon insertion is considered interesting if it is a place where a semicolon may or may not be inserted, depending on the source text which precedes it. The rest of this section describes a number of interesting cases of automatic semicolon insertion in this version of ECMAScript.</p>
     <emu-clause id="sec-asi-interesting-cases-in-statement-lists">
       <h1>Interesting Cases of Automatic Semicolon Insertion in Statement Lists</h1>
       <p>In a |StatementList|, many |StatementListItem|s end in semicolons, which may be omitted using automatic semicolon insertion. As a consequence of the rules above, at the end of a line ending an expression, a semicolon is required if the following line begins with any of the following:</p>
@@ -13533,7 +13535,7 @@
         `?.` IdentifierName
         `?.` TemplateLiteral[?Yield, ?Await, +Tagged]
         OptionalChain[?Yield, ?Await] Arguments[?Yield, ?Await]
-        OptionalChain[?Yield, ?Await]  `[` Expression[+In, ?Yield, ?Await] `]`
+        OptionalChain[?Yield, ?Await] `[` Expression[+In, ?Yield, ?Await] `]`
         OptionalChain[?Yield, ?Await] `.` IdentifierName
         OptionalChain[?Yield, ?Await] TemplateLiteral[?Yield, ?Await, +Tagged]
 
@@ -13555,9 +13557,9 @@
       <emu-clause id="sec-left-hand-side-expressions-static-semantics-early-errors">
         <h1>Static Semantics: Early Errors</h1>
         <emu-grammar>
-          OptionalChain[Yield, Await] :
-            `?.` TemplateLiteral[?Yield, ?Await, +Tagged]
-            OptionalChain[?Yield, ?Await] TemplateLiteral[?Yield, ?Await, +Tagged]
+          OptionalChain :
+            `?.` TemplateLiteral
+            OptionalChain TemplateLiteral
         </emu-grammar>
         <ul>
           <li>
@@ -13582,7 +13584,7 @@
       <emu-clause id="sec-left-hand-side-expressions-static-semantics-coveredcallexpression">
         <h1>Static Semantics: CoveredCallExpression</h1>
         <emu-grammar>
-          CallExpression : CoverCallExpressionAndAsyncArrowHead
+          CoverCallExpressionAndAsyncArrowHead : MemberExpression Arguments
         </emu-grammar>
         <emu-alg>
           1. Return the |CallMemberExpression| that is covered by |CoverCallExpressionAndAsyncArrowHead|.
@@ -13803,21 +13805,21 @@
         <emu-alg>
           1. Let _baseReference_ be the result of evaluating |CallExpression|.
           1. Let _baseValue_ be ? GetValue(_baseReference_).
-          1. If the code matched by this |CallExpression| is strict mode code, let _strict_ be *true*, else let _strict_ be *false*.
+          1. If the code matched by this |CallExpression| is strict mode code, let _strict_ be *true*; else let _strict_ be *false*.
           1. Return ? EvaluatePropertyAccessWithExpressionKey(_baseValue_, |Expression|, _strict_).
         </emu-alg>
         <emu-grammar>CallExpression : CallExpression `.` IdentifierName</emu-grammar>
         <emu-alg>
           1. Let _baseReference_ be the result of evaluating |CallExpression|.
           1. Let _baseValue_ be ? GetValue(_baseReference_).
-          1. If the code matched by this |CallExpression| is strict mode code, let _strict_ be *true*, else let _strict_ be *false*.
+          1. If the code matched by this |CallExpression| is strict mode code, let _strict_ be *true*; else let _strict_ be *false*.
           1. Return ? EvaluatePropertyAccessWithIdentifierKey(_baseValue_, |IdentifierName|, _strict_).
         </emu-alg>
       </emu-clause>
     </emu-clause>
 
     <emu-clause id="sec-evaluate-property-access-with-expression-key" aoid="EvaluatePropertyAccessWithExpressionKey">
-      <h1>Runtime Semantics: EvaluatePropertyAccessWithExpressionKey( _baseValue_, _expression_, _strict_ )</h1>
+      <h1>Runtime Semantics: EvaluatePropertyAccessWithExpressionKey ( _baseValue_, _expression_, _strict_ )</h1>
       <p>The abstract operation EvaluatePropertyAccessWithExpressionKey takes as arguments a value _baseValue_, a Parse Node _expression_, and a Boolean argument _strict_. It performs the following steps:</p>
       <emu-alg>
         1. Let _propertyNameReference_ be the result of evaluating _expression_.
@@ -13828,10 +13830,10 @@
       </emu-alg>
     </emu-clause>
     <emu-clause id="sec-evaluate-property-access-with-identifier-key" aoid="EvaluatePropertyAccessWithIdentifierKey">
-      <h1>Runtime Semantics: EvaluatePropertyAccessWithIdentifierKey( _baseValue_, _identifierName_, _strict_ )</h1>
+      <h1>Runtime Semantics: EvaluatePropertyAccessWithIdentifierKey ( _baseValue_, _identifierName_, _strict_ )</h1>
       <p>The abstract operation EvaluatePropertyAccessWithIdentifierKey takes as arguments a value _baseValue_, a Parse Node _identifierName_, and a Boolean argument _strict_. It performs the following steps:</p>
       <emu-alg>
-        1. Assert: _identifierName_ is an |IdentifierName|
+        1. Assert: _identifierName_ is an |IdentifierName|.
         1. Let _bv_ be ? RequireObjectCoercible(_baseValue_).
         1. Let _propertyNameString_ be StringValue of _identifierName_.
         1. Return a value of type Reference whose base value component is _bv_, whose referenced name component is _propertyNameString_, and whose strict reference flag is _strict_.
@@ -14095,12 +14097,12 @@
         </emu-alg>
         <emu-grammar>OptionalChain : `?.` `[` Expression `]`</emu-grammar>
         <emu-alg>
-          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*, else let _strict_ be *false*.
+          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*; else let _strict_ be *false*.
           1. Return ? EvaluatePropertyAccessWithExpressionKey(_baseValue_, |Expression|, _strict_).
         </emu-alg>
         <emu-grammar>OptionalChain : `?.` IdentifierName</emu-grammar>
         <emu-alg>
-          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*, else let _strict_ be *false*.
+          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*; else let _strict_ be *false*.
           1. Return ? EvaluatePropertyAccessWithIdentifierKey(_baseValue_, |IdentifierName|, _strict_).
         </emu-alg>
         <emu-grammar>OptionalChain : OptionalChain Arguments</emu-grammar>
@@ -14117,7 +14119,7 @@
           1. Let _optionalChain_ be |OptionalChain|.
           1. Let _newReference_ be ? ChainEvaluation of _optionalChain_ with arguments _baseValue_ and _baseReference_.
           1. Let _newValue_ be ? GetValue(_newReference_).
-          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*, else let _strict_ be *false*.
+          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*; else let _strict_ be *false*.
           1. Return ? EvaluatePropertyAccessWithExpressionKey(_newValue_, |Expression|, _strict_).
         </emu-alg>
         <emu-grammar>OptionalChain : OptionalChain `.` IdentifierName</emu-grammar>
@@ -14125,7 +14127,7 @@
           1. Let _optionalChain_ be |OptionalChain|.
           1. Let _newReference_ be ? ChainEvaluation of _optionalChain_ with arguments _baseValue_ and _baseReference_.
           1. Let _newValue_ be ? GetValue(_newReference_).
-          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*, else let _strict_ be *false*.
+          1. If the code matched by this |OptionalChain| is strict mode code, let _strict_ be *true*; else let _strict_ be *false*.
           1. Return ? EvaluatePropertyAccessWithIdentifierKey(_newValue_, |IdentifierName|, _strict_).
         </emu-alg>
       </emu-clause>
@@ -15322,7 +15324,7 @@
       <emu-alg>
         1. Let _lref_ be the result of evaluating |CoalesceExpressionHead|.
         1. Let _lval_ be ? GetValue(_lref_).
-        1. If _lval_ is *undefined* or *null*,
+        1. If _lval_ is *undefined* or *null*, then
           1. Let _rref_ be the result of evaluating |BitwiseORExpression|.
           1. Return ? GetValue(_rref_).
         1. Otherwise, return _lval_.
@@ -16708,6 +16710,12 @@
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
+        <emu-grammar>ObjectBindingPattern : `{` BindingPropertyList `,` BindingRestProperty `}`</emu-grammar>
+        <emu-alg>
+          1. Let _names_ be BoundNames of |BindingPropertyList|.
+          1. Append to _names_ the elements of BoundNames of |BindingRestProperty|.
+          1. Return _names_.
+        </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` Elision? `]`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
@@ -16759,9 +16767,17 @@
       <emu-clause id="sec-destructuring-binding-patterns-static-semantics-containsexpression">
         <h1>Static Semantics: ContainsExpression</h1>
         <emu-see-also-para op="ContainsExpression"></emu-see-also-para>
-        <emu-grammar>ObjectBindingPattern : `{` `}`</emu-grammar>
+        <emu-grammar>
+          ObjectBindingPattern :
+            `{` `}`
+            `{` BindingRestProperty `}`
+        </emu-grammar>
         <emu-alg>
           1. Return *false*.
+        </emu-alg>
+        <emu-grammar>ObjectBindingPattern : `{` BindingPropertyList `,` BindingRestProperty `}`</emu-grammar>
+        <emu-alg>
+          1. Return ContainsExpression of |BindingPropertyList|.
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` Elision? `]`</emu-grammar>
         <emu-alg>
@@ -17313,10 +17329,10 @@
         `for` `(` [lookahead != `let` `[`] LeftHandSideExpression[?Yield, ?Await] `in` Expression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
         `for` `(` `var` ForBinding[?Yield, ?Await] `in` Expression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
         `for` `(` ForDeclaration[?Yield, ?Await] `in` Expression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
-        `for` `(` [lookahead != `let` ] LeftHandSideExpression[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
+        `for` `(` [lookahead != `let`] LeftHandSideExpression[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
         `for` `(` `var` ForBinding[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
         `for` `(` ForDeclaration[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
-        [+Await] `for` `await` `(` [lookahead != `let` ] LeftHandSideExpression[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
+        [+Await] `for` `await` `(` [lookahead != `let`] LeftHandSideExpression[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
         [+Await] `for` `await` `(` `var` ForBinding[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
         [+Await] `for` `await` `(` ForDeclaration[?Yield, ?Await] `of` AssignmentExpression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
 
@@ -17767,7 +17783,6 @@
             `for` `await` `(` LeftHandSideExpression `of` AssignmentExpression `)` Statement
             `for` `await` `(` `var` ForBinding `of` AssignmentExpression `)` Statement
             `for` `await` `(` ForDeclaration `of` AssignmentExpression `)` Statement
-
         </emu-grammar>
         <emu-alg>
           1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
@@ -19597,6 +19612,16 @@
       </emu-note>
     </emu-clause>
 
+    <emu-clause id="sec-function-definitions-static-semantics-containsduplicatelabels">
+      <h1>Static Semantics: ContainsDuplicateLabels</h1>
+      <p>With parameter _labelSet_.</p>
+      <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
+      <emu-grammar>FunctionStatementList : [empty]</emu-grammar>
+      <emu-alg>
+        1. Return *false*.
+      </emu-alg>
+    </emu-clause>
+
     <emu-clause id="sec-function-definitions-static-semantics-containsexpression">
       <h1>Static Semantics: ContainsExpression</h1>
       <emu-see-also-para op="ContainsExpression"></emu-see-also-para>
@@ -19616,6 +19641,26 @@
       </emu-alg>
     </emu-clause>
 
+    <emu-clause id="sec-function-definitions-static-semantics-containsundefinedbreaktarget">
+      <h1>Static Semantics: ContainsUndefinedBreakTarget</h1>
+      <p>With parameter _labelSet_.</p>
+      <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
+      <emu-grammar>FunctionStatementList : [empty]</emu-grammar>
+      <emu-alg>
+        1. Return *false*.
+      </emu-alg>
+    </emu-clause>
+
+    <emu-clause id="sec-function-definitions-static-semantics-containsundefinedcontinuetarget">
+      <h1>Static Semantics: ContainsUndefinedContinueTarget</h1>
+      <p>With parameters _iterationSet_ and _labelSet_.</p>
+      <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
+      <emu-grammar>FunctionStatementList : [empty]</emu-grammar>
+      <emu-alg>
+        1. Return *false*.
+      </emu-alg>
+    </emu-clause>
+
     <emu-clause id="sec-function-definitions-static-semantics-containsusestrict">
       <h1>Static Semantics: ContainsUseStrict</h1>
       <emu-see-also-para op="ContainsUseStrict"></emu-see-also-para>
@@ -19628,7 +19673,11 @@
     <emu-clause id="sec-function-definitions-static-semantics-expectedargumentcount">
       <h1>Static Semantics: ExpectedArgumentCount</h1>
       <emu-see-also-para op="ExpectedArgumentCount"></emu-see-also-para>
-      <emu-grammar>FormalParameters : [empty]</emu-grammar>
+      <emu-grammar>
+        FormalParameters :
+          [empty]
+          FunctionRestParameter
+      </emu-grammar>
       <emu-alg>
         1. Return 0.
       </emu-alg>
@@ -19639,6 +19688,11 @@
       <emu-note>
         <p>The ExpectedArgumentCount of a |FormalParameterList| is the number of |FormalParameters| to the left of either the rest parameter or the first |FormalParameter| with an Initializer. A |FormalParameter| without an initializer is allowed after the first parameter with an initializer but such parameters are considered to be optional with *undefined* as their default value.</p>
       </emu-note>
+      <emu-grammar>FormalParameterList : FormalParameter</emu-grammar>
+      <emu-alg>
+        1. If HasInitializer of |FormalParameter| is *true*, return 0.
+        1. Return 1.
+      </emu-alg>
       <emu-grammar>FormalParameterList : FormalParameterList `,` FormalParameter</emu-grammar>
       <emu-alg>
         1. Let _count_ be ExpectedArgumentCount of |FormalParameterList|.
@@ -19920,7 +19974,7 @@
         CoverParenthesizedExpressionAndArrowParameterList[?Yield, ?Await] #parencover
 
       ConciseBody[In] :
-        [lookahead != `{` ] ExpressionBody[?In, ~Await]
+        [lookahead != `{`] ExpressionBody[?In, ~Await]
         `{` FunctionBody[~Yield, ~Await] `}`
 
       ExpressionBody[In, Await] :
@@ -20002,6 +20056,11 @@
       <emu-alg>
         1. Return *false*.
       </emu-alg>
+      <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
+      <emu-alg>
+        1. Let _formals_ be CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
+        1. Return ContainsExpression of _formals_.
+      </emu-alg>
     </emu-clause>
 
     <emu-clause id="sec-arrow-function-definitions-static-semantics-containsusestrict">
@@ -20019,6 +20078,11 @@
       <emu-grammar>ArrowParameters : BindingIdentifier</emu-grammar>
       <emu-alg>
         1. Return 1.
+      </emu-alg>
+      <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
+      <emu-alg>
+        1. Let _formals_ be CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
+        1. Return ExpectedArgumentCount of _formals_.
       </emu-alg>
     </emu-clause>
 
@@ -20054,6 +20118,7 @@
       <emu-grammar>
         CoverParenthesizedExpressionAndArrowParameterList :
           `(` Expression `)`
+          `(` Expression `,` `)`
           `(` `)`
           `(` `...` BindingIdentifier `)`
           `(` `...` BindingPattern `)`
@@ -20121,6 +20186,11 @@
           1. ReturnIfAbrupt(_v_).
         1. If _iteratorRecord_.[[Done]] is *true*, let _v_ be *undefined*.
         1. Return the result of performing BindingInitialization for |BindingIdentifier| using _v_ and _environment_ as the arguments.
+      </emu-alg>
+      <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
+      <emu-alg>
+        1. Let _formals_ be CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
+        1. Return IteratorBindingInitialization of _formals_.
       </emu-alg>
     </emu-clause>
 
@@ -21737,7 +21807,7 @@
     <emu-clause id="sec-async-arrow-function-definitions-static-semantics-containsusestrict">
       <h1>Static Semantics: ContainsUseStrict</h1>
       <emu-see-also-para op="ContainsUseStrict"></emu-see-also-para>
-      <emu-grammar>AsyncConciseBody : AssignmentExpression</emu-grammar>
+      <emu-grammar>AsyncConciseBody : ExpressionBody</emu-grammar>
       <emu-alg>
         1. Return *false*.
       </emu-alg>
@@ -21986,6 +22056,9 @@
             `for` `(` LeftHandSideExpression `in` Expression `)` Statement
             `for` `(` `var` ForBinding `in` Expression `)` Statement
             `for` `(` ForDeclaration `in` Expression `)` Statement
+            `for` `await` `(` LeftHandSideExpression `of` AssignmentExpression `)` Statement
+            `for` `await` `(` `var` ForBinding `of` AssignmentExpression `)` Statement
+            `for` `await` `(` ForDeclaration `of` AssignmentExpression `)` Statement
 
           WithStatement : `with` `(` Expression `)` Statement
         </emu-grammar>
@@ -24484,7 +24557,7 @@
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>ExportFromClause : `*` `as` IdentifierName </emu-grammar>
+        <emu-grammar>ExportFromClause : `*` `as` IdentifierName</emu-grammar>
         <emu-alg>
           1. Return a List containing the StringValue of |IdentifierName|.
         </emu-alg>
@@ -27073,7 +27146,7 @@
         <emu-alg>
           1. If _value_ is present, then
             1. Let _prim_ be ? ToNumeric(_value_).
-            1. If Type(_prim_) is BigInt, let _n_ be the Number value for _prim_.
+            1. If Type(_prim_) is BigInt, let _n_ be the Number value for the mathematical value of _prim_.
             1. Otherwise, let _n_ be _prim_.
           1. Else,
             1. Let _n_ be *+0*.
@@ -31067,13 +31140,13 @@ THH:mm:ss.sss
         <emu-grammar>RegExpIdentifierStart[U] :: `\` RegExpUnicodeEscapeSequence[?U]</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if SV(|RegExpUnicodeEscapeSequence|) is none of *"$"*, or *"_"*, or the UTF16Encoding of a code point matched by the |UnicodeIDStart| lexical grammar production.
+            It is a Syntax Error if the SV of |RegExpUnicodeEscapeSequence| is none of *"$"*, or *"_"*, or the UTF16Encoding of a code point matched by the |UnicodeIDStart| lexical grammar production.
           </li>
         </ul>
         <emu-grammar>RegExpIdentifierPart[U] :: `\` RegExpUnicodeEscapeSequence[?U]</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if SV(|RegExpUnicodeEscapeSequence|) is none of *"$"*, or *"_"*, or the UTF16Encoding of either &lt;ZWNJ&gt; or &lt;ZWJ&gt;, or the UTF16Encoding of a Unicode code point that would be matched by the |UnicodeIDContinue| lexical grammar production.
+            It is a Syntax Error if the SV of |RegExpUnicodeEscapeSequence| is none of *"$"*, or *"_"*, or the UTF16Encoding of either &lt;ZWNJ&gt; or &lt;ZWJ&gt;, or the UTF16Encoding of a Unicode code point that would be matched by the |UnicodeIDContinue| lexical grammar production.
           </li>
         </ul>
         <emu-grammar>UnicodePropertyValueExpression :: UnicodePropertyName `=` UnicodePropertyValue</emu-grammar>
@@ -31411,9 +31484,6 @@ THH:mm:ss.sss
           <li>
             A <em>Matcher</em> procedure is an internal closure that takes two arguments&mdash;a State and a Continuation&mdash;and returns a MatchResult result. A Matcher attempts to match a middle subpattern (specified by the closure's already-bound arguments) of the pattern against _Input_, starting at the intermediate state given by its State argument. The Continuation argument should be a closure that matches the rest of the pattern. After matching the subpattern of a pattern to obtain a new State, the Matcher then calls Continuation on that new State to test if the rest of the pattern can match as well. If it can, the Matcher returns the State returned by Continuation; if not, the Matcher may try different choices at its choice points, repeatedly calling Continuation until it either succeeds or all possibilities have been exhausted.
           </li>
-          <li>
-            An <em>AssertionTester</em> procedure is an internal closure that takes a State argument and returns a Boolean result. The assertion tester tests a specific condition (specified by the closure's already-bound arguments) against the current place in _Input_ and returns *true* if the condition matched or *false* if not.
-          </li>
         </ul>
       </emu-clause>
 
@@ -31498,14 +31568,10 @@ THH:mm:ss.sss
         <p>With parameter _direction_.</p>
         <p>The production <emu-grammar>Term :: Assertion</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Return an internal Matcher closure that takes two arguments, a State _x_ and a Continuation _c_, and performs the following steps:
-            1. Evaluate |Assertion| to obtain an AssertionTester _t_.
-            1. Call _t_(_x_) and let _r_ be the resulting Boolean value.
-            1. If _r_ is *false*, return ~failure~.
-            1. Call _c_(_x_) and return its result.
+          1. Return the Matcher that is the result of evaluating |Assertion|.
         </emu-alg>
         <emu-note>
-          <p>The AssertionTester is independent of _direction_.</p>
+          <p>The resulting Matcher is independent of _direction_.</p>
         </emu-note>
         <p>The production <emu-grammar>Term :: Atom</emu-grammar> evaluates as follows:</p>
         <emu-alg>
@@ -31592,44 +31658,42 @@ THH:mm:ss.sss
         <h1>Assertion</h1>
         <p>The production <emu-grammar>Assertion :: `^`</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Return an internal AssertionTester closure that takes a State argument _x_ and performs the following steps:
+          1. Return an internal Matcher closure that takes two arguments, a State _x_ and a Continuation _c_, and performs the following steps:
             1. Let _e_ be _x_'s _endIndex_.
-            1. If _e_ is zero, return *true*.
-            1. If _Multiline_ is *false*, return *false*.
-            1. If the character _Input_[_e_ - 1] is one of |LineTerminator|, return *true*.
-            1. Return *false*.
+            1. If _e_ is zero, or if _Multiline_ is *true* and the character _Input_[_e_ - 1] is one of |LineTerminator|, then
+              1. Call _c_(_x_) and return its result.
+            1. Return ~failure~.
         </emu-alg>
         <emu-note>
           <p>Even when the `y` flag is used with a pattern, `^` always matches only at the beginning of _Input_, or (if _Multiline_ is *true*) at the beginning of a line.</p>
         </emu-note>
         <p>The production <emu-grammar>Assertion :: `$`</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Return an internal AssertionTester closure that takes a State argument _x_ and performs the following steps:
+          1. Return an internal Matcher closure that takes two arguments, a State _x_ and a Continuation _c_, and performs the following steps:
             1. Let _e_ be _x_'s _endIndex_.
-            1. If _e_ is equal to _InputLength_, return *true*.
-            1. If _Multiline_ is *false*, return *false*.
-            1. If the character _Input_[_e_] is one of |LineTerminator|, return *true*.
-            1. Return *false*.
+            1. If _e_ is equal to _InputLength_, or if _Multiline_ is *true* and the character _Input_[_e_] is one of |LineTerminator|, then
+              1. Call _c_(_x_) and return its result.
+            1. Return ~failure~.
         </emu-alg>
         <p>The production <emu-grammar>Assertion :: `\` `b`</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Return an internal AssertionTester closure that takes a State argument _x_ and performs the following steps:
+          1. Return an internal Matcher closure that takes two arguments, a State _x_ and a Continuation _c_, and performs the following steps:
             1. Let _e_ be _x_'s _endIndex_.
             1. Call IsWordChar(_e_ - 1) and let _a_ be the Boolean result.
             1. Call IsWordChar(_e_) and let _b_ be the Boolean result.
-            1. If _a_ is *true* and _b_ is *false*, return *true*.
-            1. If _a_ is *false* and _b_ is *true*, return *true*.
-            1. Return *false*.
+            1. If _a_ is *true* and _b_ is *false*, or if _a_ is *false* and _b_ is *true*, then
+              1. Call _c_(_x_) and return its result.
+            1. Return ~failure~.
         </emu-alg>
         <p>The production <emu-grammar>Assertion :: `\` `B`</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Return an internal AssertionTester closure that takes a State argument _x_ and performs the following steps:
+          1. Return an internal Matcher closure that takes two arguments, a State _x_ and a Continuation _c_, and performs the following steps:
             1. Let _e_ be _x_'s _endIndex_.
             1. Call IsWordChar(_e_ - 1) and let _a_ be the Boolean result.
             1. Call IsWordChar(_e_) and let _b_ be the Boolean result.
-            1. If _a_ is *true* and _b_ is *false*, return *false*.
-            1. If _a_ is *false* and _b_ is *true*, return *false*.
-            1. Return *true*.
+            1. If _a_ is *true* and _b_ is *true*, or if _a_ is *false* and _b_ is *false*, then
+              1. Call _c_(_x_) and return its result.
+            1. Return ~failure~.
         </emu-alg>
         <p>The production <emu-grammar>Assertion :: `(` `?` `=` Disjunction `)`</emu-grammar> evaluates as follows:</p>
         <emu-alg>
@@ -41541,6 +41605,8 @@ THH:mm:ss.sss
     <emu-prodref name=UnicodeIDContinue></emu-prodref>
     <emu-prodref name=ReservedWord></emu-prodref>
     <emu-prodref name=Punctuator></emu-prodref>
+    <emu-prodref name=OptionalChainingPunctuator></emu-prodref>
+    <emu-prodref name=OtherPunctuator></emu-prodref>
     <emu-prodref name=DivPunctuator></emu-prodref>
     <emu-prodref name=RightBracePunctuator></emu-prodref>
     <emu-prodref name=NullLiteral></emu-prodref>
@@ -41648,6 +41714,8 @@ THH:mm:ss.sss
     <emu-prodref name=ImportCall></emu-prodref>
     <emu-prodref name=Arguments></emu-prodref>
     <emu-prodref name=ArgumentList></emu-prodref>
+    <emu-prodref name=OptionalExpression></emu-prodref>
+    <emu-prodref name=OptionalChain></emu-prodref>
     <emu-prodref name=LeftHandSideExpression></emu-prodref>
     <emu-prodref name=UpdateExpression></emu-prodref>
     <emu-prodref name=UnaryExpression></emu-prodref>
@@ -41752,6 +41820,7 @@ THH:mm:ss.sss
     <emu-prodref name=ArrowFunction></emu-prodref>
     <emu-prodref name=ArrowParameters></emu-prodref>
     <emu-prodref name=ConciseBody></emu-prodref>
+    <emu-prodref name=ExpressionBody></emu-prodref>
     <p>When the production <emu-prodref name=ArrowParameters a="parencover"></emu-prodref> is recognized the following grammar is used to refine the interpretation of |CoverParenthesizedExpressionAndArrowParameterList|:</p>
     <emu-prodref name=ArrowFormalParameters></emu-prodref>
     <p>&nbsp;</p>
