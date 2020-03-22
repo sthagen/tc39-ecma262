@@ -17914,18 +17914,18 @@
         </emu-note>
       </emu-clause>
 
-      <emu-clause id="sec-runtime-semantics-forin-div-ofheadevaluation-tdznames-expr-iterationkind" aoid="ForIn/OfHeadEvaluation">
-        <h1>Runtime Semantics: ForIn/OfHeadEvaluation ( _TDZnames_, _expr_, _iterationKind_ )</h1>
-        <p>The abstract operation ForIn/OfHeadEvaluation is called with arguments _TDZnames_, _expr_, and _iterationKind_. The value of _iterationKind_ is either ~enumerate~, ~iterate~, or ~async-iterate~.</p>
+      <emu-clause id="sec-runtime-semantics-forinofheadevaluation" oldids="sec-runtime-semantics-forin-div-ofheadevaluation-tdznames-expr-iterationkind" aoid="ForIn/OfHeadEvaluation">
+        <h1>Runtime Semantics: ForIn/OfHeadEvaluation ( _uninitializedBoundNames_, _expr_, _iterationKind_ )</h1>
+        <p>The abstract operation ForIn/OfHeadEvaluation is called with arguments _uninitializedBoundNames_, _expr_, and _iterationKind_. The value of _iterationKind_ is either ~enumerate~, ~iterate~, or ~async-iterate~.</p>
         <emu-alg>
           1. Let _oldEnv_ be the running execution context's LexicalEnvironment.
-          1. If _TDZnames_ is not an empty List, then
-            1. Assert: _TDZnames_ has no duplicate entries.
-            1. Let _TDZ_ be NewDeclarativeEnvironment(_oldEnv_).
-            1. Let _TDZEnvRec_ be _TDZ_'s EnvironmentRecord.
-            1. For each string _name_ in _TDZnames_, do
-              1. Perform ! _TDZEnvRec_.CreateMutableBinding(_name_, *false*).
-            1. Set the running execution context's LexicalEnvironment to _TDZ_.
+          1. If _uninitializedBoundNames_ is not an empty List, then
+            1. Assert: _uninitializedBoundNames_ has no duplicate entries.
+            1. Let _newEnv_ be NewDeclarativeEnvironment(_oldEnv_).
+            1. Let _newEnvRec_ be _newEnv_'s EnvironmentRecord.
+            1. For each string _name_ in _uninitializedBoundNames_, do
+              1. Perform ! _newEnvRec_.CreateMutableBinding(_name_, *false*).
+            1. Set the running execution context's LexicalEnvironment to _newEnv_.
           1. Let _exprRef_ be the result of evaluating _expr_.
           1. Set the running execution context's LexicalEnvironment to _oldEnv_.
           1. Let _exprValue_ be ? GetValue(_exprRef_).
@@ -24080,7 +24080,6 @@
         </emu-note>
       </emu-clause>
 
-      <!-- es6num="15.2.1.20" -->
       <emu-clause id="sec-module-semantics-runtime-semantics-evaluation">
         <h1>Runtime Semantics: Evaluation</h1>
         <emu-grammar>Module : [empty]</emu-grammar>
@@ -24728,7 +24727,6 @@
     </li>
   </ul>
 
-  <!-- es6num="16.1" -->
   <emu-clause id="sec-forbidden-extensions">
     <h1>Forbidden Extensions</h1>
     <p>An implementation must not extend this specification in the following ways:</p>
@@ -38173,7 +38171,7 @@ THH:mm:ss.sss
             1. If IsCallable(_toJSON_) is *true*, then
               1. Set _value_ to ? Call(_toJSON_, _value_, &laquo; _key_ &raquo;).
           1. If _state_.[[ReplacerFunction]] is not *undefined*, then
-            1. Set _value_ to ? Call(state.[[ReplacerFunction]], _holder_, &laquo; _key_, _value_ &raquo;).
+            1. Set _value_ to ? Call(_state_.[[ReplacerFunction]], _holder_, &laquo; _key_, _value_ &raquo;).
           1. If Type(_value_) is Object, then
             1. If _value_ has a [[NumberData]] internal slot, then
               1. Set _value_ to ? ToNumber(_value_).
@@ -38343,14 +38341,14 @@ THH:mm:ss.sss
             1. If _strP_ is not *undefined*, then
               1. Let _member_ be QuoteJSONString(_P_).
               1. Set _member_ to the string-concatenation of _member_ and *":"*.
-              1. If state_.[[Gap]] is not the empty String, then
+              1. If _state_.[[Gap]] is not the empty String, then
                 1. Set _member_ to the string-concatenation of _member_ and the code unit 0x0020 (SPACE).
               1. Set _member_ to the string-concatenation of _member_ and _strP_.
               1. Append _member_ to _partial_.
           1. If _partial_ is empty, then
             1. Let _final_ be *"{}"*.
           1. Else,
-            1. If state_.[[Gap]] is the empty String, then
+            1. If _state_.[[Gap]] is the empty String, then
               1. Let _properties_ be the String value formed by concatenating all the element Strings of _partial_ with each adjacent pair of Strings separated with the code unit 0x002C (COMMA). A comma is not inserted either before the first String or after the last String.
               1. Let _final_ be the string-concatenation of *"{"*, _properties_, and *"}"*.
             1. Else,
@@ -39915,7 +39913,7 @@ THH:mm:ss.sss
           1. If _reaction_.[[Handler]] is not *undefined*, then
             1. Let _getHandlerRealmResult_ be GetFunctionRealm(_reaction_.[[Handler]]).
             1. If _getHandlerRealmResult_ is a normal completion, then set _handlerRealm_ to _getHandlerRealmResult_.[[Value]].
-          1. Return { [[Job]]: _job_, [[Realm]]: _handlerRealm_ }.
+          1. Return the Record { [[Job]]: _job_, [[Realm]]: _handlerRealm_ }.
         </emu-alg>
       </emu-clause>
 
@@ -39933,7 +39931,7 @@ THH:mm:ss.sss
           1. Let _getThenRealmResult_ be GetFunctionRealm(_then_).
           1. If _getThenRealmResult_ is a normal completion, then let _thenRealm_ be _getThenRealmResult_.[[Value]].
           1. Otherwise, let _thenRealm_ be *null*.
-          1. Return { [[Job]]: _job_, [[Realm]]: _thenRealm_ }.
+          1. Return the Record { [[Job]]: _job_, [[Realm]]: _thenRealm_ }.
         </emu-alg>
         <emu-note>
           <p>This Job uses the supplied thenable and its `then` method to resolve the given promise. This process must take place as a Job to ensure that the evaluation of the `then` method occurs after evaluation of any surrounding code has completed.</p>
@@ -41601,9 +41599,8 @@ THH:mm:ss.sss
     <h1>Expressions</h1>
     <emu-prodref name="IdentifierReference"></emu-prodref>
     <emu-prodref name="BindingIdentifier"></emu-prodref>
-    <emu-prodref name="Identifier"></emu-prodref>
-    <emu-prodref name="AsyncArrowBindingIdentifier"></emu-prodref>
     <emu-prodref name="LabelIdentifier"></emu-prodref>
+    <emu-prodref name="Identifier"></emu-prodref>
     <emu-prodref name="PrimaryExpression"></emu-prodref>
     <emu-prodref name="CoverParenthesizedExpressionAndArrowParameterList"></emu-prodref>
     <p>When processing an instance of the production <emu-prodref name="PrimaryExpression" a="parencover"></emu-prodref> the interpretation of |CoverParenthesizedExpressionAndArrowParameterList| is refined using the following grammar:</p>
@@ -41632,11 +41629,9 @@ THH:mm:ss.sss
     <emu-prodref name="NewTarget"></emu-prodref>
     <emu-prodref name="NewExpression"></emu-prodref>
     <emu-prodref name="CallExpression"></emu-prodref>
-    <emu-prodref name="CoverCallExpressionAndAsyncArrowHead"></emu-prodref>
     <p>When processing an instance of the production <emu-prodref name="CallExpression" a="callcover"></emu-prodref> the interpretation of |CoverCallExpressionAndAsyncArrowHead| is refined using the following grammar:</p>
     <emu-prodref name="CallMemberExpression"></emu-prodref>
     <p>&nbsp;</p>
-
     <emu-prodref name="SuperCall"></emu-prodref>
     <emu-prodref name="ImportCall"></emu-prodref>
     <emu-prodref name="Arguments"></emu-prodref>
@@ -41663,6 +41658,7 @@ THH:mm:ss.sss
     <emu-prodref name="ShortCircuitExpression"></emu-prodref>
     <emu-prodref name="ConditionalExpression"></emu-prodref>
     <emu-prodref name="AssignmentExpression"></emu-prodref>
+    <emu-prodref name="AssignmentOperator"></emu-prodref>
     <p>In certain circumstances when processing an instance of the production <emu-prodref name="AssignmentExpression" a="assignment"></emu-prodref> the following grammar is used to refine the interpretation of |LeftHandSideExpression|:</p>
     <emu-prodref name="AssignmentPattern"></emu-prodref>
     <emu-prodref name="ObjectAssignmentPattern"></emu-prodref>
@@ -41676,7 +41672,6 @@ THH:mm:ss.sss
     <emu-prodref name="AssignmentRestElement"></emu-prodref>
     <emu-prodref name="DestructuringAssignmentTarget"></emu-prodref>
     <p>&nbsp;</p>
-    <emu-prodref name="AssignmentOperator"></emu-prodref>
     <emu-prodref name="Expression"></emu-prodref>
   </emu-annex>
 
@@ -41753,7 +41748,9 @@ THH:mm:ss.sss
     <p>&nbsp;</p>
     <emu-prodref name="AsyncArrowFunction"></emu-prodref>
     <emu-prodref name="AsyncConciseBody"></emu-prodref>
-    <p>When the production <emu-prodref name="AsyncArrowFunction" a="callcover"></emu-prodref> is recognized the following grammar is used to refine the interpretation of |CoverParenthesizedExpressionAndArrowParameterList|:</p>
+    <emu-prodref name="AsyncArrowBindingIdentifier"></emu-prodref>
+    <emu-prodref name="CoverCallExpressionAndAsyncArrowHead"></emu-prodref>
+    <p>When the production <emu-prodref name="AsyncArrowFunction" a="callcover"></emu-prodref> is recognized the following grammar is used to refine the interpretation of |CoverCallExpressionAndAsyncArrowHead|:</p>
     <emu-prodref name="AsyncArrowHead"></emu-prodref>
     <p>&nbsp;</p>
     <emu-prodref name="MethodDefinition"></emu-prodref>
@@ -41767,9 +41764,9 @@ THH:mm:ss.sss
     <emu-prodref name="AsyncGeneratorDeclaration"></emu-prodref>
     <emu-prodref name="AsyncGeneratorExpression"></emu-prodref>
     <emu-prodref name="AsyncGeneratorBody"></emu-prodref>
-    <emu-prodref name="AsyncMethod"></emu-prodref>
     <emu-prodref name="AsyncFunctionDeclaration"></emu-prodref>
     <emu-prodref name="AsyncFunctionExpression"></emu-prodref>
+    <emu-prodref name="AsyncMethod"></emu-prodref>
     <emu-prodref name="AsyncFunctionBody"></emu-prodref>
     <emu-prodref name="AwaitExpression"></emu-prodref>
     <emu-prodref name="ClassDeclaration"></emu-prodref>
@@ -41814,13 +41811,6 @@ THH:mm:ss.sss
     <emu-prodref name="StrNumericLiteral"></emu-prodref>
     <emu-prodref name="StrDecimalLiteral"></emu-prodref>
     <emu-prodref name="StrUnsignedDecimalLiteral"></emu-prodref>
-    <emu-prodref name="DecimalDigits"></emu-prodref>
-    <emu-prodref name="DecimalDigit"></emu-prodref>
-    <emu-prodref name="ExponentPart"></emu-prodref>
-    <emu-prodref name="ExponentIndicator"></emu-prodref>
-    <emu-prodref name="SignedInteger"></emu-prodref>
-    <emu-prodref name="HexIntegerLiteral"></emu-prodref>
-    <emu-prodref name="HexDigit"></emu-prodref>
     <p>All grammar symbols not explicitly defined by the |StringNumericLiteral| grammar have the definitions used in the <emu-xref href="#sec-literals-numeric-literals">Lexical Grammar for numeric literals</emu-xref>.</p>
   </emu-annex>
 
