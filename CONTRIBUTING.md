@@ -26,6 +26,7 @@ If you are changing the signature or behavior of an existing construct, please c
 
 * [Web IDL](https://heycam.github.io/webidl/) — [file an issue](https://github.com/heycam/webidl/issues/new)
 * [HTML Standard](https://html.spec.whatwg.org/) — [file an issue](https://github.com/whatwg/html/issues/new)
+* [ECMAScript Intl API](https://tc39.es/ecma402/) - [file an issue](https://github.com/tc39/ecma402/issues/new)
 
 #### New feature proposals
 TC39 is open to accepting new feature requests for ECMAScript, referred to as "proposals". Proposals go through a four-stage process which is documented in the [TC39 process document](https://tc39.es/process-document/).
@@ -36,6 +37,8 @@ Feature requests for future versions of ECMAScript should not be made in this re
 To make a feature request, document the problem and a sketch of the solution with others in the community, including TC39 members. One place to do this is the [TC39 Discourse](https://es.discourse.group/); another is the IRC channel #tc39 on Freenode ([instructions](https://freenode.net/kb/answer/chat)).
 
 Your goal will be to convince others that your proposal is a useful addition to the language and recruit TC39 members to help turn your request into a proposal and shepherd it into the language. Once a proposal is introduced to the committee, new features are considered by the committee according to the [TC39 process document](https://tc39.es/process-document/).
+
+You can look at [existing proposals](https://github.com/tc39/proposals/) for examples of how proposals are structured, and some delegates use [this template](https://github.com/tc39/template-for-proposals) when creating repositories for their proposals. Proposals need to have a repository and be moved to the TC39 org on GitHub once they reach Stage 1.
 
 ##### TC39 meetings and champions
 If you have a new proposal you want to get into the language, you first need a TC39 "champion": a member of the committee who will make the case for the proposal at [in-person TC39 meetings](https://github.com/tc39/agendas#agendas) and help it move through the process. If you are a TC39 member, you can be a champion; otherwise, find a TC39 member to work with for this (e.g., through es-discuss or #tc39). Proposals may have multiple champions (a "champion group").
