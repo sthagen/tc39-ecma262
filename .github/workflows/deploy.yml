@@ -1,4 +1,4 @@
-name: 'ecma-262'
+name: 'ecma-262 deploy'
 
 on:
   push:

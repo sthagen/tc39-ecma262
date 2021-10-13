@@ -16,11 +16,11 @@ If you want to explore how the specification was written, you can also view the 
 
 Proposals follow [the TC39 process](https://tc39.es/process-document/) and are tracked in the [proposals repository](https://github.com/tc39/proposals).
 
-* [Finished Proposals](https://github.com/tc39/proposals/blob/master/finished-proposals.md)
+* [Finished Proposals](https://github.com/tc39/proposals/blob/HEAD/finished-proposals.md)
 * [Active Proposals](https://github.com/tc39/proposals)
-* [Stage 1 Proposals](https://github.com/tc39/proposals/blob/master/stage-1-proposals.md)
-* [Stage 0 Proposals](https://github.com/tc39/proposals/blob/master/stage-0-proposals.md)
-* [Inactive Proposals](https://github.com/tc39/proposals/blob/master/inactive-proposals.md)
+* [Stage 1 Proposals](https://github.com/tc39/proposals/blob/HEAD/stage-1-proposals.md)
+* [Stage 0 Proposals](https://github.com/tc39/proposals/blob/HEAD/stage-0-proposals.md)
+* [Inactive Proposals](https://github.com/tc39/proposals/blob/HEAD/inactive-proposals.md)
 
 ### Contributing New Proposals
 
@@ -32,6 +32,5 @@ After cloning, do `npm install` to set up your environment. You can then do `npm
 
 ## Community
 
-* [ES discourse](https://es.discourse.group/): Discourse for ECMAScript discussion and questions
-* [Es-discuss mailing list](https://esdiscuss.org): Mailing list for ECMAScript discussions
-* IRC: #tc39 on Freenode ([instructions](https://freenode.net/kb/answer/chat))
+* [ES discourse](https://es.discourse.group/): Forum for ECMAScript discussion and questions
+* [Matrix](https://github.com/tc39/how-we-work/blob/HEAD/matrix-guide.md): Chat
