@@ -56,6 +56,7 @@
   shortname: ECMA-262
   status: draft
   location: https://tc39.es/ecma262/
+  markEffects: true
 </pre>
 <p><img src="img/ecma-logo.svg" id="ecma-logo"></p>
 <div id="metadata-block">
@@ -99,7 +100,7 @@
   <p>After publication of the third edition, ECMAScript achieved massive adoption in conjunction with the World Wide Web where it has become the programming language that is supported by essentially all web browsers. Significant work was done to develop a fourth edition of ECMAScript. However, that work was not completed and not published as the fourth edition of ECMAScript but some of it was incorporated into the development of the sixth edition.</p>
   <p>The fifth edition of ECMAScript (published as ECMA-262 5<sup>th</sup> edition) codified de facto interpretations of the language specification that have become common among browser implementations and added support for new features that had emerged since the publication of the third edition. Such features include accessor properties, reflective creation and inspection of objects, program control of property attributes, additional array manipulation functions, support for the JSON object encoding format, and a strict mode that provides enhanced error checking and program security. The fifth edition was adopted by the Ecma General Assembly of December 2009.</p>
   <p>The fifth edition was submitted to ISO/IEC JTC 1 for adoption under the fast-track procedure, and approved as international standard ISO/IEC 16262:2011. Edition 5.1 of the ECMAScript Standard incorporated minor corrections and is the same text as ISO/IEC 16262:2011. The 5.1 Edition was adopted by the Ecma General Assembly of June 2011.</p>
-  <p>Focused development of the sixth edition started in 2009, as the fifth edition was being prepared for publication. However, this was preceded by significant experimentation and language enhancement design efforts dating to the publication of the third edition in 1999. In a very real sense, the completion of the sixth edition is the culmination of a fifteen year effort. The goals for this edition included providing better support for large applications, library creation, and for use of ECMAScript as a compilation target for other languages. Some of its major enhancements included modules, class declarations, lexical block scoping, iterators and generators, promises for asynchronous programming, destructuring patterns, and proper tail calls. The ECMAScript library of built-ins was expanded to support additional data abstractions including maps, sets, and arrays of binary numeric values as well as additional support for Unicode supplemental characters in strings and regular expressions. The built-ins were also made extensible via subclassing. The sixth edition provides the foundation for regular, incremental language and library enhancements. The sixth edition was adopted by the General Assembly of June 2015.</p>
+  <p>Focused development of the sixth edition started in 2009, as the fifth edition was being prepared for publication. However, this was preceded by significant experimentation and language enhancement design efforts dating to the publication of the third edition in 1999. In a very real sense, the completion of the sixth edition is the culmination of a fifteen year effort. The goals for this edition included providing better support for large applications, library creation, and for use of ECMAScript as a compilation target for other languages. Some of its major enhancements included modules, class declarations, lexical block scoping, iterators and generators, promises for asynchronous programming, destructuring patterns, and proper tail calls. The ECMAScript library of built-ins was expanded to support additional data abstractions including maps, sets, and arrays of binary numeric values as well as additional support for Unicode supplementary characters in strings and regular expressions. The built-ins were also made extensible via subclassing. The sixth edition provides the foundation for regular, incremental language and library enhancements. The sixth edition was adopted by the General Assembly of June 2015.</p>
   <p>ECMAScript 2016 was the first ECMAScript edition released under Ecma TC39's new yearly release cadence and open development process. A plain-text source document was built from the ECMAScript 2015 source document to serve as the base for further development entirely on GitHub. Over the year of this standard's development, hundreds of pull requests and issues were filed representing thousands of bug fixes, editorial fixes and other improvements. Additionally, numerous software tools were developed to aid in this effort including Ecmarkup, Ecmarkdown, and Grammarkdown. ES2016 also included support for a new exponentiation operator and adds a new method to `Array.prototype` called `includes`.</p>
   <p>ECMAScript 2017 introduced Async Functions, Shared Memory, and Atomics along with smaller language and library enhancements, bug fixes, and editorial updates. Async functions improve the asynchronous programming experience by providing syntax for promise-returning functions. Shared Memory and Atomics introduce a new memory model that allows multi-agent programs to communicate using atomic operations that ensure a well-defined execution order even on parallel CPUs. It also included new static methods on Object: `Object.values`, `Object.entries`, and `Object.getOwnPropertyDescriptors`.</p>
   <p>ECMAScript 2018 introduced support for asynchronous iteration via the AsyncIterator protocol and async generators. It also included four new regular expression features: the `dotAll` flag, named capture groups, Unicode property escapes, and look-behind assertions. Lastly it included object rest and spread properties.</p>
@@ -830,7 +831,7 @@
       <p>In order to facilitate their use in multiple parts of this specification, some algorithms, called <dfn>abstract operations</dfn>, are named and written in parameterized functional form so that they may be referenced by name from within other algorithms. Abstract operations are typically referenced using a functional application style such as OperationName(_arg1_, _arg2_). Some abstract operations are treated as polymorphically dispatched methods of class-like specification abstractions. Such method-like abstract operations are typically referenced using a method application style such as _someValue_.OperationName(_arg1_, _arg2_).</p>
     </emu-clause>
 
-    <emu-clause id="sec-algorithm-conventions-syntax-directed-operations" namespace="algorithm-conventions">
+    <emu-clause id="sec-algorithm-conventions-syntax-directed-operations">
       <h1>Syntax-Directed Operations</h1>
       <p>A <dfn variants="syntax-directed operations">syntax-directed operation</dfn> is a named operation whose definition consists of algorithms, each of which is associated with one or more productions from one of the ECMAScript grammars. A production that has multiple alternative definitions will typically have a distinct algorithm for each alternative. When an algorithm is associated with a grammar production, it may reference the terminal and nonterminal symbols of the production alternative as if they were parameters of the algorithm. When used in this manner, nonterminal symbols refer to the actual alternative definition that is matched when parsing the source text. The <dfn>source text matched by</dfn> a grammar production or Parse Node derived from it is the portion of the source text that starts at the beginning of the first terminal that participated in the match and ends at the end of the last terminal that participated in the match.</p>
       <p>When an algorithm is associated with a production alternative, the alternative is typically shown without any &ldquo;[ ]&rdquo; grammar annotations. Such annotations should only affect the syntactic recognition of the alternative and have no effect on the associated semantics for the alternative.</p>
@@ -1365,7 +1366,7 @@
               BigInt::exponentiate
             </td>
             <td>
-              either a normal completion containing a BigInt or an abrupt completion
+              either a normal completion containing a BigInt or a throw completion
             </td>
           </tr>
 
@@ -1411,7 +1412,7 @@
               BigInt::divide
             </td>
             <td>
-              either a normal completion containing a BigInt or an abrupt completion
+              either a normal completion containing a BigInt or a throw completion
             </td>
           </tr>
 
@@ -1434,7 +1435,7 @@
               BigInt::remainder
             </td>
             <td>
-              either a normal completion containing a BigInt or an abrupt completion
+              either a normal completion containing a BigInt or a throw completion
             </td>
           </tr>
 
@@ -2289,7 +2290,7 @@
             BigInt::exponentiate (
               _base_: a BigInt,
               _exponent_: a BigInt,
-            ): either a normal completion containing a BigInt or an abrupt completion
+            ): either a normal completion containing a BigInt or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -2320,7 +2321,7 @@
             BigInt::divide (
               _x_: a BigInt,
               _y_: a BigInt,
-            ): either a normal completion containing a BigInt or an abrupt completion
+            ): either a normal completion containing a BigInt or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -2336,7 +2337,7 @@
             BigInt::remainder (
               _n_: a BigInt,
               _d_: a BigInt,
-            ): either a normal completion containing a BigInt or an abrupt completion
+            ): either a normal completion containing a BigInt or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -2634,7 +2635,7 @@
         </li>
       </ul>
       <p>Properties are identified using key values. A <dfn variants="property keys">property key</dfn> value is either an ECMAScript String value or a Symbol value. All String and Symbol values, including the empty String, are valid as property keys. A <dfn id="property-name">property name</dfn> is a property key that is a String value.</p>
-      <p>An <dfn id="integer-index" variants="integer indices">integer index</dfn> is a String-valued property key that is a canonical numeric String (see <emu-xref href="#sec-canonicalnumericindexstring"></emu-xref>) and whose numeric value is either *+0*<sub>𝔽</sub> or a positive integral Number &le; 𝔽(2<sup>53</sup> - 1). An <dfn id="array-index" variants="array indices">array index</dfn> is an integer index whose numeric value _i_ is in the range <emu-eqn>*+0*<sub>𝔽</sub> &le; _i_ &lt; 𝔽(2<sup>32</sup> - 1)</emu-eqn>.</p>
+      <p>An <dfn id="integer-index" variants="integer indices">integer index</dfn> is a String-valued property key that is a canonical numeric string and whose numeric value is either *+0*<sub>𝔽</sub> or a positive integral Number &le; 𝔽(2<sup>53</sup> - 1). An <dfn id="array-index" variants="array indices">array index</dfn> is an integer index whose numeric value _i_ is in the range <emu-eqn>*+0*<sub>𝔽</sub> &le; _i_ &lt; 𝔽(2<sup>32</sup> - 1)</emu-eqn>.</p>
       <p>Property keys are used to access properties and their values. There are two kinds of access for properties: <em>get</em> and <em>set</em>, corresponding to value retrieval and assignment, respectively. The properties accessible via get and set access includes both <em>own properties</em> that are a direct part of an object and <em>inherited properties</em> which are provided by another associated object via a property inheritance relationship. Inherited properties may be either own or inherited properties of the associated object. Each own property of an object must each have a key value that is distinct from the key values of the other own properties of that object.</p>
       <p>All objects are logically collections of properties, but there are multiple forms of objects that differ in their semantics for accessing and manipulating their properties. Please see <emu-xref href="#sec-object-internal-methods-and-internal-slots"></emu-xref> for definitions of the multiple forms of objects.</p>
 
@@ -3150,7 +3151,7 @@
       <emu-clause id="sec-well-known-intrinsic-objects">
         <h1>Well-Known Intrinsic Objects</h1>
         <p>Well-known intrinsics are built-in objects that are explicitly referenced by the algorithms of this specification and which usually have realm-specific identities. Unless otherwise specified each intrinsic object actually corresponds to a set of similar objects, one per realm.</p>
-        <p>Within this specification a reference such as %name% means the intrinsic object, associated with the current realm, corresponding to the name. A reference such as %name.a.b% means, as if the "b" property of the "a" property of the intrinsic object %name% was accessed prior to any ECMAScript code being evaluated. Determination of the current realm and its intrinsics is described in <emu-xref href="#sec-execution-contexts"></emu-xref>. The well-known intrinsics are listed in <emu-xref href="#table-well-known-intrinsic-objects"></emu-xref>.</p>
+        <p>Within this specification a reference such as %name% means the intrinsic object, associated with the current realm, corresponding to the name. A reference such as %name.a.b% means, as if the *"b"* property of the value of the *"a"* property of the intrinsic object %name% was accessed prior to any ECMAScript code being evaluated. Determination of the current realm and its intrinsics is described in <emu-xref href="#sec-execution-contexts"></emu-xref>. The well-known intrinsics are listed in <emu-xref href="#table-well-known-intrinsic-objects"></emu-xref>.</p>
         <emu-table id="table-well-known-intrinsic-objects" caption="Well-Known Intrinsic Objects" oldids="table-7">
           <table>
             <tr>
@@ -4398,7 +4399,7 @@
         <h1>
           ToPropertyDescriptor (
             _Obj_: unknown,
-          ): either a normal completion containing a Property Descriptor or an abrupt completion
+          ): either a normal completion containing a Property Descriptor or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -4493,7 +4494,7 @@
         <h1>
           CreateByteDataBlock (
             _size_: a non-negative integer,
-          ): either a normal completion containing a Data Block or an abrupt completion
+          ): either a normal completion containing a Data Block or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -4508,7 +4509,7 @@
         <h1>
           CreateSharedByteDataBlock (
             _size_: a non-negative integer,
-          ): either a normal completion containing a Shared Data Block or an abrupt completion
+          ): either a normal completion containing a Shared Data Block or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -4755,7 +4756,7 @@
         ToPrimitive (
           _input_: an ECMAScript language value,
           optional _preferredType_: ~string~ or ~number~,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -4786,7 +4787,7 @@
           OrdinaryToPrimitive (
             _O_: an Object,
             _hint_: ~string~ or ~number~,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -4900,7 +4901,7 @@
       <h1>
         ToNumeric (
           _value_: unknown,
-        ): either a normal completion containing either a Number or a BigInt, or an abrupt completion
+        ): either a normal completion containing either a Number or a BigInt, or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -4917,7 +4918,7 @@
       <h1>
         ToNumber (
           _argument_: unknown,
-        ): either a normal completion containing a Number or an abrupt completion
+        ): either a normal completion containing a Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5057,6 +5058,9 @@
             <li>
               A |StringNumericLiteral| cannot include a |BigIntLiteralSuffix|.
             </li>
+            <li>
+              A |StringNumericLiteral| cannot include a |NumericLiteralSeparator|.
+            </li>
           </ul>
         </emu-note>
 
@@ -5157,7 +5161,7 @@
       <h1>
         ToIntegerOrInfinity (
           _argument_: an ECMAScript language value,
-        ): either a normal completion containing either an integer, +&infin;, or -&infin;, or an abrupt completion
+        ): either a normal completion containing either an integer, +&infin;, or -&infin;, or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5178,7 +5182,7 @@
       <h1>
         ToInt32 (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5211,7 +5215,7 @@
       <h1>
         ToUint32 (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5247,7 +5251,7 @@
       <h1>
         ToInt16 (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5266,7 +5270,7 @@
       <h1>
         ToUint16 (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5296,7 +5300,7 @@
       <h1>
         ToInt8 (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5315,7 +5319,7 @@
       <h1>
         ToUint8 (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5334,7 +5338,7 @@
       <h1>
         ToUint8Clamp (
           _argument_: unknown,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5360,7 +5364,7 @@
       <h1>
         ToBigInt (
           _argument_: unknown,
-        ): either a normal completion containing a BigInt or an abrupt completion
+        ): either a normal completion containing a BigInt or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5493,7 +5497,7 @@
       <h1>
         ToBigInt64 (
           _argument_: unknown,
-        ): either a normal completion containing a BigInt or an abrupt completion
+        ): either a normal completion containing a BigInt or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5510,7 +5514,7 @@
       <h1>
         ToBigUint64 (
           _argument_: unknown,
-        ): either a normal completion containing a BigInt or an abrupt completion
+        ): either a normal completion containing a BigInt or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5527,7 +5531,7 @@
       <h1>
         ToString (
           _argument_: unknown,
-        ): either a normal completion containing a String or an abrupt completion
+        ): either a normal completion containing a String or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5620,7 +5624,7 @@
       <h1>
         ToObject (
           _argument_: unknown,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5708,7 +5712,7 @@
       <h1>
         ToPropertyKey (
           _argument_: unknown,
-        ): either a normal completion containing a property key or an abrupt completion
+        ): either a normal completion containing a property key or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5726,7 +5730,7 @@
       <h1>
         ToLength (
           _argument_: an ECMAScript language value,
-        ): either a normal completion containing an integral Number or an abrupt completion
+        ): either a normal completion containing an integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5752,17 +5756,17 @@
       <emu-alg>
         1. If _argument_ is *"-0"*, return *-0*<sub>𝔽</sub>.
         1. Let _n_ be ! ToNumber(_argument_).
-        1. If SameValue(! ToString(_n_), _argument_) is *false*, return *undefined*.
-        1. Return _n_.
+        1. If SameValue(! ToString(_n_), _argument_) is *true*, return _n_.
+        1. Return *undefined*.
       </emu-alg>
-      <p>A <em>canonical numeric string</em> is any String value for which the CanonicalNumericIndexString abstract operation does not return *undefined*.</p>
+      <p>A <dfn variants="canonical numeric strings">canonical numeric string</dfn> is any String value for which the CanonicalNumericIndexString abstract operation does not return *undefined*.</p>
     </emu-clause>
 
     <emu-clause id="sec-toindex" type="abstract operation">
       <h1>
         ToIndex (
           _value_: an ECMAScript language value,
-        ): either a normal completion containing a non-negative integer or an abrupt completion
+        ): either a normal completion containing a non-negative integer or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5788,7 +5792,7 @@
       <h1>
         RequireObjectCoercible (
           _argument_: unknown,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5876,7 +5880,7 @@
       <h1>
         IsArray (
           _argument_: unknown,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -5929,7 +5933,7 @@
       <h1>
         IsExtensible (
           _O_: an Object,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5979,7 +5983,7 @@
       <h1>
         IsRegExp (
           _argument_: unknown,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6110,7 +6114,7 @@
           _x_: an ECMAScript language value,
           _y_: an ECMAScript language value,
           _LeftFirst_: a Boolean,
-        ): either a normal completion containing either a Boolean or *undefined*, or an abrupt completion
+        ): either a normal completion containing either a Boolean or *undefined*, or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6168,7 +6172,7 @@
         IsLooselyEqual (
           _x_: an ECMAScript language value,
           _y_: an ECMAScript language value,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6256,7 +6260,7 @@
         Get (
           _O_: an Object,
           _P_: a property key,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6272,7 +6276,7 @@
         GetV (
           _V_: an ECMAScript language value,
           _P_: a property key,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6291,7 +6295,7 @@
           _P_: a property key,
           _V_: an ECMAScript language value,
           _Throw_: a Boolean,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6310,7 +6314,7 @@
           _O_: an Object,
           _P_: a property key,
           _V_: an ECMAScript language value,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6354,7 +6358,7 @@
           _O_: an Object,
           _P_: a property key,
           _V_: an ECMAScript language value,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6399,7 +6403,7 @@
           _O_: an Object,
           _P_: a property key,
           _desc_: a Property Descriptor,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6417,7 +6421,7 @@
         DeletePropertyOrThrow (
           _O_: an Object,
           _P_: a property key,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6435,7 +6439,7 @@
         GetMethod (
           _V_: an ECMAScript language value,
           _P_: a property key,
-        ): either a normal completion containing either a function object or *undefined*, or an abrupt completion
+        ): either a normal completion containing either a function object or *undefined*, or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6454,7 +6458,7 @@
         HasProperty (
           _O_: an Object,
           _P_: a property key,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6470,7 +6474,7 @@
         HasOwnProperty (
           _O_: an Object,
           _P_: a property key,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6489,7 +6493,7 @@
           _F_: an ECMAScript language value,
           _V_: an ECMAScript language value,
           optional _argumentsList_: a List of ECMAScript language values,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6508,7 +6512,7 @@
           _F_: a constructor,
           optional _argumentsList_: unknown,
           optional _newTarget_: a constructor,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6529,7 +6533,7 @@
         SetIntegrityLevel (
           _O_: an Object,
           _level_: ~sealed~ or ~frozen~,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6561,7 +6565,7 @@
         TestIntegrityLevel (
           _O_: an Object,
           _level_: ~sealed~ or ~frozen~,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6606,7 +6610,7 @@
       <h1>
         LengthOfArrayLike (
           _obj_: an Object,
-        ): either a normal completion containing a non-negative integer or an abrupt completion
+        ): either a normal completion containing a non-negative integer or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6629,7 +6633,7 @@
         CreateListFromArrayLike (
           _obj_: unknown,
           optional _elementTypes_: a List of names of ECMAScript Language Types,
-        ): either a normal completion containing a List or an abrupt completion
+        ): either a normal completion containing a List or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6657,7 +6661,7 @@
           _V_: an ECMAScript language value,
           _P_: a property key,
           optional _argumentsList_: a List of ECMAScript language values,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6676,7 +6680,7 @@
         OrdinaryHasInstance (
           _C_: an ECMAScript language value,
           _O_: unknown,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6702,7 +6706,7 @@
         SpeciesConstructor (
           _O_: an Object,
           _defaultConstructor_: a constructor,
-        ): either a normal completion containing a constructor or an abrupt completion
+        ): either a normal completion containing a constructor or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -6724,7 +6728,7 @@
         EnumerableOwnPropertyNames (
           _O_: an Object,
           _kind_: ~key~, ~value~, or ~key+value~,
-        ): either a normal completion containing a List or an abrupt completion
+        ): either a normal completion containing a List or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6751,7 +6755,7 @@
       <h1>
         GetFunctionRealm (
           _obj_: a function object,
-        ): either a normal completion containing a Realm Record or an abrupt completion
+        ): either a normal completion containing a Realm Record or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6778,7 +6782,7 @@
           _target_: an Object,
           _source_: an ECMAScript language value,
           _excludedItems_: a List of property keys,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6826,7 +6830,7 @@
           _O_: an Object,
           _P_: a Private Name,
           _value_: an ECMAScript language value,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6843,7 +6847,7 @@
         PrivateMethodOrAccessorAdd (
           _O_: an Object,
           _method_: a PrivateElement,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6864,7 +6868,7 @@
         PrivateGet (
           _O_: an Object,
           _P_: a Private Name,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6886,7 +6890,7 @@
           _O_: an Object,
           _P_: a Private Name,
           _value_: an ECMAScript language value,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6911,7 +6915,7 @@
         DefineField (
           _receiver_: an Object,
           _fieldRecord_: a ClassFieldDefinition Record,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -6935,7 +6939,7 @@
         InitializeInstanceElements (
           _O_: an Object,
           _constructor_: an ECMAScript function object,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -7015,7 +7019,7 @@
           _obj_: an ECMAScript language value,
           optional _hint_: ~sync~ or ~async~,
           optional _method_: a function object,
-        ): either a normal completion containing an Iterator Record or an abrupt completion
+        ): either a normal completion containing an Iterator Record or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -7042,7 +7046,7 @@
         IteratorNext (
           _iteratorRecord_: an Iterator Record,
           optional _value_: an ECMAScript language value,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -7060,7 +7064,7 @@
       <h1>
         IteratorComplete (
           _iterResult_: an Object,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -7073,7 +7077,7 @@
       <h1>
         IteratorValue (
           _iterResult_: an Object,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -7086,7 +7090,7 @@
       <h1>
         IteratorStep (
           _iteratorRecord_: an Iterator Record,
-        ): either a normal completion containing either an Object or *false*, or an abrupt completion
+        ): either a normal completion containing either an Object or *false*, or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -7213,7 +7217,7 @@
         IterableToList (
           _items_: an ECMAScript language value,
           optional _method_: a function object,
-        ): either a normal completion containing a List or an abrupt completion
+        ): either a normal completion containing a List or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -10241,7 +10245,7 @@
               _N_: a String,
               _V_: an ECMAScript language value,
               _S_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10275,7 +10279,7 @@
             GetBindingValue (
               _N_: a String,
               _S_: a Boolean,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10400,7 +10404,7 @@
           <h1>
             HasBinding (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10427,7 +10431,7 @@
             CreateMutableBinding (
               _N_: a String,
               _D_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10456,7 +10460,7 @@
             InitializeBinding (
               _N_: a String,
               _V_: an ECMAScript language value,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10480,7 +10484,7 @@
               _N_: a String,
               _V_: an ECMAScript language value,
               _S_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10503,7 +10507,7 @@
             GetBindingValue (
               _N_: a String,
               _S_: a Boolean,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10525,7 +10529,7 @@
           <h1>
             DeleteBinding (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10676,7 +10680,7 @@
                 GetSuperBase()
               </td>
               <td>
-                Return the object that is the base for `super` property accesses bound in this Environment Record. The value *undefined* indicates that `super` property accesses will produce runtime errors.
+                Return the object that is the base for `super` property accesses bound in this Environment Record. The value *undefined* indicates that such accesses will produce runtime errors.
               </td>
             </tr>
           </table>
@@ -10687,7 +10691,7 @@
           <h1>
             BindThisValue (
               _V_: an ECMAScript language value,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10726,7 +10730,7 @@
         </emu-clause>
 
         <emu-clause id="sec-function-environment-records-getthisbinding" type="concrete method">
-          <h1>GetThisBinding ( ): either a normal completion containing an ECMAScript language value or an abrupt completion</h1>
+          <h1>GetThisBinding ( ): either a normal completion containing an ECMAScript language value or a throw completion</h1>
           <dl class="header">
             <dt>for</dt>
             <dd>a function Environment Record _envRec_</dd>
@@ -10739,7 +10743,7 @@
         </emu-clause>
 
         <emu-clause id="sec-getsuperbase" type="concrete method">
-          <h1>GetSuperBase ( ): either a normal completion containing either an Object, *null*, or *undefined*, or an abrupt completion</h1>
+          <h1>GetSuperBase ( ): either a normal completion containing either an Object, *null*, or *undefined*, or a throw completion</h1>
           <dl class="header">
             <dt>for</dt>
             <dd>a function Environment Record _envRec_</dd>
@@ -10900,7 +10904,7 @@
           <h1>
             HasBinding (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10922,7 +10926,7 @@
             CreateMutableBinding (
               _N_: a String,
               _D_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10943,7 +10947,7 @@
             CreateImmutableBinding (
               _N_: a String,
               _S_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10964,7 +10968,7 @@
             InitializeBinding (
               _N_: a String,
               _V_: an ECMAScript language value,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -10989,7 +10993,7 @@
               _N_: a String,
               _V_: an ECMAScript language value,
               _S_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11012,7 +11016,7 @@
             GetBindingValue (
               _N_: a String,
               _S_: a Boolean,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11034,7 +11038,7 @@
           <h1>
             DeleteBinding (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11153,7 +11157,7 @@
           <h1>
             HasRestrictedGlobalProperty (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11179,7 +11183,7 @@
           <h1>
             CanDeclareGlobalVar (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11201,7 +11205,7 @@
           <h1>
             CanDeclareGlobalFunction (
               _N_: a String,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11226,7 +11230,7 @@
             CreateGlobalVarBinding (
               _N_: a String,
               _D_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11256,7 +11260,7 @@
               _N_: a String,
               _V_: an ECMAScript language value,
               _D_: a Boolean,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11325,7 +11329,7 @@
             GetBindingValue (
               _N_: a String,
               _S_: a Boolean,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11418,7 +11422,7 @@
             _env_: an Environment Record or *null*,
             _name_: a String,
             _strict_: a Boolean,
-          ): either a normal completion containing a Reference Record or an abrupt completion
+          ): either a normal completion containing a Reference Record or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -11712,7 +11716,7 @@
       </dl>
       <emu-alg>
         1. Set _realmRec_.[[Intrinsics]] to a new Record.
-        1. Set fields of _realmRec_.[[Intrinsics]] with the values listed in <emu-xref href="#table-well-known-intrinsic-objects"></emu-xref>. The field names are the names listed in column one of the table. The value of each field is a new object value fully and recursively populated with property values as defined by the specification of each object in clauses <emu-xref href="#sec-global-object"></emu-xref> through <emu-xref href="#sec-reflection"></emu-xref>. All object property values are newly created object values. All values that are built-in function objects are created by performing CreateBuiltinFunction(_steps_, _length_, _name_, _slots_, _realmRec_, _prototype_) where _steps_ is the definition of that function provided by this specification, _name_ is the initial value of the function's `name` property, _length_ is the initial value of the function's `length` property, _slots_ is a list of the names, if any, of the function's specified internal slots, and _prototype_ is the specified value of the function's [[Prototype]] internal slot. The creation of the intrinsics and their properties must be ordered to avoid any dependencies upon objects that have not yet been created.
+        1. Set fields of _realmRec_.[[Intrinsics]] with the values listed in <emu-xref href="#table-well-known-intrinsic-objects"></emu-xref>. The field names are the names listed in column one of the table. The value of each field is a new object value fully and recursively populated with property values as defined by the specification of each object in clauses <emu-xref href="#sec-global-object"></emu-xref> through <emu-xref href="#sec-reflection"></emu-xref>. All object property values are newly created object values. All values that are built-in function objects are created by performing CreateBuiltinFunction(_steps_, _length_, _name_, _slots_, _realmRec_, _prototype_) where _steps_ is the definition of that function provided by this specification, _name_ is the initial value of the function's *"name"* property, _length_ is the initial value of the function's *"length"* property, _slots_ is a list of the names, if any, of the function's specified internal slots, and _prototype_ is the specified value of the function's [[Prototype]] internal slot. The creation of the intrinsics and their properties must be ordered to avoid any dependencies upon objects that have not yet been created.
         1. Perform AddRestrictedFunctionProperties(_realmRec_.[[Intrinsics]].[[%Function.prototype%]], _realmRec_).
         1. Return ~unused~.
       </emu-alg>
@@ -11745,7 +11749,7 @@
       <h1>
         SetDefaultGlobalBindings (
           _realmRec_: unknown,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -11892,7 +11896,7 @@
         ResolveBinding (
           _name_: a String,
           optional _env_: an Environment Record or *undefined*,
-        ): either a normal completion containing a Reference Record or an abrupt completion
+        ): either a normal completion containing a Reference Record or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -11931,7 +11935,7 @@
     </emu-clause>
 
     <emu-clause id="sec-resolvethisbinding" type="abstract operation">
-      <h1>ResolveThisBinding ( ): either a normal completion containing an ECMAScript language value or an abrupt completion</h1>
+      <h1>ResolveThisBinding ( ): either a normal completion containing an ECMAScript language value or a throw completion</h1>
       <dl class="header">
         <dt>description</dt>
         <dd>It determines the binding of the keyword `this` using the LexicalEnvironment of the running execution context.</dd>
@@ -12083,7 +12087,7 @@
           _jobCallback_: a JobCallback Record,
           _V_: an ECMAScript language value,
           _argumentsList_: a List of ECMAScript language values,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -12128,7 +12132,7 @@
   </emu-clause>
 
   <emu-clause id="sec-initializehostdefinedrealm" type="abstract operation">
-    <h1>InitializeHostDefinedRealm ( ): either a normal completion containing ~unused~ or an abrupt completion</h1>
+    <h1>InitializeHostDefinedRealm ( ): either a normal completion containing ~unused~ or a throw completion</h1>
     <dl class="header">
     </dl>
 
@@ -12152,7 +12156,7 @@
     <h1>Agents</h1>
 
     <p>An <dfn id="agent" variants="agents">agent</dfn> comprises a set of ECMAScript execution contexts, an execution context stack, a running execution context, an <dfn id="agent-record" variants="Agent Records">Agent Record</dfn>, and an <dfn id="executing-thread" variants="executing threads">executing thread</dfn>. Except for the executing thread, the constituents of an agent belong exclusively to that agent.</p>
-    <p>An agent's executing thread executes a job on the agent's execution contexts independently of other agents, except that an executing thread may be used as the executing thread by multiple agents, provided none of the agents sharing the thread have an Agent Record whose [[CanBlock]] property is *true*.</p>
+    <p>An agent's executing thread executes a job on the agent's execution contexts independently of other agents, except that an executing thread may be used as the executing thread by multiple agents, provided none of the agents sharing the thread have an Agent Record whose [[CanBlock]] field is *true*.</p>
     <emu-note>
       <p>Some web browsers share a single executing thread across multiple unrelated tabs of a browser window, for example.</p>
     </emu-note>
@@ -12213,7 +12217,7 @@
     <emu-note>
       <p>The values of [[IsLockFree1]] and [[IsLockFree2]] are not necessarily determined by the hardware, but may also reflect implementation choices that can vary over time and between ECMAScript implementations.</p>
 
-      <p>There is no [[IsLockFree4]] property: 4-byte atomic operations are always lock-free.</p>
+      <p>There is no [[IsLockFree4]] field: 4-byte atomic operations are always lock-free.</p>
 
       <p>In practice, if an atomic operation is implemented with any type of lock the operation is not lock-free. Lock-free does not imply wait-free: there is no upper bound on how many machine steps may be required to complete a lock-free atomic operation.</p>
 
@@ -12265,15 +12269,15 @@
       <p>The agents in a cluster need not all be alive at some particular point in time. If agent <b>A</b> creates another agent <b>B</b>, after which <b>A</b> terminates and <b>B</b> creates agent <b>C</b>, the three agents are in the same cluster if <b>A</b> could share some memory with <b>B</b> and <b>B</b> could share some memory with <b>C</b>.</p>
     </emu-note>
 
-    <p>All agents within a cluster must have the same value for the [[LittleEndian]] property in their respective Agent Records.</p>
+    <p>All agents within a cluster must have the same value for the [[LittleEndian]] field in their respective Agent Records.</p>
 
     <emu-note>
       <p>If different agents within an agent cluster have different values of [[LittleEndian]] it becomes hard to use shared memory for multi-byte data.</p>
     </emu-note>
 
-    <p>All agents within a cluster must have the same values for the [[IsLockFree1]] property in their respective Agent Records; similarly for the [[IsLockFree2]] property.</p>
+    <p>All agents within a cluster must have the same values for the [[IsLockFree1]] field in their respective Agent Records; similarly for the [[IsLockFree2]] field.</p>
 
-    <p>All agents within a cluster must have different values for the [[Signifier]] property in their respective Agent Records.</p>
+    <p>All agents within a cluster must have different values for the [[Signifier]] field in their respective Agent Records.</p>
 
     <p>An embedding may deactivate (stop forward progress) or activate (resume forward progress) an agent without the agent's knowledge or cooperation. If the embedding does so, it must not leave some agents in the cluster active while other agents in the cluster are deactivated indefinitely.</p>
 
@@ -12303,7 +12307,7 @@
   <emu-clause id="sec-forward-progress">
     <h1>Forward Progress</h1>
     <p>For an agent to <em>make forward progress</em> is for it to perform an evaluation step according to this specification.</p>
-    <p>An agent becomes <em>blocked</em> when its running execution context waits synchronously and indefinitely for an external event. Only agents whose Agent Record's [[CanBlock]] property is *true* can become blocked in this sense. An <em>unblocked</em> agent is one that is not blocked.</p>
+    <p>An agent becomes <em>blocked</em> when its running execution context waits synchronously and indefinitely for an external event. Only agents whose Agent Record's [[CanBlock]] field is *true* can become blocked in this sense. An <em>unblocked</em> agent is one that is not blocked.</p>
 
     <p>Implementations must ensure that:</p>
     <ul>
@@ -12473,7 +12477,7 @@
     <h1>
       CleanupFinalizationRegistry (
         _finalizationRegistry_: a FinalizationRegistry,
-      ): either a normal completion containing ~unused~ or an abrupt completion
+      ): either a normal completion containing ~unused~ or a throw completion
     </h1>
     <dl class="header">
     </dl>
@@ -12663,7 +12667,7 @@
         [[DefineOwnProperty]] (
           _P_: a property key,
           _Desc_: a Property Descriptor,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -12679,7 +12683,7 @@
             _O_: an Object,
             _P_: a property key,
             _Desc_: a Property Descriptor,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -12761,7 +12765,7 @@
       <h1>
         [[HasProperty]] (
           _P_: a property key,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -12776,7 +12780,7 @@
           OrdinaryHasProperty (
             _O_: an Object,
             _P_: a property key,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -12796,7 +12800,7 @@
         [[Get]] (
           _P_: a property key,
           _Receiver_: an ECMAScript language value,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -12813,7 +12817,7 @@
             _O_: an Object,
             _P_: a property key,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -12839,7 +12843,7 @@
           _P_: a property key,
           _V_: an ECMAScript language value,
           _Receiver_: an ECMAScript language value,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -12856,7 +12860,7 @@
             _P_: a property key,
             _V_: an ECMAScript language value,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -12875,7 +12879,7 @@
             _V_: an ECMAScript language value,
             _Receiver_: an ECMAScript language value,
             _ownDesc_: a Property Descriptor or *undefined*,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -12912,7 +12916,7 @@
       <h1>
         [[Delete]] (
           _P_: a property key,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -12927,7 +12931,7 @@
           OrdinaryDelete (
             _O_: an Object,
             _P_: a property key,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -13004,7 +13008,7 @@
           _constructor_: unknown,
           _intrinsicDefaultProto_: a String,
           optional _internalSlotsList_: a List of names of internal slots,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -13022,7 +13026,7 @@
         GetPrototypeFromConstructor (
           _constructor_: a function object,
           _intrinsicDefaultProto_: a String,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -13046,7 +13050,7 @@
         RequireInternalSlot (
           _O_: unknown,
           _internalSlot_: unknown,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -13251,7 +13255,7 @@
         [[Call]] (
           _thisArgument_: an ECMAScript language value,
           _argumentsList_: a List of ECMAScript language values,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -13420,7 +13424,7 @@
         [[Construct]] (
           _argumentsList_: a List of ECMAScript language values,
           _newTarget_: a constructor,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -13732,6 +13736,7 @@
             1. Let _ao_ be CreateMappedArgumentsObject(_func_, _formals_, _argumentsList_, _env_).
           1. If _strict_ is *true*, then
             1. Perform ! _env_.CreateImmutableBinding(*"arguments"*, *false*).
+            1. NOTE: In strict mode code early errors prevent attempting to assign to this binding, so its mutability is not observable.
           1. Else,
             1. Perform ! _env_.CreateMutableBinding(*"arguments"*, *false*).
           1. Perform ! _env_.InitializeBinding(*"arguments"*, _ao_).
@@ -13809,7 +13814,7 @@
         [[Call]] (
           _thisArgument_: an ECMAScript language value,
           _argumentsList_: a List of ECMAScript language values,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -13839,11 +13844,11 @@
         [[Construct]] (
           _argumentsList_: a List of ECMAScript language values,
           _newTarget_: a constructor,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
-        <dd>a built-in function object _F_</dd>
+        <dd>a built-in function object _F_ (when the method is present)</dd>
 
         <dt>description</dt>
         <dd>The steps performed are the same as [[Call]] (see <emu-xref href="#sec-built-in-function-objects-call-thisargument-argumentslist"></emu-xref>) except that step <emu-xref href="#step-call-builtin-function-result"></emu-xref> is replaced by:</dd>
@@ -13955,7 +13960,7 @@
           [[Call]] (
             _thisArgument_: an ECMAScript language value,
             _argumentsList_: a List of ECMAScript language values,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -13975,7 +13980,7 @@
           [[Construct]] (
             _argumentsList_: a List of ECMAScript language values,
             _newTarget_: a constructor,
-          ): either a normal completion containing an Object or an abrupt completion
+          ): either a normal completion containing an Object or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -13997,7 +14002,7 @@
             _targetFunction_: a function object,
             _boundThis_: an ECMAScript language value,
             _boundArgs_: a List of ECMAScript language values,
-          ): either a normal completion containing a function object or an abrupt completion
+          ): either a normal completion containing a function object or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -14033,7 +14038,7 @@
           [[DefineOwnProperty]] (
             _P_: a property key,
             _Desc_: a Property Descriptor,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14066,7 +14071,7 @@
           ArrayCreate (
             _length_: a non-negative integer,
             optional _proto_: unknown,
-          ): either a normal completion containing an Array exotic object or an abrupt completion
+          ): either a normal completion containing an Array exotic object or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -14088,7 +14093,7 @@
           ArraySpeciesCreate (
             _originalArray_: unknown,
             _length_: a non-negative integer,
-          ): either a normal completion containing an Object or an abrupt completion
+          ): either a normal completion containing an Object or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -14120,7 +14125,7 @@
           ArraySetLength (
             _A_: an Array,
             _Desc_: a Property Descriptor,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -14367,7 +14372,7 @@
           [[Get]] (
             _P_: a property key,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14390,7 +14395,7 @@
             _P_: a property key,
             _V_: an ECMAScript language value,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14413,7 +14418,7 @@
         <h1>
           [[Delete]] (
             _P_: a property key,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14433,7 +14438,7 @@
         <h1>
           CreateUnmappedArgumentsObject (
             _argumentsList_: unknown,
-          ): an arguments exotic object
+          ): an ordinary object
         </h1>
         <dl class="header">
         </dl>
@@ -14573,7 +14578,7 @@
         <h1>
           [[HasProperty]] (
             _P_: a property key,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14592,7 +14597,7 @@
           [[DefineOwnProperty]] (
             _P_: a property key,
             _Desc_: a Property Descriptor,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14618,7 +14623,7 @@
           [[Get]] (
             _P_: a property key,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14639,7 +14644,7 @@
             _P_: a property key,
             _V_: an ECMAScript language value,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14761,7 +14766,7 @@
             _O_: an Integer-Indexed exotic object,
             _index_: a Number,
             _value_: an ECMAScript language value,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -14877,7 +14882,7 @@
         <h1>
           [[GetOwnProperty]] (
             _P_: a property key,
-          ): either a normal completion containing either a Property Descriptor or *undefined*, or an abrupt completion
+          ): either a normal completion containing either a Property Descriptor or *undefined*, or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14897,7 +14902,7 @@
           [[DefineOwnProperty]] (
             _P_: a property key,
             _Desc_: a Property Descriptor,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -14939,7 +14944,7 @@
           [[Get]] (
             _P_: a property key,
             _Receiver_: an ECMAScript language value,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -15055,7 +15060,7 @@
         <h1>
           [[SetPrototypeOf]] (
             _V_: an Object or *null*,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
           <dt>for</dt>
@@ -15071,7 +15076,7 @@
           SetImmutablePrototype (
             _O_: unknown,
             _V_: an Object or *null*,
-          ): either a normal completion containing a Boolean or an abrupt completion
+          ): either a normal completion containing a Boolean or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -15212,7 +15217,7 @@
     <p>In the following algorithm descriptions, assume _O_ is an ECMAScript Proxy object, _P_ is a property key value, _V_ is any ECMAScript language value and _Desc_ is a Property Descriptor record.</p>
 
     <emu-clause id="sec-proxy-object-internal-methods-and-internal-slots-getprototypeof" type="internal method">
-      <h1>[[GetPrototypeOf]] ( ): either a normal completion containing either an Object or *null*, or an abrupt completion</h1>
+      <h1>[[GetPrototypeOf]] ( ): either a normal completion containing either an Object or *null*, or a throw completion</h1>
       <dl class="header">
         <dt>for</dt>
         <dd>a Proxy exotic object _O_</dd>
@@ -15250,7 +15255,7 @@
       <h1>
         [[SetPrototypeOf]] (
           _V_: an Object or *null*,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15286,7 +15291,7 @@
     </emu-clause>
 
     <emu-clause id="sec-proxy-object-internal-methods-and-internal-slots-isextensible" type="internal method">
-      <h1>[[IsExtensible]] ( ): either a normal completion containing a Boolean or an abrupt completion</h1>
+      <h1>[[IsExtensible]] ( ): either a normal completion containing a Boolean or a throw completion</h1>
       <dl class="header">
         <dt>for</dt>
         <dd>a Proxy exotic object _O_</dd>
@@ -15318,7 +15323,7 @@
     </emu-clause>
 
     <emu-clause id="sec-proxy-object-internal-methods-and-internal-slots-preventextensions" type="internal method">
-      <h1>[[PreventExtensions]] ( ): either a normal completion containing a Boolean or an abrupt completion</h1>
+      <h1>[[PreventExtensions]] ( ): either a normal completion containing a Boolean or a throw completion</h1>
       <dl class="header">
         <dt>for</dt>
         <dd>a Proxy exotic object _O_</dd>
@@ -15354,7 +15359,7 @@
       <h1>
         [[GetOwnProperty]] (
           _P_: a property key,
-        ): either a normal completion containing either a Property Descriptor or *undefined*, or an abrupt completion
+        ): either a normal completion containing either a Property Descriptor or *undefined*, or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15420,7 +15425,7 @@
         [[DefineOwnProperty]] (
           _P_: a property key,
           _Desc_: a Property Descriptor,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15478,7 +15483,7 @@
       <h1>
         [[HasProperty]] (
           _P_: a property key,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15522,7 +15527,7 @@
         [[Get]] (
           _P_: a property key,
           _Receiver_: an ECMAScript language value,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15564,7 +15569,7 @@
           _P_: a property key,
           _V_: an ECMAScript language value,
           _Receiver_: an ECMAScript language value,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15608,7 +15613,7 @@
       <h1>
         [[Delete]] (
           _P_: a property key,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15648,7 +15653,7 @@
     </emu-clause>
 
     <emu-clause id="sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys" type="internal method">
-      <h1>[[OwnPropertyKeys]] ( ): either a normal completion containing a List of property keys or an abrupt completion</h1>
+      <h1>[[OwnPropertyKeys]] ( ): either a normal completion containing a List of property keys or a throw completion</h1>
       <dl class="header">
         <dt>for</dt>
         <dd>a Proxy exotic object _O_</dd>
@@ -15716,7 +15721,7 @@
         [[Call]] (
           _thisArgument_: an ECMAScript language value,
           _argumentsList_: a List of ECMAScript language values,
-        ): either a normal completion containing an ECMAScript language value or an abrupt completion
+        ): either a normal completion containing an ECMAScript language value or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15743,7 +15748,7 @@
         [[Construct]] (
           _argumentsList_: a List of ECMAScript language values,
           _newTarget_: a constructor,
-        ): either a normal completion containing an Object or an abrupt completion
+        ): either a normal completion containing an Object or a throw completion
       </h1>
       <dl class="header">
         <dt>for</dt>
@@ -15781,7 +15786,7 @@
         ProxyCreate (
           _target_: unknown,
           _handler_: unknown,
-        ): either a normal completion containing a Proxy exotic object or an abrupt completion
+        ): either a normal completion containing a Proxy exotic object or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -19071,8 +19076,7 @@
               1. If _argList_ has no elements, return *undefined*.
               1. Let _evalArg_ be the first element of _argList_.
               1. If the source text matched by this |CallExpression| is strict mode code, let _strictCaller_ be *true*. Otherwise let _strictCaller_ be *false*.
-              1. Let _evalRealm_ be the current Realm Record.
-              1. [id="step-callexpression-evaluation-direct-eval"] Return ? PerformEval(_evalArg_, _evalRealm_, _strictCaller_, *true*).
+              1. [id="step-callexpression-evaluation-direct-eval"] Return ? PerformEval(_evalArg_, _strictCaller_, *true*).
           1. Let _thisCall_ be this |CallExpression|.
           1. Let _tailCall_ be IsInTailPosition(_thisCall_).
           1. Return ? EvaluateCall(_func_, _ref_, _arguments_, _tailCall_).
@@ -19178,7 +19182,7 @@
             _actualThis_: unknown,
             _propertyKey_: unknown,
             _strict_: unknown,
-          ): either a normal completion containing a Super Reference Record or an abrupt completion
+          ): either a normal completion containing a Super Reference Record or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -20117,7 +20121,7 @@
         InstanceofOperator (
           _V_: an ECMAScript language value,
           _target_: an ECMAScript language value,
-        ): either a normal completion containing a Boolean or an abrupt completion
+        ): either a normal completion containing a Boolean or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -20502,7 +20506,7 @@
           _lval_: an ECMAScript language value,
           _opText_: `**`, `*`, `/`, `%`, `+`, `-`, `&lt;&lt;`, `&gt;&gt;`, `&gt;&gt;&gt;`, `&amp;`, `^`, or `|`,
           _rval_: an ECMAScript language value,
-        ): either a normal completion containing either a String, a BigInt, or a Number, or an abrupt completion
+        ): either a normal completion containing either a String, a BigInt, or a Number, or a throw completion
       </h1>
       <dl class="header">
       </dl>
@@ -21785,7 +21789,7 @@
         <h1>
           CreatePerIterationEnvironment (
             _perIterationBindings_: unknown,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -25845,7 +25849,7 @@
         GlobalDeclarationInstantiation (
           _script_: a |ScriptBody| Parse Node,
           _env_: a global Environment Record,
-        ): either a normal completion containing ~unused~ or an abrupt completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -26205,7 +26209,7 @@
                 [[EvaluationError]]
               </td>
               <td>
-                an abrupt completion or ~empty~
+                a throw completion or ~empty~
               </td>
               <td>
                 A throw completion representing the exception that occurred during evaluation. *undefined* if no exception occurred or if [[Status]] is not ~evaluated~.
@@ -26343,7 +26347,7 @@
         </emu-table>
 
         <emu-clause id="sec-moduledeclarationlinking" type="concrete method" oldids="sec-moduledeclarationinstantiation">
-          <h1>Link ( ): either a normal completion containing ~unused~ or an abrupt completion</h1>
+          <h1>Link ( ): either a normal completion containing ~unused~ or a throw completion</h1>
           <dl class="header">
             <dt>for</dt>
             <dd>a Cyclic Module Record _module_</dd>
@@ -26373,7 +26377,7 @@
                 _module_: a Module Record,
                 _stack_: unknown,
                 _index_: a non-negative integer,
-              ): either a normal completion containing a non-negative integer or an abrupt completion
+              ): either a normal completion containing a non-negative integer or a throw completion
             </h1>
             <dl class="header">
               <dt>description</dt>
@@ -26460,7 +26464,7 @@
                 _module_: a Module Record,
                 _stack_: unknown,
                 _index_: a non-negative integer,
-              ): either a normal completion containing a non-negative integer or an abrupt completion
+              ): either a normal completion containing a non-negative integer or a throw completion
             </h1>
             <dl class="header">
               <dt>description</dt>
@@ -27592,7 +27596,7 @@
           <h1>
             GetExportedNames (
               optional _exportStarSet_: a List of Source Text Module Records,
-            ): either a normal completion containing a List of either Strings or *null*, or an abrupt completion
+            ): either a normal completion containing a List of either Strings or *null*, or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -27630,7 +27634,7 @@
             ResolveExport (
               _exportName_: a String,
               optional _resolveSet_: a List of Records that have [[Module]] and [[ExportName]] fields,
-            ): either a normal completion containing either a ResolvedBinding Record, *null*, or ~ambiguous~, or an abrupt completion
+            ): either a normal completion containing either a ResolvedBinding Record, *null*, or ~ambiguous~, or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -27685,7 +27689,7 @@
         </emu-clause>
 
         <emu-clause id="sec-source-text-module-record-initialize-environment" type="concrete method">
-          <h1>InitializeEnvironment ( ): either a normal completion containing ~unused~ or an abrupt completion</h1>
+          <h1>InitializeEnvironment ( ): either a normal completion containing ~unused~ or a throw completion</h1>
           <dl class="header">
             <dt>for</dt>
             <dd>a Source Text Module Record _module_</dd>
@@ -27756,7 +27760,7 @@
           <h1>
             ExecuteModule (
               optional _capability_: unknown,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -27793,7 +27797,7 @@
           HostResolveImportedModule (
             _referencingScriptOrModule_: a Script Record, a Module Record, or *null*,
             _specifier_: a |ModuleSpecifier| String,
-          ): either a normal completion containing a Module Record or an abrupt completion
+          ): either a normal completion containing a Module Record or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -27912,7 +27916,7 @@
         <h1>
           GetModuleNamespace (
             _module_: an instance of a concrete subclass of Module Record,
-          ): either a normal completion containing either a Module Namespace Object or ~empty~, or an abrupt completion
+          ): either a normal completion containing either a Module Namespace Object or ~empty~, or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -28630,20 +28634,16 @@
       <h1>eval ( _x_ )</h1>
       <p>The `eval` function is the <dfn>%eval%</dfn> intrinsic object. When the `eval` function is called with one argument _x_, the following steps are taken:</p>
       <emu-alg>
-        1. Assert: The execution context stack has at least two elements.
-        1. Let _callerContext_ be the second to top element of the execution context stack.
-        1. Let _callerRealm_ be _callerContext_'s Realm.
-        1. Return ? PerformEval(_x_, _callerRealm_, *false*, *false*).
+        1. Return ? PerformEval(_x_, *false*, *false*).
       </emu-alg>
 
       <emu-clause id="sec-performeval" type="abstract operation" oldids="sec-performeval-rules-outside-functions,sec-performeval-rules-outside-methods,sec-performeval-rules-outside-constructors">
         <h1>
           PerformEval (
             _x_: unknown,
-            _callerRealm_: unknown,
             _strictCaller_: unknown,
             _direct_: unknown,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -28651,7 +28651,8 @@
           1. Assert: If _direct_ is *false*, then _strictCaller_ is also *false*.
           1. If Type(_x_) is not String, return _x_.
           1. Let _evalRealm_ be the current Realm Record.
-          1. Perform ? HostEnsureCanCompileStrings(_callerRealm_, _evalRealm_).
+          1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
+          1. Perform ? HostEnsureCanCompileStrings(_evalRealm_).
           1. Let _inFunction_ be *false*.
           1. Let _inMethod_ be *false*.
           1. Let _inDerivedConstructor_ be *false*.
@@ -28663,8 +28664,8 @@
               1. Set _inFunction_ to *true*.
               1. Set _inMethod_ to _thisEnvRec_.HasSuperBinding().
               1. If _F_.[[ConstructorKind]] is ~derived~, set _inDerivedConstructor_ to *true*.
-              1. Let _classFieldIntializerName_ be _F_.[[ClassFieldInitializerName]].
-              1. If _classFieldIntializerName_ is not ~empty~, set _inClassFieldInitializer_ to *true*.
+              1. Let _classFieldInitializerName_ be _F_.[[ClassFieldInitializerName]].
+              1. If _classFieldInitializerName_ is not ~empty~, set _inClassFieldInitializer_ to *true*.
           1. Perform the following substeps in an implementation-defined order, possibly interleaving parsing and error detection:
             1. Let _script_ be ParseText(StringToCodePoints(_x_), |Script|).
             1. If _script_ is a List of errors, throw a *SyntaxError* exception.
@@ -28713,9 +28714,8 @@
       <emu-clause id="sec-hostensurecancompilestrings" type="host-defined abstract operation">
         <h1>
           HostEnsureCanCompileStrings (
-            _callerRealm_: a Realm Record,
             _calleeRealm_: a Realm Record,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -28736,7 +28736,7 @@
             _lexEnv_: unknown,
             _privateEnv_: unknown,
             _strict_: unknown,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -28970,7 +28970,7 @@
             Encode (
               _string_: a String,
               _unescapedSet_: a String,
-            ): either a normal completion containing a String or an abrupt completion
+            ): either a normal completion containing a String or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -29004,7 +29004,7 @@
             Decode (
               _string_: a String,
               _reservedSet_: a String,
-            ): either a normal completion containing a String or an abrupt completion
+            ): either a normal completion containing a String or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -29424,7 +29424,7 @@
             ObjectDefineProperties (
               _O_: an Object,
               _Properties_: unknown,
-            ): either a normal completion containing an Object or an abrupt completion
+            ): either a normal completion containing an Object or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -29545,7 +29545,7 @@
             GetOwnPropertyKeys (
               _O_: unknown,
               _type_: ~string~ or ~symbol~,
-            ): either a normal completion containing a List of property keys or an abrupt completion
+            ): either a normal completion containing a List of property keys or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -29924,18 +29924,15 @@
               _newTarget_: a constructor,
               _kind_: ~normal~, ~generator~, ~async~, or ~asyncGenerator~,
               _args_: a List of ECMAScript language values,
-            ): either a normal completion containing a function object or an abrupt completion
+            ): either a normal completion containing a function object or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
             <dd>_constructor_ is the constructor function that is performing this action. _newTarget_ is the constructor that `new` was initially applied to. _args_ is the argument values that were passed to _constructor_.</dd>
           </dl>
           <emu-alg>
-            1. Assert: The execution context stack has at least two elements.
-            1. Let _callerContext_ be the second to top element of the execution context stack.
-            1. Let _callerRealm_ be _callerContext_'s Realm.
-            1. Let _calleeRealm_ be the current Realm Record.
-            1. Perform ? HostEnsureCanCompileStrings(_callerRealm_, _calleeRealm_).
+            1. Let _currentRealm_ be the current Realm Record.
+            1. Perform ? HostEnsureCanCompileStrings(_currentRealm_).
             1. If _newTarget_ is *undefined*, set _newTarget_ to _constructor_.
             1. If _kind_ is ~normal~, then
               1. Let _prefix_ be *"function"*.
@@ -30586,7 +30583,7 @@
   <emu-clause id="sec-error-objects">
     <h1>Error Objects</h1>
     <p>Instances of Error objects are thrown as exceptions when runtime errors occur. The Error objects may also serve as base objects for user-defined exception classes.</p>
-    <p>When an ECMAScript implementation detects a runtime error, it throws a new instance of one of the _NativeError_ objects defined in <emu-xref href="#sec-native-error-types-used-in-this-standard"></emu-xref> or a new instance of AggregateError object defined in <emu-xref href="#sec-aggregate-error-objects"></emu-xref>. Each of these objects has the structure described below, differing only in the name used as the constructor name instead of _NativeError_, in the `name` property of the prototype object, in the implementation-defined `message` property of the prototype object, and in the presence of the %AggregateError%-specific `errors` property.</p>
+    <p>When an ECMAScript implementation detects a runtime error, it throws a new instance of one of the _NativeError_ objects defined in <emu-xref href="#sec-native-error-types-used-in-this-standard"></emu-xref> or a new instance of AggregateError object defined in <emu-xref href="#sec-aggregate-error-objects"></emu-xref>. Each of these objects has the structure described below, differing only in the name used as the constructor name instead of _NativeError_, in the *"name"* property of the prototype object, in the implementation-defined *"message"* property of the prototype object, and in the presence of the %AggregateError%-specific *"errors"* property.</p>
 
     <emu-clause id="sec-error-constructor">
       <h1>The Error Constructor</h1>
@@ -30877,7 +30874,7 @@
           InstallErrorCause (
             _O_: an Object,
             _options_: an ECMAScript language value,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -31276,7 +31273,7 @@
           <h1>
             NumberToBigInt (
               _number_: a Number,
-            ): either a normal completion containing a BigInt or an abrupt completion
+            ): either a normal completion containing a BigInt or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -31996,7 +31993,7 @@
       <emu-clause id="sec-time-values-and-time-range">
         <h1>Time Values and Time Range</h1>
         <p>Time measurement in ECMAScript is analogous to time measurement in POSIX, in particular sharing definition in terms of the proleptic Gregorian calendar, an epoch of midnight at the beginning of 1 January 1970 UTC, and an accounting of every day as comprising exactly 86,400 seconds (each of which is 1000 milliseconds long).</p>
-        <p>An ECMAScript <dfn variants="time values">time value</dfn> is a Number, either a finite integral Number representing an instant in time to millisecond precision or *NaN* representing no specific instant. A time value that is a multiple of <emu-eqn>24 &times; 60 &times; 60 &times; 1000 = 86,400,000</emu-eqn> (i.e., is equal to 86,400,000 &times; _d_ for some integer _d_) represents the instant at the start of the UTC day that follows the epoch by _d_ whole UTC days (preceding the epoch for negative _d_). Every other finite time value _t_ is defined relative to the greatest preceding time value _s_ that is such a multiple, and represents the instant that occurs within the same UTC day as _s_ but follows it by _t_ &minus; _s_ milliseconds.</p>
+        <p>An ECMAScript <dfn variants="time values">time value</dfn> is a Number, either a finite integral Number representing an instant in time to millisecond precision or *NaN* representing no specific instant. A time value that is a multiple of <emu-eqn>24 &times; 60 &times; 60 &times; 1000 = 86,400,000</emu-eqn> (i.e., is equal to 86,400,000 &times; _d_ for some integer _d_) represents the instant at the start of the UTC day that follows the epoch by _d_ whole UTC days (preceding the epoch for negative _d_). Every other finite time value _t_ is defined relative to the greatest preceding time value _s_ that is such a multiple, and represents the instant that occurs within the same UTC day as _s_ but follows it by (_t_ - _s_) milliseconds.</p>
         <p>Time values do not account for UTC leap seconds&mdash;there are no time values representing instants within positive leap seconds, and there are time values representing instants removed from the UTC timeline by negative leap seconds. However, the definition of time values nonetheless yields piecewise alignment with UTC, with discontinuities only at leap second boundaries and zero difference outside of leap seconds.</p>
         <p>A Number can exactly represent all integers from -9,007,199,254,740,992 to 9,007,199,254,740,992 (<emu-xref href="#sec-number.min_safe_integer"></emu-xref> and <emu-xref href="#sec-number.max_safe_integer"></emu-xref>). A time value supports a slightly smaller range of -8,640,000,000,000,000 to 8,640,000,000,000,000 milliseconds. This yields a supported time value range of exactly -100,000,000 days to 100,000,000 days relative to midnight at the beginning of 1 January 1970 UTC.</p>
         <p>The exact moment of midnight at the beginning of 1 January 1970 UTC is represented by the time value *+0*<sub>𝔽</sub>.</p>
@@ -33448,7 +33445,6 @@ THH:mm:ss.sss
         <h1>String.fromCharCode ( ..._codeUnits_ )</h1>
         <p>The `String.fromCharCode` function may be called with any number of arguments which form the rest parameter _codeUnits_. The following steps are taken:</p>
         <emu-alg>
-          1. Let _length_ be the number of elements in _codeUnits_.
           1. Let _elements_ be a new empty List.
           1. For each element _next_ of _codeUnits_, do
             1. Let _nextCU_ be ℝ(? ToUint16(_next_)).
@@ -33866,7 +33862,7 @@ THH:mm:ss.sss
               _maxLength_: an ECMAScript language value,
               _fillString_: an ECMAScript language value,
               _placement_: ~start~ or ~end~,
-            ): either a normal completion containing a String or an abrupt completion
+            ): either a normal completion containing a String or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -33966,7 +33962,7 @@ THH:mm:ss.sss
               _captures_: a possibly empty List, each of whose elements is a String or *undefined*,
               _namedCaptures_: an Object or *undefined*,
               _replacementTemplate_: a String,
-            ): either a normal completion containing a String or an abrupt completion
+            ): either a normal completion containing a String or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -34301,7 +34297,7 @@ THH:mm:ss.sss
             TrimString (
               _string_: an ECMAScript language value,
               _where_: ~start~, ~end~, or ~start+end~,
-            ): either a normal completion containing a String or an abrupt completion
+            ): either a normal completion containing a String or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -34641,7 +34637,7 @@ THH:mm:ss.sss
         <emu-grammar>Pattern :: Disjunction</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if _NcapturingParens_ &ge; 2<sup>32</sup> - 1.
+            It is a Syntax Error if CountLeftCapturingParensWithin(|Pattern|) &ge; 2<sup>32</sup> - 1.
           </li>
           <li>
             It is a Syntax Error if |Pattern| contains multiple |GroupSpecifier|s whose enclosed |RegExpIdentifierName|s have the same CapturingGroupName.
@@ -34662,7 +34658,7 @@ THH:mm:ss.sss
         <emu-grammar>AtomEscape :: DecimalEscape</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if the CapturingGroupNumber of |DecimalEscape| is larger than _NcapturingParens_ (<emu-xref href="#sec-notation"></emu-xref>).
+            It is a Syntax Error if the CapturingGroupNumber of |DecimalEscape| is larger than CountLeftCapturingParensWithin(the |Pattern| containing |AtomEscape|).
           </li>
         </ul>
         <emu-grammar>NonemptyClassRanges :: ClassAtom `-` ClassAtom ClassRanges</emu-grammar>
@@ -34722,6 +34718,45 @@ THH:mm:ss.sss
             It is a Syntax Error if the List of Unicode code points that is SourceText of |LoneUnicodePropertyNameOrValue| is not identical to a List of Unicode code points that is a Unicode general category or general category alias listed in the &ldquo;Property value and aliases&rdquo; column of <emu-xref href="#table-unicode-general-category-values"></emu-xref>, nor a binary property or binary property alias listed in the &ldquo;Property name and aliases&rdquo; column of <emu-xref href="#table-binary-unicode-properties"></emu-xref>.
           </li>
         </ul>
+      </emu-clause>
+
+      <emu-clause id="sec-countleftcapturingparenswithin" type="abstract operation">
+        <h1>
+          Static Semantics: CountLeftCapturingParensWithin (
+            _node_: a Parse Node,
+          ): a non-negative integer
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It returns the number of left-capturing parentheses in _node_. A <dfn variants="left-capturing parentheses">left-capturing parenthesis</dfn> is any `(` pattern character that is matched by the `(` terminal of the <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> production.</dd>
+        </dl>
+        <emu-note>
+          <p>This section is amended in <emu-xref href="#sec-countleftcapturingparens-annexb"></emu-xref>.</p>
+        </emu-note>
+        <emu-alg>
+          1. Assert: _node_ is an instance of a production in <emu-xref href="#sec-patterns">the RegExp Pattern grammar</emu-xref>.
+          1. Return the number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes contained within _node_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-countleftcapturingparensbefore" type="abstract operation">
+        <h1>
+          Static Semantics: CountLeftCapturingParensBefore (
+            _node_: a Parse Node,
+          ): a non-negative integer
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It returns the number of left-capturing parentheses within the enclosing pattern that occur to the left of _node_.</dd>
+        </dl>
+        <emu-note>
+          <p>This section is amended in <emu-xref href="#sec-countleftcapturingparens-annexb"></emu-xref>.</p>
+        </emu-note>
+        <emu-alg>
+          1. Assert: _node_ is an instance of a production in <emu-xref href="#sec-patterns">the RegExp Pattern grammar</emu-xref>.
+          1. Let _pattern_ be the |Pattern| containing _node_.
+          1. Return the number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes contained within _pattern_ that either occur before _node_ or contain _node_.
+        </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-patterns-static-semantics-capturing-group-number" type="sdo">
@@ -35063,7 +35098,7 @@ THH:mm:ss.sss
             _InputLength_ is the number of characters in _Input_.
           </li>
           <li>
-            _NcapturingParens_ is the total number of left-capturing parentheses (i.e. the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes) in the pattern. A left-capturing parenthesis is any `(` pattern character that is matched by the `(` terminal of the <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> production.
+            _NcapturingParens_ is CountLeftCapturingParensWithin(the pattern).
           </li>
           <li>
             _DotAll_ is *true* if the RegExp object's [[OriginalFlags]] internal slot contains *"s"* and otherwise is *false*.
@@ -35215,8 +35250,8 @@ THH:mm:ss.sss
           1. Let _m_ be CompileAtom of |Atom| with argument _direction_.
           1. Let _q_ be CompileQuantifier of |Quantifier|.
           1. Assert: _q_.[[Min]] &le; _q_.[[Max]].
-          1. Let _parenIndex_ be the number of left-capturing parentheses in the entire regular expression that occur to the left of this |Term|. This is the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes prior to or enclosing this |Term|.
-          1. Let _parenCount_ be the number of left-capturing parentheses in |Atom|. This is the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes enclosed by |Atom|.
+          1. Let _parenIndex_ be CountLeftCapturingParensBefore(|Term|).
+          1. Let _parenCount_ be CountLeftCapturingParensWithin(|Atom|).
           1. Return a new Matcher with parameters (_x_, _c_) that captures _m_, _q_, _parenIndex_, and _parenCount_ and performs the following steps when called:
             1. Assert: _x_ is a State.
             1. Assert: _c_ is a Continuation.
@@ -35516,7 +35551,7 @@ THH:mm:ss.sss
         <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar>
         <emu-alg>
           1. Let _m_ be CompileSubpattern of |Disjunction| with argument _direction_.
-          1. Let _parenIndex_ be the number of left-capturing parentheses in the entire regular expression that occur to the left of this |Atom|. This is the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes prior to or enclosing this |Atom|.
+          1. Let _parenIndex_ be CountLeftCapturingParensBefore(|Atom|).
           1. Return a new Matcher with parameters (_x_, _c_) that captures _direction_, _m_, and _parenIndex_ and performs the following steps when called:
             1. Assert: _x_ is a State.
             1. Assert: _c_ is a Continuation.
@@ -35568,7 +35603,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Search the enclosing |Pattern| for an instance of a |GroupSpecifier| containing a |RegExpIdentifierName| which has a CapturingGroupName equal to the CapturingGroupName of the |RegExpIdentifierName| contained in |GroupName|.
           1. Assert: A unique such |GroupSpecifier| is found.
-          1. Let _parenIndex_ be the number of left-capturing parentheses in the entire regular expression that occur to the left of the located |GroupSpecifier|. This is the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes prior to or enclosing the located |GroupSpecifier|, including its immediately enclosing |Atom|.
+          1. Let _parenIndex_ be CountLeftCapturingParensBefore(the located |GroupSpecifier|).
           1. Return BackreferenceMatcher(_parenIndex_, _direction_).
         </emu-alg>
 
@@ -35957,7 +35992,7 @@ THH:mm:ss.sss
           <h1>
             RegExpAlloc (
               _newTarget_: unknown,
-            ): either a normal completion containing an Object or an abrupt completion
+            ): either a normal completion containing an Object or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -35974,7 +36009,7 @@ THH:mm:ss.sss
               _obj_: an Object,
               _pattern_: an ECMAScript language value,
               _flags_: an ECMAScript language value,
-            ): either a normal completion containing an Object or an abrupt completion
+            ): either a normal completion containing an Object or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -36026,7 +36061,7 @@ THH:mm:ss.sss
             RegExpCreate (
               _P_: unknown,
               _F_: unknown,
-            ): either a normal completion containing an Object or an abrupt completion
+            ): either a normal completion containing an Object or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -36115,7 +36150,7 @@ THH:mm:ss.sss
             RegExpExec (
               _R_: an Object,
               _S_: a String,
-            ): either a normal completion containing either an Object or *null*, or an abrupt completion
+            ): either a normal completion containing either an Object or *null*, or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -36138,7 +36173,7 @@ THH:mm:ss.sss
             RegExpBuiltinExec (
               _R_: an initialized RegExp instance,
               _S_: a String,
-            ): either a normal completion containing either an Array exotic object or *null*, or an abrupt completion
+            ): either a normal completion containing either an Array exotic object or *null*, or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -36366,7 +36401,7 @@ THH:mm:ss.sss
             RegExpHasFlag (
               _R_: an ECMAScript language value,
               _codeUnit_: a code unit,
-            ): either a normal completion containing either a Boolean or *undefined*, or an abrupt completion
+            ): either a normal completion containing either a Boolean or *undefined*, or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -37049,7 +37084,7 @@ THH:mm:ss.sss
           <h1>
             IsConcatSpreadable (
               _O_: unknown,
-            ): either a normal completion containing a Boolean or an abrupt completion
+            ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -37304,7 +37339,7 @@ THH:mm:ss.sss
               _depth_: a non-negative integer or +&infin;,
               optional _mapperFunction_: unknown,
               optional _thisArg_: unknown,
-            ): either a normal completion containing a non-negative integer or an abrupt completion
+            ): either a normal completion containing a non-negative integer or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -37869,7 +37904,7 @@ THH:mm:ss.sss
                 1. Append _kValue_ to _items_.
               1. Set _k_ to _k_ + 1.
             1. Let _itemCount_ be the number of elements in _items_.
-            1. [id="step-array-sort"] Sort _items_ using an implementation-defined sequence of calls to _SortCompare_. If any such call returns an abrupt completion, stop before performing any further calls to _SortCompare_ and return that Completion Record.
+            1. [id="step-array-sort"] Sort _items_ using an implementation-defined sequence of <emu-meta effects="user-code">calls to _SortCompare_</emu-meta>. If any such call returns an abrupt completion, stop before performing any further calls to _SortCompare_ and return that Completion Record.
             1. Let _j_ be 0.
             1. Repeat, while _j_ &lt; _itemCount_,
               1. Perform ? Set(_obj_, ! ToString(𝔽(_j_)), _items_[_j_], *true*).
@@ -37933,7 +37968,7 @@ THH:mm:ss.sss
           1. If _relativeStart_ is -&infin;, let _actualStart_ be 0.
           1. Else if _relativeStart_ &lt; 0, let _actualStart_ be max(_len_ + _relativeStart_, 0).
           1. Else, let _actualStart_ be min(_relativeStart_, _len_).
-          1. Let _insertCount_ be the number of elements in _items_.
+          1. Let _itemCount_ be the number of elements in _items_.
           1. If _start_ is not present, then
             1. Let _actualDeleteCount_ be 0.
           1. Else if _deleteCount_ is not present, then
@@ -37941,7 +37976,7 @@ THH:mm:ss.sss
           1. Else,
             1. Let _dc_ be ? ToIntegerOrInfinity(_deleteCount_).
             1. Let _actualDeleteCount_ be the result of clamping _dc_ between 0 and _len_ - _actualStart_.
-          1. If _len_ + _insertCount_ - _actualDeleteCount_ &gt; 2<sup>53</sup> - 1, throw a *TypeError* exception.
+          1. If _len_ + _itemCount_ - _actualDeleteCount_ &gt; 2<sup>53</sup> - 1, throw a *TypeError* exception.
           1. Let _A_ be ? ArraySpeciesCreate(_O_, _actualDeleteCount_).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _actualDeleteCount_,
@@ -37951,7 +37986,6 @@ THH:mm:ss.sss
               1. Perform ? CreateDataPropertyOrThrow(_A_, ! ToString(𝔽(_k_)), _fromValue_).
             1. Set _k_ to _k_ + 1.
           1. Perform ? Set(_A_, *"length"*, 𝔽(_actualDeleteCount_), *true*).
-          1. Let _itemCount_ be the number of elements in _items_.
           1. If _itemCount_ &lt; _actualDeleteCount_, then
             1. Set _k_ to _actualStart_.
             1. Repeat, while _k_ &lt; (_len_ - _actualDeleteCount_),
@@ -39051,7 +39085,7 @@ THH:mm:ss.sss
               _target_: a TypedArray,
               _targetOffset_: a non-negative integer or +&infin;,
               _source_: a TypedArray,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -39078,8 +39112,7 @@ THH:mm:ss.sss
             1. Else, let _same_ be SameValue(_srcBuffer_, _targetBuffer_).
             1. If _same_ is *true*, then
               1. Let _srcByteLength_ be _source_.[[ByteLength]].
-              1. Set _srcBuffer_ to ? <emu-meta suppress-effects="user-code">CloneArrayBuffer(_srcBuffer_, _srcByteOffset_, _srcByteLength_, %ArrayBuffer%)</emu-meta>.
-              1. NOTE: %ArrayBuffer% is used to clone _srcBuffer_ because is it known to not have any observable side-effects.
+              1. Set _srcBuffer_ to ? CloneArrayBuffer(_srcBuffer_, _srcByteOffset_, _srcByteLength_).
               1. Let _srcByteIndex_ be 0.
             1. Else, let _srcByteIndex_ be _srcByteOffset_.
             1. Let _targetByteIndex_ be _targetOffset_ &times; _targetElementSize_ + _targetByteOffset_.
@@ -39107,7 +39140,7 @@ THH:mm:ss.sss
               _target_: a TypedArray,
               _targetOffset_: a non-negative integer or +&infin;,
               _source_: an ECMAScript language value, but not a TypedArray,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -39117,25 +39150,17 @@ THH:mm:ss.sss
             1. Let _targetBuffer_ be _target_.[[ViewedArrayBuffer]].
             1. If IsDetachedBuffer(_targetBuffer_) is *true*, throw a *TypeError* exception.
             1. Let _targetLength_ be _target_.[[ArrayLength]].
-            1. Let _targetElementSize_ be TypedArrayElementSize(_target_).
-            1. Let _targetType_ be TypedArrayElementType(_target_).
-            1. Let _targetByteOffset_ be _target_.[[ByteOffset]].
             1. Let _src_ be ? ToObject(_source_).
             1. Let _srcLength_ be ? LengthOfArrayLike(_src_).
             1. If _targetOffset_ is +&infin;, throw a *RangeError* exception.
             1. If _srcLength_ + _targetOffset_ &gt; _targetLength_, throw a *RangeError* exception.
-            1. Let _targetByteIndex_ be _targetOffset_ &times; _targetElementSize_ + _targetByteOffset_.
             1. Let _k_ be 0.
-            1. Let _limit_ be _targetByteIndex_ + _targetElementSize_ &times; _srcLength_.
-            1. Repeat, while _targetByteIndex_ &lt; _limit_,
+            1. Repeat, while _k_ &lt; _srcLength_,
               1. Let _Pk_ be ! ToString(𝔽(_k_)).
               1. Let _value_ be ? Get(_src_, _Pk_).
-              1. If _target_.[[ContentType]] is ~BigInt~, set _value_ to ? ToBigInt(_value_).
-              1. Otherwise, set _value_ to ? ToNumber(_value_).
-              1. If IsDetachedBuffer(_targetBuffer_) is *true*, throw a *TypeError* exception.
-              1. Perform SetValueInBuffer(_targetBuffer_, _targetByteIndex_, _targetType_, _value_, *true*, ~Unordered~).
+              1. Let _targetIndex_ be 𝔽(_targetOffset_ + _k_).
+              1. Perform ? IntegerIndexedElementSet(_target_, _targetIndex_, _value_).
               1. Set _k_ to _k_ + 1.
-              1. Set _targetByteIndex_ to _targetByteIndex_ + _targetElementSize_.
             1. Return ~unused~.
           </emu-alg>
         </emu-clause>
@@ -39227,7 +39252,6 @@ THH:mm:ss.sss
             1. Assert: Both Type(_x_) and Type(_y_) are Number or both are BigInt.
             1. If _comparefn_ is not *undefined*, then
               1. Let _v_ be ? ToNumber(? Call(_comparefn_, *undefined*, &laquo; _x_, _y_ &raquo;)).
-              1. If IsDetachedBuffer(_buffer_) is *true*, throw a *TypeError* exception.
               1. If _v_ is *NaN*, return *+0*<sub>𝔽</sub>.
               1. Return _v_.
             1. If _x_ and _y_ are both *NaN*, return *+0*<sub>𝔽</sub>.
@@ -39326,7 +39350,7 @@ THH:mm:ss.sss
           TypedArraySpeciesCreate (
             _exemplar_: a TypedArray,
             _argumentList_: unknown,
-          ): either a normal completion containing a TypedArray or an abrupt completion
+          ): either a normal completion containing a TypedArray or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -39347,7 +39371,7 @@ THH:mm:ss.sss
           TypedArrayCreate (
             _constructor_: unknown,
             _argumentList_: unknown,
-          ): either a normal completion containing a TypedArray or an abrupt completion
+          ): either a normal completion containing a TypedArray or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -39366,7 +39390,7 @@ THH:mm:ss.sss
         <h1>
           ValidateTypedArray (
             _O_: unknown,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -39460,7 +39484,7 @@ THH:mm:ss.sss
               _newTarget_: unknown,
               _defaultProto_: unknown,
               optional _length_: a non-negative integer,
-            ): either a normal completion containing a TypedArray or an abrupt completion
+            ): either a normal completion containing a TypedArray or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -39488,7 +39512,7 @@ THH:mm:ss.sss
             InitializeTypedArrayFromTypedArray (
               _O_: a TypedArray,
               _srcArray_: a TypedArray,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -39502,15 +39526,10 @@ THH:mm:ss.sss
             1. Let _srcByteOffset_ be _srcArray_.[[ByteOffset]].
             1. Let _elementLength_ be _srcArray_.[[ArrayLength]].
             1. Let _byteLength_ be _elementSize_ &times; _elementLength_.
-            1. If IsSharedArrayBuffer(_srcData_) is *false*, then
-              1. Let _bufferConstructor_ be ? SpeciesConstructor(_srcData_, %ArrayBuffer%).
-            1. Else,
-              1. Let _bufferConstructor_ be %ArrayBuffer%.
             1. If _elementType_ is the same as _srcType_, then
-              1. Let _data_ be ? CloneArrayBuffer(_srcData_, _srcByteOffset_, _byteLength_, _bufferConstructor_).
+              1. Let _data_ be ? CloneArrayBuffer(_srcData_, _srcByteOffset_, _byteLength_).
             1. Else,
-              1. Let _data_ be ? AllocateArrayBuffer(_bufferConstructor_, _byteLength_).
-              1. If IsDetachedBuffer(_srcData_) is *true*, throw a *TypeError* exception.
+              1. Let _data_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(%ArrayBuffer%, _byteLength_)</emu-meta>.
               1. If _srcArray_.[[ContentType]] &ne; _O_.[[ContentType]], throw a *TypeError* exception.
               1. Let _srcByteIndex_ be _srcByteOffset_.
               1. Let _targetByteIndex_ be 0.
@@ -39536,7 +39555,7 @@ THH:mm:ss.sss
               _buffer_: an ArrayBuffer or a SharedArrayBuffer,
               _byteOffset_: an ECMAScript language value,
               _length_: an ECMAScript language value,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -39568,7 +39587,7 @@ THH:mm:ss.sss
             InitializeTypedArrayFromList (
               _O_: a TypedArray,
               _values_: a List of ECMAScript language values,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -39591,7 +39610,7 @@ THH:mm:ss.sss
             InitializeTypedArrayFromArrayLike (
               _O_: a TypedArray,
               _arrayLike_: an Object, but not a TypedArray or an ArrayBuffer,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -39613,7 +39632,7 @@ THH:mm:ss.sss
             AllocateTypedArrayBuffer (
               _O_: a TypedArray,
               _length_: a non-negative integer,
-            ): either a normal completion containing ~unused~ or an abrupt completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -39725,7 +39744,7 @@ THH:mm:ss.sss
             _target_: unknown,
             _iterable_: an ECMAScript language value, but not *undefined* or *null*,
             _adder_: a function object,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -39964,7 +39983,7 @@ THH:mm:ss.sss
           CreateMapIterator (
             _map_: an ECMAScript language value,
             _kind_: ~key+value~, ~key~, or ~value~,
-          ): either a normal completion containing a Generator or an abrupt completion
+          ): either a normal completion containing a Generator or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -40253,7 +40272,7 @@ THH:mm:ss.sss
           CreateSetIterator (
             _set_: an ECMAScript language value,
             _kind_: ~key+value~ or ~value~,
-          ): either a normal completion containing a Generator or an abrupt completion
+          ): either a normal completion containing a Generator or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -40621,7 +40640,7 @@ THH:mm:ss.sss
           AllocateArrayBuffer (
             _constructor_: unknown,
             _byteLength_: a non-negative integer,
-          ): either a normal completion containing an ArrayBuffer or an abrupt completion
+          ): either a normal completion containing an ArrayBuffer or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -40655,7 +40674,7 @@ THH:mm:ss.sss
           DetachArrayBuffer (
             _arrayBuffer_: an ArrayBuffer,
             optional _key_: unknown,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -40678,16 +40697,15 @@ THH:mm:ss.sss
             _srcBuffer_: an ArrayBuffer or a SharedArrayBuffer,
             _srcByteOffset_: a non-negative integer,
             _srcLength_: a non-negative integer,
-            _cloneConstructor_: a constructor,
-          ): either a normal completion containing an ArrayBuffer or an abrupt completion
+          ): either a normal completion containing an ArrayBuffer or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
           <dd>It creates a new ArrayBuffer whose data is a copy of _srcBuffer_'s data over the range starting at _srcByteOffset_ and continuing for _srcLength_ bytes.</dd>
         </dl>
         <emu-alg>
-          1. Let _targetBuffer_ be ? AllocateArrayBuffer(_cloneConstructor_, _srcLength_).
-          1. If IsDetachedBuffer(_srcBuffer_) is *true*, throw a *TypeError* exception.
+          1. Assert: IsDetachedBuffer(_srcBuffer_) is *false*.
+          1. Let _targetBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(%ArrayBuffer%, _srcLength_)</emu-meta>.
           1. Let _srcBlock_ be _srcBuffer_.[[ArrayBufferData]].
           1. Let _targetBlock_ be _targetBuffer_.[[ArrayBufferData]].
           1. Perform CopyDataBlockBytes(_targetBlock_, 0, _srcBlock_, _srcByteOffset_, _srcLength_).
@@ -41067,7 +41085,7 @@ THH:mm:ss.sss
           AllocateSharedArrayBuffer (
             _constructor_: unknown,
             _byteLength_: a non-negative integer,
-          ): either a normal completion containing a SharedArrayBuffer or an abrupt completion
+          ): either a normal completion containing a SharedArrayBuffer or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -41241,7 +41259,7 @@ THH:mm:ss.sss
             _requestIndex_: unknown,
             _isLittleEndian_: unknown,
             _type_: unknown,
-          ): either a normal completion containing either a Number or a BigInt, or an abrupt completion
+          ): either a normal completion containing either a Number or a BigInt, or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -41271,7 +41289,7 @@ THH:mm:ss.sss
             _isLittleEndian_: unknown,
             _type_: unknown,
             _value_: unknown,
-          ): either a normal completion containing *undefined* or an abrupt completion
+          ): either a normal completion containing *undefined* or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -41643,7 +41661,7 @@ THH:mm:ss.sss
           ValidateIntegerTypedArray (
             _typedArray_: unknown,
             optional _waitable_: a Boolean,
-          ): either a normal completion containing either an ArrayBuffer or a SharedArrayBuffer, or an abrupt completion
+          ): either a normal completion containing either an ArrayBuffer or a SharedArrayBuffer, or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -41665,7 +41683,7 @@ THH:mm:ss.sss
           ValidateAtomicAccess (
             _typedArray_: a TypedArray,
             _requestIndex_: unknown,
-          ): either a normal completion containing an integer or an abrupt completion
+          ): either a normal completion containing an integer or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -41704,7 +41722,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is not in the critical section for any WaiterList.
+          1. Assert: The surrounding agent is not in the critical section for any WaiterList.
           1. Wait until no agent is in the critical section for _WL_, then enter the critical section for _WL_ (without allowing any other agent to enter).
           1. If _WL_ has a Synchronize event, then
             1. NOTE: A _WL_ whose critical section has been entered at least once has a Synchronize event set by LeaveCriticalSection.
@@ -41729,8 +41747,8 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is in the critical section for _WL_.
-          1. Let _execution_ be the [[CandidateExecution]] field of the calling surrounding's Agent Record.
+          1. Assert: The surrounding agent is in the critical section for _WL_.
+          1. Let _execution_ be the [[CandidateExecution]] field of the surrounding agent's Agent Record.
           1. Let _eventsRecord_ be the Agent Events Record in _execution_.[[EventsRecords]] whose [[AgentSignifier]] is AgentSignifier().
           1. Let _leaverEventList_ be _eventsRecord_.[[EventList]].
           1. Let _leaveEvent_ be a new Synchronize event.
@@ -41751,7 +41769,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is in the critical section for _WL_.
+          1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Assert: _W_ is not on the list of waiters in any WaiterList.
           1. Add _W_ to the end of the list of waiters in _WL_.
           1. Return ~unused~.
@@ -41768,7 +41786,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is in the critical section for _WL_.
+          1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Assert: _W_ is on the list of waiters in _WL_.
           1. Remove _W_ from the list of waiters in _WL_.
           1. Return ~unused~.
@@ -41785,7 +41803,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is in the critical section for _WL_.
+          1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Let _L_ be a new empty List.
           1. Let _S_ be a reference to the list of waiters in _WL_.
           1. Repeat, while _c_ &gt; 0 and _S_ is not an empty List,
@@ -41808,7 +41826,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is in the critical section for _WL_.
+          1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Assert: _W_ is equivalent to AgentSignifier().
           1. Assert: _W_ is on the list of waiters in _WL_.
           1. Assert: AgentCanSuspend() is *true*.
@@ -41829,7 +41847,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Assert: The calling agent is in the critical section for _WL_.
+          1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Notify the agent _W_.
           1. Return ~unused~.
         </emu-alg>
@@ -41845,7 +41863,7 @@ THH:mm:ss.sss
             _index_: unknown,
             _value_: unknown,
             _op_: a read-modify-write modification function,
-          ): either a normal completion containing either a Number or a BigInt, or an abrupt completion
+          ): either a normal completion containing either a Number or a BigInt, or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -42007,7 +42025,7 @@ THH:mm:ss.sss
         1. Return *false*.
       </emu-alg>
       <emu-note>
-        <p>`Atomics.isLockFree`() is an optimization primitive. The intuition is that if the atomic step of an atomic primitive (`compareExchange`, `load`, `store`, `add`, `sub`, `and`, `or`, `xor`, or `exchange`) on a datum of size _n_ bytes will be performed without the calling agent acquiring a lock outside the _n_ bytes comprising the datum, then `Atomics.isLockFree`(_n_) will return *true*. High-performance algorithms will use `Atomics.isLockFree` to determine whether to use locks or atomic operations in critical sections. If an atomic primitive is not lock-free then it is often more efficient for an algorithm to provide its own locking.</p>
+        <p>`Atomics.isLockFree`() is an optimization primitive. The intuition is that if the atomic step of an atomic primitive (`compareExchange`, `load`, `store`, `add`, `sub`, `and`, `or`, `xor`, or `exchange`) on a datum of size _n_ bytes will be performed without the surrounding agent acquiring a lock outside the _n_ bytes comprising the datum, then `Atomics.isLockFree`(_n_) will return *true*. High-performance algorithms will use `Atomics.isLockFree` to determine whether to use locks or atomic operations in critical sections. If an atomic primitive is not lock-free then it is often more efficient for an algorithm to provide its own locking.</p>
         <p>`Atomics.isLockFree`(4) always returns *true* as that can be supported on all known relevant hardware. Being able to assume this will generally simplify programs.</p>
         <p>Regardless of the value of `Atomics.isLockFree`, all atomic operations are guaranteed to be atomic. For example, they will never have a visible operation take place in the middle of the operation (e.g., "tearing").</p>
       </emu-note>
@@ -42075,7 +42093,7 @@ THH:mm:ss.sss
 
     <emu-clause id="sec-atomics.wait">
       <h1>Atomics.wait ( _typedArray_, _index_, _value_, _timeout_ )</h1>
-      <p>`Atomics.wait` puts the calling agent in a wait queue and puts it to sleep until it is notified or the sleep times out. The following steps are taken:</p>
+      <p>`Atomics.wait` puts the surrounding agent in a wait queue and puts it to sleep until it is notified or the sleep times out. The following steps are taken:</p>
       <emu-alg>
         1. Let _buffer_ be ? ValidateIntegerTypedArray(_typedArray_, *true*).
         1. If IsSharedArrayBuffer(_buffer_) is *false*, throw a *TypeError* exception.
@@ -42199,7 +42217,7 @@ THH:mm:ss.sss
             _holder_: an Object,
             _name_: a String,
             _reviver_: a function object,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -42330,7 +42348,7 @@ THH:mm:ss.sss
             _state_: unknown,
             _key_: unknown,
             _holder_: unknown,
-          ): either a normal completion containing either *undefined* or a String, or an abrupt completion
+          ): either a normal completion containing either *undefined* or a String, or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -42509,7 +42527,7 @@ THH:mm:ss.sss
           SerializeJSONObject (
             _state_: unknown,
             _value_: an Object,
-          ): either a normal completion containing a String or an abrupt completion
+          ): either a normal completion containing a String or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -42555,7 +42573,7 @@ THH:mm:ss.sss
           SerializeJSONArray (
             _state_: unknown,
             _value_: an ECMAScript language value,
-          ): either a normal completion containing a String or an abrupt completion
+          ): either a normal completion containing a String or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -43556,7 +43574,7 @@ THH:mm:ss.sss
         <h1>
           NewPromiseCapability (
             _C_: unknown,
-          ): either a normal completion containing a PromiseCapability Record or an abrupt completion
+          ): either a normal completion containing a PromiseCapability Record or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -43817,7 +43835,7 @@ THH:mm:ss.sss
           <h1>
             GetPromiseResolve (
               _promiseConstructor_: a constructor,
-            ): either a normal completion containing a function object or an abrupt completion
+            ): either a normal completion containing a function object or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -43835,7 +43853,7 @@ THH:mm:ss.sss
               _constructor_: a constructor,
               _resultCapability_: a PromiseCapability Record,
               _promiseResolve_: a function object,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -43923,7 +43941,7 @@ THH:mm:ss.sss
               _constructor_: a constructor,
               _resultCapability_: a PromiseCapability Record,
               _promiseResolve_: a function object,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -44050,7 +44068,7 @@ THH:mm:ss.sss
               _constructor_: a constructor,
               _resultCapability_: a PromiseCapability Record,
               _promiseResolve_: a function object,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -44149,7 +44167,7 @@ THH:mm:ss.sss
               _constructor_: a constructor,
               _resultCapability_: a PromiseCapability Record,
               _promiseResolve_: a function object,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -44201,7 +44219,7 @@ THH:mm:ss.sss
             PromiseResolve (
               _C_: a constructor,
               _x_: an ECMAScript language value,
-            ): either a normal completion containing an ECMAScript language value or an abrupt completion
+            ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
           <dl class="header">
             <dt>description</dt>
@@ -44798,7 +44816,7 @@ THH:mm:ss.sss
           GeneratorValidate (
             _generator_: unknown,
             _generatorBrand_: unknown,
-          ): either a normal completion containing either ~suspendedStart~, ~suspendedYield~, or ~completed~, or an abrupt completion
+          ): either a normal completion containing either ~suspendedStart~, ~suspendedYield~, or ~completed~, or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -44819,7 +44837,7 @@ THH:mm:ss.sss
             _generator_: unknown,
             _value_: unknown,
             _generatorBrand_: unknown,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -44844,7 +44862,7 @@ THH:mm:ss.sss
             _generator_: unknown,
             _abruptCompletion_: a return completion or a throw completion,
             _generatorBrand_: unknown,
-          ): either a normal completion containing an ECMAScript language value or an abrupt completion
+          ): either a normal completion containing an ECMAScript language value or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -45150,7 +45168,7 @@ THH:mm:ss.sss
           AsyncGeneratorValidate (
             _generator_: unknown,
             _generatorBrand_: unknown,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -45294,7 +45312,7 @@ THH:mm:ss.sss
         <h1>
           AsyncGeneratorAwaitReturn (
             _generator_: an AsyncGenerator,
-          ): either a normal completion containing ~unused~ or an abrupt completion
+          ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
         </dl>
@@ -46953,7 +46971,7 @@ THH:mm:ss.sss
           `\` AtomEscape[~UnicodeMode, ?N]
           `\` [lookahead == `c`]
           CharacterClass[~UnicodeMode]
-          `(` Disjunction[~UnicodeMode, ?N] `)`
+          `(` GroupSpecifier[~UnicodeMode] Disjunction[~UnicodeMode, ?N] `)`
           `(` `?` `:` Disjunction[~UnicodeMode, ?N] `)`
           InvalidBracedQuantifier
           ExtendedPatternCharacter
@@ -46968,7 +46986,7 @@ THH:mm:ss.sss
 
         AtomEscape[UnicodeMode, N] ::
           [+UnicodeMode] DecimalEscape
-          [~UnicodeMode] DecimalEscape [> but only if the CapturingGroupNumber of |DecimalEscape| is &le; _NcapturingParens_]
+          [~UnicodeMode] DecimalEscape [> but only if the CapturingGroupNumber of |DecimalEscape| is &le; CountLeftCapturingParensWithin(the |Pattern| containing |DecimalEscape|)]
           CharacterClassEscape[?UnicodeMode]
           CharacterEscape[?UnicodeMode, ?N]
           [+N] `k` GroupName[?UnicodeMode]
@@ -47041,6 +47059,11 @@ THH:mm:ss.sss
         </ul>
       </emu-annex>
 
+      <emu-annex id="sec-countleftcapturingparens-annexb">
+        <h1>Static Semantics: CountLeftCapturingParensWithin and CountLeftCapturingParensBefore</h1>
+        <p>In the definitions of CountLeftCapturingParensWithin and CountLeftCapturingParensBefore, references to &ldquo;<emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> &rdquo; are to be interpreted as meaning &ldquo;<emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> &rdquo; or &ldquo;<emu-grammar>ExtendedAtom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> &rdquo;.</p>
+      </emu-annex>
+
       <emu-annex id="sec-patterns-static-semantics-is-character-class-annexb">
         <h1>Static Semantics: IsCharacterClass</h1>
         <p>The semantics of <emu-xref href="#sec-patterns-static-semantics-is-character-class"></emu-xref> is extended as follows:</p>
@@ -47076,7 +47099,6 @@ THH:mm:ss.sss
       <emu-annex id="sec-compilesubpattern-annexb" oldids="sec-regular-expression-patterns-semantics">
         <h1>Runtime Semantics: CompileSubpattern</h1>
         <p>The semantics of CompileSubpattern is extended as follows:</p>
-        <p>Within the rule for <emu-grammar>Term :: Atom Quantifier</emu-grammar>, references to &ldquo;<emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> &rdquo; are to be interpreted as meaning &ldquo;<emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> &rdquo; or &ldquo;<emu-grammar>ExtendedAtom :: `(` Disjunction `)`</emu-grammar> &rdquo;.</p>
 
         <p>The rule for <emu-grammar>Term :: QuantifiableAssertion Quantifier</emu-grammar> is the same as for <emu-grammar>Term :: Atom Quantifier</emu-grammar> but with |QuantifiableAssertion| substituted for |Atom|.</p>
         <p>The rule for <emu-grammar>Term :: ExtendedAtom Quantifier</emu-grammar> is the same as for <emu-grammar>Term :: Atom Quantifier</emu-grammar> but with |ExtendedAtom| substituted for |Atom|.</p>
@@ -47311,7 +47333,7 @@ THH:mm:ss.sss
               _tag_: a String,
               _attribute_: a String,
               _value_: unknown,
-            ): either a normal completion containing a String or an abrupt completion
+            ): either a normal completion containing a String or a throw completion
           </h1>
           <dl class="header">
           </dl>
