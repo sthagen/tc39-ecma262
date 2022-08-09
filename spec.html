@@ -6630,7 +6630,7 @@
           1. Let _indexName_ be ! ToString(𝔽(_index_)).
           1. Let _next_ be ? Get(_obj_, _indexName_).
           1. If Type(_next_) is not an element of _elementTypes_, throw a *TypeError* exception.
-          1. Append _next_ as the last element of _list_.
+          1. Append _next_ to _list_.
           1. Set _index_ to _index_ + 1.
         1. Return _list_.
       </emu-alg>
@@ -7213,7 +7213,7 @@
           1. Set _next_ to ? IteratorStep(_iteratorRecord_).
           1. If _next_ is not *false*, then
             1. Let _nextValue_ be ? IteratorValue(_next_).
-            1. Append _nextValue_ to the end of the List _values_.
+            1. Append _nextValue_ to _values_.
         1. Return _values_.
       </emu-alg>
     </emu-clause>
@@ -10021,27 +10021,27 @@
 
     <emu-clause id="sec-the-environment-record-type-hierarchy">
       <h1>The Environment Record Type Hierarchy</h1>
-      <p>Environment Records can be thought of as existing in a simple object-oriented hierarchy where Environment Record is an abstract class with three concrete subclasses: declarative Environment Record, object Environment Record, and global Environment Record. Function Environment Records and module Environment Records are subclasses of declarative Environment Record.</p>
+      <p>Environment Records can be thought of as existing in a simple object-oriented hierarchy where Environment Record is an abstract class with three concrete subclasses: Declarative Environment Record, Object Environment Record, and Global Environment Record. Function Environment Records and Module Environment Records are subclasses of Declarative Environment Record.</p>
       <ul>
         <li>
           <p>Environment Record (abstract)</p>
           <ul>
             <li>
-              <p>A <em>declarative Environment Record</em> is used to define the effect of ECMAScript language syntactic elements such as |FunctionDeclaration|s, |VariableDeclaration|s, and |Catch| clauses that directly associate identifier bindings with ECMAScript language values.</p>
+              <p>A <em>Declarative Environment Record</em> is used to define the effect of ECMAScript language syntactic elements such as |FunctionDeclaration|s, |VariableDeclaration|s, and |Catch| clauses that directly associate identifier bindings with ECMAScript language values.</p>
               <ul>
                 <li>
-                  <p>A <em>function Environment Record</em> corresponds to the invocation of an ECMAScript function object, and contains bindings for the top-level declarations within that function. It may establish a new `this` binding. It also captures the state necessary to support `super` method invocations.</p>
+                  <p>A <em>Function Environment Record</em> corresponds to the invocation of an ECMAScript function object, and contains bindings for the top-level declarations within that function. It may establish a new `this` binding. It also captures the state necessary to support `super` method invocations.</p>
                 </li>
                 <li>
-                  <p>A <em>module Environment Record</em> contains the bindings for the top-level declarations of a |Module|. It also contains the bindings that are explicitly imported by the |Module|. Its [[OuterEnv]] is a global Environment Record.</p>
+                  <p>A <em>Module Environment Record</em> contains the bindings for the top-level declarations of a |Module|. It also contains the bindings that are explicitly imported by the |Module|. Its [[OuterEnv]] is a Global Environment Record.</p>
                 </li>
               </ul>
             </li>
             <li>
-              <p>An <em>object Environment Record</em> is used to define the effect of ECMAScript elements such as |WithStatement| that associate identifier bindings with the properties of some object.</p>
+              <p>An <em>Object Environment Record</em> is used to define the effect of ECMAScript elements such as |WithStatement| that associate identifier bindings with the properties of some object.</p>
             </li>
             <li>
-              <p>A <em>global Environment Record</em> is used for |Script| global declarations. It does not have an outer environment; its [[OuterEnv]] is *null*. It may be prepopulated with identifier bindings and it includes an associated global object whose properties provide some of the global environment's identifier bindings. As ECMAScript code is executed, additional properties may be added to the global object and the initial properties may be modified.</p>
+              <p>A <em>Global Environment Record</em> is used for |Script| global declarations. It does not have an outer environment; its [[OuterEnv]] is *null*. It may be prepopulated with identifier bindings and it includes an associated global object whose properties provide some of the global environment's identifier bindings. As ECMAScript code is executed, additional properties may be added to the global object and the initial properties may be modified.</p>
             </li>
           </ul>
         </li>
@@ -10143,8 +10143,8 @@
 
       <emu-clause id="sec-declarative-environment-records">
         <h1>Declarative Environment Records</h1>
-        <p>Each <dfn variants="declarative Environment Records">declarative Environment Record</dfn> is associated with an ECMAScript program scope containing variable, constant, let, class, module, import, and/or function declarations. A declarative Environment Record binds the set of identifiers defined by the declarations contained within its scope.</p>
-        <p>The behaviour of the concrete specification methods for declarative Environment Records is defined by the following algorithms.</p>
+        <p>Each <dfn variants="Declarative Environment Records">Declarative Environment Record</dfn> is associated with an ECMAScript program scope containing variable, constant, let, class, module, import, and/or function declarations. A Declarative Environment Record binds the set of identifiers defined by the declarations contained within its scope.</p>
+        <p>The behaviour of the concrete specification methods for Declarative Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-declarative-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -10154,7 +10154,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if the argument identifier is one of the identifiers bound by the record.</dd>
@@ -10174,7 +10174,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It creates a new mutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _D_ is *true*, the new binding is marked as being subject to deletion.</dd>
@@ -10195,7 +10195,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It creates a new immutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _S_ is *true*, the new binding is marked as a strict binding.</dd>
@@ -10216,7 +10216,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It is used to set the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. An uninitialized binding for _N_ must already exist.</dd>
@@ -10239,7 +10239,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It attempts to change the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. A binding for _N_ normally already exists, but in rare cases it may not. If the binding is an immutable binding, a *TypeError* is thrown if _S_ is *true*.</dd>
@@ -10273,7 +10273,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It returns the value of its bound identifier whose name is the value of the argument _N_. If the binding exists but is uninitialized a *ReferenceError* is thrown, regardless of the value of _S_.</dd>
@@ -10293,7 +10293,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It can only delete bindings that have been explicitly designated as being subject to deletion.</dd>
@@ -10310,13 +10310,13 @@
           <h1>HasThisBinding ( ): *false*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *false*.
           </emu-alg>
           <emu-note>
-            <p>A regular declarative Environment Record (i.e., one that is neither a function Environment Record nor a module Environment Record) does not provide a `this` binding.</p>
+            <p>A regular Declarative Environment Record (i.e., one that is neither a Function Environment Record nor a Module Environment Record) does not provide a `this` binding.</p>
           </emu-note>
         </emu-clause>
 
@@ -10324,13 +10324,13 @@
           <h1>HasSuperBinding ( ): *false*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *false*.
           </emu-alg>
           <emu-note>
-            <p>A regular declarative Environment Record (i.e., one that is neither a function Environment Record nor a module Environment Record) does not provide a `super` binding.</p>
+            <p>A regular Declarative Environment Record (i.e., one that is neither a Function Environment Record nor a Module Environment Record) does not provide a `super` binding.</p>
           </emu-note>
         </emu-clause>
 
@@ -10338,7 +10338,7 @@
           <h1>WithBaseObject ( ): *undefined*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a declarative Environment Record _envRec_</dd>
+            <dd>a Declarative Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *undefined*.
@@ -10348,7 +10348,7 @@
 
       <emu-clause id="sec-object-environment-records">
         <h1>Object Environment Records</h1>
-        <p>Each <dfn variants="object Environment Records">object Environment Record</dfn> is associated with an object called its <em>binding object</em>. An object Environment Record binds the set of string identifier names that directly correspond to the property names of its binding object. Property keys that are not strings in the form of an |IdentifierName| are not included in the set of bound identifiers. Both own and inherited properties are included in the set regardless of the setting of their [[Enumerable]] attribute. Because properties can be dynamically added and deleted from objects, the set of identifiers bound by an object Environment Record may potentially change as a side-effect of any operation that adds or deletes properties. Any bindings that are created as a result of such a side-effect are considered to be a mutable binding even if the Writable attribute of the corresponding property is *false*. Immutable bindings do not exist for object Environment Records.</p>
+        <p>Each <dfn variants="Object Environment Records">Object Environment Record</dfn> is associated with an object called its <em>binding object</em>. An Object Environment Record binds the set of string identifier names that directly correspond to the property names of its binding object. Property keys that are not strings in the form of an |IdentifierName| are not included in the set of bound identifiers. Both own and inherited properties are included in the set regardless of the setting of their [[Enumerable]] attribute. Because properties can be dynamically added and deleted from objects, the set of identifiers bound by an Object Environment Record may potentially change as a side-effect of any operation that adds or deletes properties. Any bindings that are created as a result of such a side-effect are considered to be a mutable binding even if the Writable attribute of the corresponding property is *false*. Immutable bindings do not exist for Object Environment Records.</p>
         <p>Object Environment Records created for `with` statements (<emu-xref href="#sec-with-statement"></emu-xref>) can provide their binding object as an implicit *this* value for use in function calls. The capability is controlled by a Boolean [[IsWithEnvironment]] field.</p>
         <p>Object Environment Records have the additional state fields listed in <emu-xref href="#table-additional-fields-of-object-environment-records"></emu-xref>.</p>
         <emu-table id="table-additional-fields-of-object-environment-records" caption="Additional Fields of Object Environment Records">
@@ -10388,7 +10388,7 @@
             </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the concrete specification methods for object Environment Records is defined by the following algorithms.</p>
+        <p>The behaviour of the concrete specification methods for Object Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-object-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -10398,7 +10398,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if its associated binding object has a property whose name is the value of the argument _N_.</dd>
@@ -10425,7 +10425,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It creates in an Environment Record's associated binding object a property whose name is the String value and initializes it to the value *undefined*. If _D_ is *true*, the new property's [[Configurable]] attribute is set to *true*; otherwise it is set to *false*.</dd>
@@ -10442,7 +10442,7 @@
 
         <emu-clause id="sec-object-environment-records-createimmutablebinding-n-s">
           <h1>CreateImmutableBinding ( _N_, _S_ )</h1>
-          <p>The CreateImmutableBinding concrete method of an object Environment Record is never used within this specification.</p>
+          <p>The CreateImmutableBinding concrete method of an Object Environment Record is never used within this specification.</p>
         </emu-clause>
 
         <emu-clause id="sec-object-environment-records-initializebinding-n-v" type="concrete method">
@@ -10454,7 +10454,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It is used to set the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_.</dd>
@@ -10464,7 +10464,7 @@
             1. Return ~unused~.
           </emu-alg>
           <emu-note>
-            <p>In this specification, all uses of CreateMutableBinding for object Environment Records are immediately followed by a call to InitializeBinding for the same name. Hence, this specification does not explicitly track the initialization state of bindings in object Environment Records.</p>
+            <p>In this specification, all uses of CreateMutableBinding for Object Environment Records are immediately followed by a call to InitializeBinding for the same name. Hence, this specification does not explicitly track the initialization state of bindings in Object Environment Records.</p>
           </emu-note>
         </emu-clause>
 
@@ -10478,7 +10478,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It attempts to set the value of the Environment Record's associated binding object's property whose name is the value of the argument _N_ to the value of argument _V_. A property named _N_ normally already exists but if it does not or is not currently writable, error handling is determined by _S_.</dd>
@@ -10501,7 +10501,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It returns the value of its associated binding object's property whose name is the String value of the argument identifier _N_. The property should already exist but if it does not the result depends upon _S_.</dd>
@@ -10523,7 +10523,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It can only delete bindings that correspond to properties of the environment object whose [[Configurable]] attribute have the value *true*.</dd>
@@ -10538,7 +10538,7 @@
           <h1>HasThisBinding ( ): *false*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *false*.
@@ -10552,7 +10552,7 @@
           <h1>HasSuperBinding ( ): *false*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *false*.
@@ -10566,7 +10566,7 @@
           <h1>WithBaseObject ( ): an Object or *undefined*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>an object Environment Record _envRec_</dd>
+            <dd>an Object Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. If _envRec_.[[IsWithEnvironment]] is *true*, return _envRec_.[[BindingObject]].
@@ -10577,7 +10577,7 @@
 
       <emu-clause id="sec-function-environment-records" oldids="function-environment">
         <h1>Function Environment Records</h1>
-        <p>A <dfn variants="function Environment Records">function Environment Record</dfn> is a declarative Environment Record that is used to represent the top-level scope of a function and, if the function is not an |ArrowFunction|, provides a `this` binding. If a function is not an |ArrowFunction| function and references `super`, its function Environment Record also contains the state that is used to perform `super` method invocations from within the function.</p>
+        <p>A <dfn variants="Function Environment Records">Function Environment Record</dfn> is a Declarative Environment Record that is used to represent the top-level scope of a function and, if the function is not an |ArrowFunction|, provides a `this` binding. If a function is not an |ArrowFunction| function and references `super`, its Function Environment Record also contains the state that is used to perform `super` method invocations from within the function.</p>
         <p>Function Environment Records have the additional state fields listed in <emu-xref href="#table-additional-fields-of-function-environment-records"></emu-xref>.</p>
         <emu-table id="table-additional-fields-of-function-environment-records" caption="Additional Fields of Function Environment Records" oldids="table-16">
           <table>
@@ -10638,7 +10638,7 @@
             </tr>
           </table>
         </emu-table>
-        <p>Function Environment Records support all of the declarative Environment Record methods listed in <emu-xref href="#table-abstract-methods-of-environment-records"></emu-xref> and share the same specifications for all of those methods except for HasThisBinding and HasSuperBinding. In addition, function Environment Records support the methods listed in <emu-xref href="#table-additional-methods-of-function-environment-records"></emu-xref>:</p>
+        <p>Function Environment Records support all of the Declarative Environment Record methods listed in <emu-xref href="#table-abstract-methods-of-environment-records"></emu-xref> and share the same specifications for all of those methods except for HasThisBinding and HasSuperBinding. In addition, Function Environment Records support the methods listed in <emu-xref href="#table-additional-methods-of-function-environment-records"></emu-xref>:</p>
         <emu-table id="table-additional-methods-of-function-environment-records" caption="Additional Methods of Function Environment Records" oldids="table-17">
           <table>
             <tr>
@@ -10675,7 +10675,7 @@
             </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the additional concrete specification methods for function Environment Records is defined by the following algorithms:</p>
+        <p>The behaviour of the additional concrete specification methods for Function Environment Records is defined by the following algorithms:</p>
 
         <emu-clause id="sec-bindthisvalue" type="concrete method">
           <h1>
@@ -10685,7 +10685,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a function Environment Record _envRec_</dd>
+            <dd>a Function Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Assert: _envRec_.[[ThisBindingStatus]] is not ~lexical~.
@@ -10700,7 +10700,7 @@
           <h1>HasThisBinding ( ): a Boolean</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a function Environment Record _envRec_</dd>
+            <dd>a Function Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. If _envRec_.[[ThisBindingStatus]] is ~lexical~, return *false*; otherwise, return *true*.
@@ -10711,7 +10711,7 @@
           <h1>HasSuperBinding ( ): a Boolean</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a function Environment Record _envRec_</dd>
+            <dd>a Function Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. If _envRec_.[[ThisBindingStatus]] is ~lexical~, return *false*.
@@ -10723,7 +10723,7 @@
           <h1>GetThisBinding ( ): either a normal completion containing an ECMAScript language value or a throw completion</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a function Environment Record _envRec_</dd>
+            <dd>a Function Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Assert: _envRec_.[[ThisBindingStatus]] is not ~lexical~.
@@ -10736,7 +10736,7 @@
           <h1>GetSuperBase ( ): either a normal completion containing either an Object, *null*, or *undefined*, or a throw completion</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a function Environment Record _envRec_</dd>
+            <dd>a Function Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Let _home_ be _envRec_.[[FunctionObject]].[[HomeObject]].
@@ -10749,9 +10749,9 @@
 
       <emu-clause id="sec-global-environment-records" oldids="global-environment">
         <h1>Global Environment Records</h1>
-        <p>A <dfn variants="global Environment Records">global Environment Record</dfn> is used to represent the outer most scope that is shared by all of the ECMAScript |Script| elements that are processed in a common realm. A global Environment Record provides the bindings for built-in globals (clause <emu-xref href="#sec-global-object"></emu-xref>), properties of the global object, and for all top-level declarations (<emu-xref href="#sec-static-semantics-toplevellexicallyscopeddeclarations"></emu-xref>, <emu-xref href="#sec-static-semantics-toplevelvarscopeddeclarations"></emu-xref>) that occur within a |Script|.</p>
-        <p>A global Environment Record is logically a single record but it is specified as a composite encapsulating an object Environment Record and a declarative Environment Record. The object Environment Record has as its base object the global object of the associated Realm Record. This global object is the value returned by the global Environment Record's GetThisBinding concrete method. The object Environment Record component of a global Environment Record contains the bindings for all built-in globals (clause <emu-xref href="#sec-global-object"></emu-xref>) and all bindings introduced by a |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableStatement| contained in global code. The bindings for all other ECMAScript declarations in global code are contained in the declarative Environment Record component of the global Environment Record.</p>
-        <p>Properties may be created directly on a global object. Hence, the object Environment Record component of a global Environment Record may contain both bindings created explicitly by |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableDeclaration| declarations and bindings created implicitly as properties of the global object. In order to identify which bindings were explicitly created using declarations, a global Environment Record maintains a list of the names bound using its CreateGlobalVarBinding and CreateGlobalFunctionBinding concrete methods.</p>
+        <p>A <dfn variants="Global Environment Records">Global Environment Record</dfn> is used to represent the outer most scope that is shared by all of the ECMAScript |Script| elements that are processed in a common realm. A Global Environment Record provides the bindings for built-in globals (clause <emu-xref href="#sec-global-object"></emu-xref>), properties of the global object, and for all top-level declarations (<emu-xref href="#sec-static-semantics-toplevellexicallyscopeddeclarations"></emu-xref>, <emu-xref href="#sec-static-semantics-toplevelvarscopeddeclarations"></emu-xref>) that occur within a |Script|.</p>
+        <p>A Global Environment Record is logically a single record but it is specified as a composite encapsulating an Object Environment Record and a Declarative Environment Record. The Object Environment Record has as its base object the global object of the associated Realm Record. This global object is the value returned by the Global Environment Record's GetThisBinding concrete method. The Object Environment Record component of a Global Environment Record contains the bindings for all built-in globals (clause <emu-xref href="#sec-global-object"></emu-xref>) and all bindings introduced by a |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableStatement| contained in global code. The bindings for all other ECMAScript declarations in global code are contained in the Declarative Environment Record component of the Global Environment Record.</p>
+        <p>Properties may be created directly on a global object. Hence, the Object Environment Record component of a Global Environment Record may contain both bindings created explicitly by |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableDeclaration| declarations and bindings created implicitly as properties of the global object. In order to identify which bindings were explicitly created using declarations, a Global Environment Record maintains a list of the names bound using its CreateGlobalVarBinding and CreateGlobalFunctionBinding concrete methods.</p>
         <p>Global Environment Records have the additional fields listed in <emu-xref href="#table-additional-fields-of-global-environment-records"></emu-xref> and the additional methods listed in <emu-xref href="#table-additional-methods-of-global-environment-records"></emu-xref>.</p>
         <emu-table id="table-additional-fields-of-global-environment-records" caption="Additional Fields of Global Environment Records" oldids="table-18">
           <table>
@@ -10771,7 +10771,7 @@
                 [[ObjectRecord]]
               </td>
               <td>
-                an object Environment Record
+                an Object Environment Record
               </td>
               <td>
                 Binding object is the global object. It contains global built-in bindings as well as |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, and |VariableDeclaration| bindings in global code for the associated realm.
@@ -10793,7 +10793,7 @@
                 [[DeclarativeRecord]]
               </td>
               <td>
-                a declarative Environment Record
+                a Declarative Environment Record
               </td>
               <td>
                 <emu-not-ref>Contains</emu-not-ref> bindings for all declarations in global code for the associated realm code except for |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, and |VariableDeclaration| bindings.
@@ -10875,7 +10875,7 @@
                 CreateGlobalVarBinding(N, D)
               </td>
               <td>
-                Used to create and initialize to *undefined* a global `var` binding in the [[ObjectRecord]] component of a global Environment Record. The binding will be a mutable binding. The corresponding global object property will have attribute values appropriate for a `var`. The String value _N_ is the bound name. If _D_ is *true* the binding may be deleted. Logically equivalent to CreateMutableBinding followed by a SetMutableBinding but it allows var declarations to receive special treatment.
+                Used to create and initialize to *undefined* a global `var` binding in the [[ObjectRecord]] component of a Global Environment Record. The binding will be a mutable binding. The corresponding global object property will have attribute values appropriate for a `var`. The String value _N_ is the bound name. If _D_ is *true* the binding may be deleted. Logically equivalent to CreateMutableBinding followed by a SetMutableBinding but it allows var declarations to receive special treatment.
               </td>
             </tr>
             <tr>
@@ -10883,12 +10883,12 @@
                 CreateGlobalFunctionBinding(N, V, D)
               </td>
               <td>
-                Create and initialize a global `function` binding in the [[ObjectRecord]] component of a global Environment Record. The binding will be a mutable binding. The corresponding global object property will have attribute values appropriate for a `function`. The String value _N_ is the bound name. _V_ is the initialization value. If the Boolean argument _D_ is *true* the binding may be deleted. Logically equivalent to CreateMutableBinding followed by a SetMutableBinding but it allows function declarations to receive special treatment.
+                Create and initialize a global `function` binding in the [[ObjectRecord]] component of a Global Environment Record. The binding will be a mutable binding. The corresponding global object property will have attribute values appropriate for a `function`. The String value _N_ is the bound name. _V_ is the initialization value. If the Boolean argument _D_ is *true* the binding may be deleted. Logically equivalent to CreateMutableBinding followed by a SetMutableBinding but it allows function declarations to receive special treatment.
               </td>
             </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the concrete specification methods for global Environment Records is defined by the following algorithms.</p>
+        <p>The behaviour of the concrete specification methods for Global Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-global-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -10898,7 +10898,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if the argument identifier is one of the identifiers bound by the record.</dd>
@@ -10920,7 +10920,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It creates a new mutable binding for the name _N_ that is uninitialized. The binding is created in the associated DeclarativeRecord. A binding for _N_ must not already exist in the DeclarativeRecord. If _D_ is *true*, the new binding is marked as being subject to deletion.</dd>
@@ -10941,7 +10941,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It creates a new immutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _S_ is *true*, the new binding is marked as a strict binding.</dd>
@@ -10962,7 +10962,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It is used to set the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. An uninitialized binding for _N_ must already exist.</dd>
@@ -10971,7 +10971,7 @@
             1. Let _DclRec_ be _envRec_.[[DeclarativeRecord]].
             1. If ! _DclRec_.HasBinding(_N_) is *true*, then
               1. Return ! _DclRec_.InitializeBinding(_N_, _V_).
-            1. Assert: If the binding exists, it must be in the object Environment Record.
+            1. Assert: If the binding exists, it must be in the Object Environment Record.
             1. Let _ObjRec_ be _envRec_.[[ObjectRecord]].
             1. Return ? <emu-meta effects="user-code">_ObjRec_.InitializeBinding</emu-meta>(_N_, _V_).
           </emu-alg>
@@ -10987,7 +10987,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It attempts to change the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. If the binding is an immutable binding, a *TypeError* is thrown if _S_ is *true*. A property named _N_ normally already exists but if it does not or is not currently writable, error handling is determined by _S_.</dd>
@@ -11010,7 +11010,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It returns the value of its bound identifier whose name is the value of the argument _N_. If the binding is an uninitialized binding throw a *ReferenceError* exception. A property named _N_ normally already exists but if it does not or is not currently writable, error handling is determined by _S_.</dd>
@@ -11032,7 +11032,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It can only delete bindings that have been explicitly designated as being subject to deletion.</dd>
@@ -11058,7 +11058,7 @@
           <h1>HasThisBinding ( ): *true*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *true*.
@@ -11072,7 +11072,7 @@
           <h1>HasSuperBinding ( ): *false*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *false*.
@@ -11086,7 +11086,7 @@
           <h1>WithBaseObject ( ): *undefined*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *undefined*.
@@ -11097,7 +11097,7 @@
           <h1>GetThisBinding ( ): a normal completion containing an Object</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return _envRec_.[[GlobalThisValue]].
@@ -11112,7 +11112,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if the argument identifier has a binding in this record that was created using a |VariableStatement| or a |FunctionDeclaration|.</dd>
@@ -11132,7 +11132,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if the argument identifier has a binding in this record that was created using a lexical declaration such as a |LexicalDeclaration| or a |ClassDeclaration|.</dd>
@@ -11151,7 +11151,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if the argument identifier is the name of a property of the global object that must not be shadowed by a global lexical binding.</dd>
@@ -11177,7 +11177,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if a corresponding CreateGlobalVarBinding call would succeed if called for the same argument _N_. Redundant var declarations and var declarations for pre-existing global object properties are allowed.</dd>
@@ -11199,7 +11199,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It determines if a corresponding CreateGlobalFunctionBinding call would succeed if called for the same argument _N_.</dd>
@@ -11224,10 +11224,10 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
-            <dd>It creates and initializes a mutable binding in the associated object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is reused and assumed to be initialized.</dd>
+            <dd>It creates and initializes a mutable binding in the associated Object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is reused and assumed to be initialized.</dd>
           </dl>
           <emu-alg>
             1. Let _ObjRec_ be _envRec_.[[ObjectRecord]].
@@ -11254,10 +11254,10 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a global Environment Record _envRec_</dd>
+            <dd>a Global Environment Record _envRec_</dd>
 
             <dt>description</dt>
-            <dd>It creates and initializes a mutable binding in the associated object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is replaced.</dd>
+            <dd>It creates and initializes a mutable binding in the associated Object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is replaced.</dd>
           </dl>
           <emu-alg>
             1. Let _ObjRec_ be _envRec_.[[ObjectRecord]].
@@ -11282,8 +11282,8 @@
 
       <emu-clause id="sec-module-environment-records" oldids="module-environment">
         <h1>Module Environment Records</h1>
-        <p>A <dfn variants="module Environment Records">module Environment Record</dfn> is a declarative Environment Record that is used to represent the outer scope of an ECMAScript |Module|. In additional to normal mutable and immutable bindings, module Environment Records also provide immutable import bindings which are bindings that provide indirect access to a target binding that exists in another Environment Record.</p>
-        <p>Module Environment Records support all of the declarative Environment Record methods listed in <emu-xref href="#table-abstract-methods-of-environment-records"></emu-xref> and share the same specifications for all of those methods except for GetBindingValue, DeleteBinding, HasThisBinding and GetThisBinding. In addition, module Environment Records support the methods listed in <emu-xref href="#table-additional-methods-of-module-environment-records"></emu-xref>:</p>
+        <p>A <dfn variants="Module Environment Records">Module Environment Record</dfn> is a Declarative Environment Record that is used to represent the outer scope of an ECMAScript |Module|. In additional to normal mutable and immutable bindings, Module Environment Records also provide immutable import bindings which are bindings that provide indirect access to a target binding that exists in another Environment Record.</p>
+        <p>Module Environment Records support all of the Declarative Environment Record methods listed in <emu-xref href="#table-abstract-methods-of-environment-records"></emu-xref> and share the same specifications for all of those methods except for GetBindingValue, DeleteBinding, HasThisBinding and GetThisBinding. In addition, Module Environment Records support the methods listed in <emu-xref href="#table-additional-methods-of-module-environment-records"></emu-xref>:</p>
         <emu-table id="table-additional-methods-of-module-environment-records" caption="Additional Methods of Module Environment Records" oldids="table-20">
           <table>
             <tr>
@@ -11299,7 +11299,7 @@
                 CreateImportBinding(N, M, N2)
               </td>
               <td>
-                Create an immutable indirect binding in a module Environment Record. The String value _N_ is the text of the bound name. _M_ is a Module Record, and _N2_ is a binding that exists in _M_'s module Environment Record.
+                Create an immutable indirect binding in a Module Environment Record. The String value _N_ is the text of the bound name. _M_ is a Module Record, and _N2_ is a binding that exists in _M_'s Module Environment Record.
               </td>
             </tr>
             <tr>
@@ -11312,7 +11312,7 @@
             </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the additional concrete specification methods for module Environment Records are defined by the following algorithms:</p>
+        <p>The behaviour of the additional concrete specification methods for Module Environment Records are defined by the following algorithms:</p>
 
         <emu-clause id="sec-module-environment-records-getbindingvalue-n-s" type="concrete method">
           <h1>
@@ -11323,7 +11323,7 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a module Environment Record _envRec_</dd>
+            <dd>a Module Environment Record _envRec_</dd>
 
             <dt>description</dt>
             <dd>It returns the value of its bound identifier whose name is the value of the argument _N_. However, if the binding is an indirect binding the value of the target binding is returned. If the binding exists but is uninitialized a *ReferenceError* is thrown.</dd>
@@ -11346,9 +11346,9 @@
 
         <emu-clause id="sec-module-environment-records-deletebinding-n">
           <h1>DeleteBinding ( _N_ )</h1>
-          <p>The DeleteBinding concrete method of a module Environment Record is never used within this specification.</p>
+          <p>The DeleteBinding concrete method of a Module Environment Record is never used within this specification.</p>
           <emu-note>
-            <p>Module Environment Records are only used within strict code and an early error rule prevents the delete operator, in strict code, from being applied to a Reference Record that would resolve to a module Environment Record binding. See <emu-xref href="#sec-delete-operator-static-semantics-early-errors"></emu-xref>.</p>
+            <p>Module Environment Records are only used within strict code and an early error rule prevents the delete operator, in strict code, from being applied to a Reference Record that would resolve to a Module Environment Record binding. See <emu-xref href="#sec-delete-operator-static-semantics-early-errors"></emu-xref>.</p>
           </emu-note>
         </emu-clause>
 
@@ -11356,7 +11356,7 @@
           <h1>HasThisBinding ( ): *true*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a module Environment Record _envRec_</dd>
+            <dd>a Module Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *true*.
@@ -11370,7 +11370,7 @@
           <h1>GetThisBinding ( ): a normal completion containing *undefined*</h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a module Environment Record _envRec_</dd>
+            <dd>a Module Environment Record _envRec_</dd>
           </dl>
           <emu-alg>
             1. Return *undefined*.
@@ -11387,10 +11387,10 @@
           </h1>
           <dl class="header">
             <dt>for</dt>
-            <dd>a module Environment Record _envRec_</dd>
+            <dd>a Module Environment Record _envRec_</dd>
 
             <dt>description</dt>
-            <dd>It creates a new initialized immutable indirect binding for the name _N_. A binding must not already exist in this Environment Record for _N_. _N2_ is the name of a binding that exists in _M_'s module Environment Record. Accesses to the value of the new binding will indirectly access the bound value of the target binding.</dd>
+            <dd>It creates a new initialized immutable indirect binding for the name _N_. A binding must not already exist in this Environment Record for _N_. _N2_ is the name of a binding that exists in _M_'s Module Environment Record. Accesses to the value of the new binding will indirectly access the bound value of the target binding.</dd>
           </dl>
           <emu-alg>
             1. Assert: _envRec_ does not already have a binding for _N_.
@@ -11432,12 +11432,12 @@
         <h1>
           NewDeclarativeEnvironment (
             _E_: an Environment Record,
-          ): a declarative Environment Record
+          ): a Declarative Environment Record
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Let _env_ be a new declarative Environment Record containing no bindings.
+          1. Let _env_ be a new Declarative Environment Record containing no bindings.
           1. Set _env_.[[OuterEnv]] to _E_.
           1. Return _env_.
         </emu-alg>
@@ -11449,12 +11449,12 @@
             _O_: an Object,
             _W_: a Boolean,
             _E_: an Environment Record or *null*,
-          ): an object Environment Record
+          ): an Object Environment Record
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Let _env_ be a new object Environment Record.
+          1. Let _env_ be a new Object Environment Record.
           1. Set _env_.[[BindingObject]] to _O_.
           1. Set _env_.[[IsWithEnvironment]] to _W_.
           1. Set _env_.[[OuterEnv]] to _E_.
@@ -11467,12 +11467,12 @@
           NewFunctionEnvironment (
             _F_: an ECMAScript function,
             _newTarget_: an Object or *undefined*,
-          ): a function Environment Record
+          ): a Function Environment Record
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Let _env_ be a new function Environment Record containing no bindings.
+          1. Let _env_ be a new Function Environment Record containing no bindings.
           1. Set _env_.[[FunctionObject]] to _F_.
           1. If _F_.[[ThisMode]] is ~lexical~, set _env_.[[ThisBindingStatus]] to ~lexical~.
           1. Else, set _env_.[[ThisBindingStatus]] to ~uninitialized~.
@@ -11487,14 +11487,14 @@
           NewGlobalEnvironment (
             _G_: unknown,
             _thisValue_: unknown,
-          ): a global Environment Record
+          ): a Global Environment Record
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
           1. Let _objRec_ be NewObjectEnvironment(_G_, *false*, *null*).
-          1. Let _dclRec_ be a new declarative Environment Record containing no bindings.
-          1. Let _env_ be a new global Environment Record.
+          1. Let _dclRec_ be a new Declarative Environment Record containing no bindings.
+          1. Let _env_ be a new Global Environment Record.
           1. Set _env_.[[ObjectRecord]] to _objRec_.
           1. Set _env_.[[GlobalThisValue]] to _thisValue_.
           1. Set _env_.[[DeclarativeRecord]] to _dclRec_.
@@ -11508,12 +11508,12 @@
         <h1>
           NewModuleEnvironment (
             _E_: an Environment Record,
-          ): a module Environment Record
+          ): a Module Environment Record
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Let _env_ be a new module Environment Record containing no bindings.
+          1. Let _env_ be a new Module Environment Record containing no bindings.
           1. Set _env_.[[OuterEnv]] to _E_.
           1. Return _env_.
         </emu-alg>
@@ -11650,7 +11650,7 @@
             [[GlobalEnv]]
           </td>
           <td>
-            a global Environment Record
+            a Global Environment Record
           </td>
           <td>
             The global environment for this realm
@@ -12958,11 +12958,11 @@
         <emu-alg>
           1. Let _keys_ be a new empty List.
           1. For each own property key _P_ of _O_ such that _P_ is an array index, in ascending numeric index order, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is String and _P_ is not an array index, in ascending chronological order of property creation, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is Symbol, in ascending chronological order of property creation, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. Return _keys_.
         </emu-alg>
       </emu-clause>
@@ -13319,12 +13319,12 @@
           1. Else,
             1. If _thisArgument_ is *undefined* or *null*, then
               1. Let _globalEnv_ be _calleeRealm_.[[GlobalEnv]].
-              1. Assert: _globalEnv_ is a global Environment Record.
+              1. Assert: _globalEnv_ is a Global Environment Record.
               1. Let _thisValue_ be _globalEnv_.[[GlobalThisValue]].
             1. Else,
               1. Let _thisValue_ be ! ToObject(_thisArgument_).
               1. NOTE: ToObject produces wrapper objects using _calleeRealm_.
-          1. Assert: _localEnv_ is a function Environment Record.
+          1. Assert: _localEnv_ is a Function Environment Record.
           1. Assert: The next step never returns an abrupt completion because _localEnv_.[[ThisBindingStatus]] is not ~initialized~.
           1. Perform ! _localEnv_.BindThisValue(_thisValue_).
           1. Return ~unused~.
@@ -13667,7 +13667,7 @@
         <dd>_func_ is the function object for which the execution context is being established.</dd>
       </dl>
       <emu-note>
-        <p>When an execution context is established for evaluating an ECMAScript function a new function Environment Record is created and bindings for each formal parameter are instantiated in that Environment Record. Each declaration in the function body is also instantiated. If the function's formal parameters do not include any default value initializers then the body declarations are instantiated in the same Environment Record as the parameters. If default value parameter initializers exist, a second Environment Record is created for the body declarations. Formal parameters and functions are initialized as part of FunctionDeclarationInstantiation. All other bindings are initialized during evaluation of the function body.</p>
+        <p>When an execution context is established for evaluating an ECMAScript function a new Function Environment Record is created and bindings for each formal parameter are instantiated in that Environment Record. Each declaration in the function body is also instantiated. If the function's formal parameters do not include any default value initializers then the body declarations are instantiated in the same Environment Record as the parameters. If default value parameter initializers exist, a second Environment Record is created for the body declarations. Formal parameters and functions are initialized as part of FunctionDeclarationInstantiation. All other bindings are initialized during evaluation of the function body.</p>
       </emu-note>
       <p>It performs the following steps when called:</p>
       <!--
@@ -14220,13 +14220,13 @@
           1. Assert: Type(_str_) is String.
           1. Let _len_ be the length of _str_.
           1. For each integer _i_ starting with 0 such that _i_ &lt; _len_, in ascending order, do
-            1. Add ! ToString(𝔽(_i_)) as the last element of _keys_.
+            1. Append ! ToString(𝔽(_i_)) to _keys_.
           1. For each own property key _P_ of _O_ such that _P_ is an array index and ! ToIntegerOrInfinity(_P_) &ge; _len_, in ascending numeric index order, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is String and _P_ is not an array index, in ascending chronological order of property creation, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is Symbol, in ascending chronological order of property creation, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. Return _keys_.
         </emu-alg>
       </emu-clause>
@@ -14488,7 +14488,7 @@
           1. Repeat, while _index_ &ge; 0,
             1. Let _name_ be _parameterNames_[_index_].
             1. If _name_ is not an element of _mappedNames_, then
-              1. Add _name_ as an element of the list _mappedNames_.
+              1. Append _name_ to _mappedNames_.
               1. If _index_ &lt; _len_, then
                 1. Let _g_ be MakeArgGetter(_name_, _env_).
                 1. Let _p_ be MakeArgSetter(_name_, _env_).
@@ -14683,11 +14683,11 @@
           1. Let _keys_ be a new empty List.
           1. If IsDetachedBuffer(_O_.[[ViewedArrayBuffer]]) is *false*, then
             1. For each integer _i_ starting with 0 such that _i_ &lt; _O_.[[ArrayLength]], in ascending order, do
-              1. Add ! ToString(𝔽(_i_)) as the last element of _keys_.
+              1. Append ! ToString(𝔽(_i_)) to _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is String and _P_ is not an integer index, in ascending chronological order of property creation, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is Symbol, in ascending chronological order of property creation, do
-            1. Add _P_ as the last element of _keys_.
+            1. Append _P_ to _keys_.
           1. Return _keys_.
         </emu-alg>
       </emu-clause>
@@ -19158,7 +19158,7 @@
         </dl>
         <emu-alg>
           1. Let _envRec_ be GetThisEnvironment().
-          1. Assert: _envRec_ is a function Environment Record.
+          1. Assert: _envRec_ is a Function Environment Record.
           1. Let _activeFunction_ be _envRec_.[[FunctionObject]].
           1. Assert: _activeFunction_ is an ECMAScript function object.
           1. Let _superConstructor_ be ! _activeFunction_.[[GetPrototypeOf]]().
@@ -19215,7 +19215,7 @@
             1. Let _next_ be ? IteratorStep(_iteratorRecord_).
             1. If _next_ is *false*, return _list_.
             1. Let _nextArg_ be ? IteratorValue(_next_).
-            1. Append _nextArg_ as the last element of _list_.
+            1. Append _nextArg_ to _list_.
         </emu-alg>
         <emu-grammar>ArgumentList : ArgumentList `,` AssignmentExpression</emu-grammar>
         <emu-alg>
@@ -19233,7 +19233,7 @@
             1. Let _next_ be ? IteratorStep(_iteratorRecord_).
             1. If _next_ is *false*, return _precedingArgs_.
             1. Let _nextArg_ be ? IteratorValue(_next_).
-            1. Append _nextArg_ as the last element of _precedingArgs_.
+            1. Append _nextArg_ to _precedingArgs_.
         </emu-alg>
         <emu-grammar>TemplateLiteral : NoSubstitutionTemplate</emu-grammar>
         <emu-alg>
@@ -21089,7 +21089,7 @@
       <h1>
         BlockDeclarationInstantiation (
           _code_: a Parse Node,
-          _env_: a declarative Environment Record,
+          _env_: a Declarative Environment Record,
         ): ~unused~
       </h1>
       <dl class="header">
@@ -21097,7 +21097,7 @@
         <dd>_code_ is the Parse Node corresponding to the body of the block. _env_ is the Environment Record in which bindings are to be created.</dd>
       </dl>
       <emu-note>
-        <p>When a |Block| or |CaseBlock| is evaluated a new declarative Environment Record is created and bindings for each block scoped variable, constant, function, or class declared in the block are instantiated in the Environment Record.</p>
+        <p>When a |Block| or |CaseBlock| is evaluated a new Declarative Environment Record is created and bindings for each block scoped variable, constant, function, or class declared in the block are instantiated in the Environment Record.</p>
       </emu-note>
       <p>It performs the following steps when called:</p>
       <!--
@@ -21259,7 +21259,7 @@
           1. Return ~empty~.
         </emu-alg>
         <emu-note>
-          <p>If a |VariableDeclaration| is nested within a with statement and the |BindingIdentifier| in the |VariableDeclaration| is the same as a property name of the binding object of the with statement's object Environment Record, then step <emu-xref href="#step-vardecllist-evaluation-putvalue"></emu-xref> will assign _value_ to the property instead of assigning to the VariableEnvironment binding of the |Identifier|.</p>
+          <p>If a |VariableDeclaration| is nested within a with statement and the |BindingIdentifier| in the |VariableDeclaration| is the same as a property name of the binding object of the with statement's Object Environment Record, then step <emu-xref href="#step-vardecllist-evaluation-putvalue"></emu-xref> will assign _value_ to the property instead of assigning to the VariableEnvironment binding of the |Identifier|.</p>
         </emu-note>
         <emu-grammar>VariableDeclaration : BindingPattern Initializer</emu-grammar>
         <emu-alg>
@@ -21339,7 +21339,7 @@
 
         <emu-grammar>BindingProperty : SingleNameBinding</emu-grammar>
         <emu-alg>
-          1. Let _name_ be the string that is the only element of BoundNames of |SingleNameBinding|.
+          1. Let _name_ be the sole element of the BoundNames of |SingleNameBinding|.
           1. Perform ? KeyedBindingInitialization of |SingleNameBinding| with arguments _value_, _environment_, and _name_.
           1. Return &laquo; _name_ &raquo;.
         </emu-alg>
@@ -21944,7 +21944,7 @@
         </dl>
         <emu-grammar>ForDeclaration : LetOrConst ForBinding</emu-grammar>
         <emu-alg>
-          1. Assert: _environment_ is a declarative Environment Record.
+          1. Assert: _environment_ is a Declarative Environment Record.
           1. For each element _name_ of the BoundNames of |ForBinding|, do
             1. If IsConstantDeclaration of |LetOrConst| is *true*, then
               1. Perform ! _environment_.CreateImmutableBinding(_name_, *true*).
@@ -22030,7 +22030,7 @@
         </dl>
         <emu-alg>
           1. Let _oldEnv_ be the running execution context's LexicalEnvironment.
-          1. If _uninitializedBoundNames_ is not an empty List, then
+          1. If _uninitializedBoundNames_ is not empty, then
             1. Assert: _uninitializedBoundNames_ has no duplicate entries.
             1. Let _newEnv_ be NewDeclarativeEnvironment(_oldEnv_).
             1. For each String _name_ of _uninitializedBoundNames_, do
@@ -22441,7 +22441,7 @@
         `with` `(` Expression[+In, ?Yield, ?Await] `)` Statement[?Yield, ?Await, ?Return]
     </emu-grammar>
     <emu-note>
-      <p>The `with` statement adds an object Environment Record for a computed object to the lexical environment of the running execution context. It then executes a statement using this augmented lexical environment. Finally, it restores the original lexical environment.</p>
+      <p>The `with` statement adds an Object Environment Record for a computed object to the lexical environment of the running execution context. It then executes a statement using this augmented lexical environment. Finally, it restores the original lexical environment.</p>
     </emu-note>
 
     <emu-clause id="sec-with-statement-static-semantics-early-errors">
@@ -25798,7 +25798,7 @@
         1. Set the VariableEnvironment of _scriptContext_ to _globalEnv_.
         1. Set the LexicalEnvironment of _scriptContext_ to _globalEnv_.
         1. Set the PrivateEnvironment of _scriptContext_ to *null*.
-        1. Suspend the currently running execution context.
+        1. Suspend the running execution context.
         1. Push _scriptContext_ onto the execution context stack; _scriptContext_ is now the running execution context.
         1. Let _script_ be _scriptRecord_.[[ECMAScriptCode]].
         1. Let _result_ be Completion(GlobalDeclarationInstantiation(_script_, _globalEnv_)).
@@ -25817,7 +25817,7 @@
       <h1>
         GlobalDeclarationInstantiation (
           _script_: a |Script| Parse Node,
-          _env_: a global Environment Record,
+          _env_: a Global Environment Record,
         ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
@@ -26067,7 +26067,7 @@
                 [[Environment]]
               </td>
               <td>
-                a module Environment Record or ~empty~
+                a Module Environment Record or ~empty~
               </td>
               <td>
                 The Environment Record containing the top level bindings for this module. This field is set when the module is linked.
@@ -26129,7 +26129,7 @@
                 Link()
               </td>
               <td>
-                <p>Prepare the module for evaluation by transitively resolving all module dependencies and creating a module Environment Record.</p>
+                <p>Prepare the module for evaluation by transitively resolving all module dependencies and creating a Module Environment Record.</p>
               </td>
             </tr>
             <tr>
@@ -27744,7 +27744,7 @@
             1. Assert: _module_ has been linked and declarations in its module environment have been instantiated.
             1. Set the VariableEnvironment of _moduleContext_ to _module_.[[Environment]].
             1. Set the LexicalEnvironment of _moduleContext_ to _module_.[[Environment]].
-            1. Suspend the currently running execution context.
+            1. Suspend the running execution context.
             1. If _module_.[[HasTLA]] is *false*, then
               1. Assert: _capability_ is not present.
               1. Push _moduleContext_ onto the execution context stack; _moduleContext_ is now the running execution context.
@@ -27765,7 +27765,7 @@
         <h1>
           HostResolveImportedModule (
             _referencingScriptOrModule_: a Script Record, a Module Record, or *null*,
-            _specifier_: a |ModuleSpecifier| String,
+            _specifier_: a String,
           ): either a normal completion containing a Module Record or a throw completion
         </h1>
         <dl class="header">
@@ -27800,7 +27800,7 @@
         <h1>
           HostImportModuleDynamically (
             _referencingScriptOrModule_: a Script Record, a Module Record, or *null*,
-            _specifier_: a |ModuleSpecifier| String,
+            _specifier_: a String,
             _promiseCapability_: a PromiseCapability Record,
           ): ~unused~
         </h1>
@@ -28628,7 +28628,7 @@
           1. Let _inClassFieldInitializer_ be *false*.
           1. If _direct_ is *true*, then
             1. Let _thisEnvRec_ be GetThisEnvironment().
-            1. If _thisEnvRec_ is a function Environment Record, then
+            1. If _thisEnvRec_ is a Function Environment Record, then
               1. Let _F_ be _thisEnvRec_.[[FunctionObject]].
               1. Set _inFunction_ to *true*.
               1. Set _inMethod_ to _thisEnvRec_.HasSuperBinding().
@@ -28719,14 +28719,14 @@
           1. Let _varNames_ be the VarDeclaredNames of _body_.
           1. Let _varDeclarations_ be the VarScopedDeclarations of _body_.
           1. If _strict_ is *false*, then
-            1. If _varEnv_ is a global Environment Record, then
+            1. If _varEnv_ is a Global Environment Record, then
               1. For each element _name_ of _varNames_, do
                 1. If _varEnv_.HasLexicalDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
                 1. NOTE: `eval` will not create a global var declaration that would be shadowed by a global lexical declaration.
             1. Let _thisEnv_ be _lexEnv_.
             1. Assert: The following loop will terminate.
             1. Repeat, while _thisEnv_ is not the same as _varEnv_,
-              1. If _thisEnv_ is not an object Environment Record, then
+              1. If _thisEnv_ is not an Object Environment Record, then
                 1. NOTE: The environment of with statements cannot contain any lexical declaration so it doesn't need to be checked for var/let hoisting conflicts.
                 1. For each element _name_ of _varNames_, do
                   1. If ! _thisEnv_.HasBinding(_name_) is *true*, then
@@ -28749,7 +28749,7 @@
               1. NOTE: If there are multiple function declarations for the same name, the last declaration is used.
               1. Let _fn_ be the sole element of the BoundNames of _d_.
               1. If _fn_ is not an element of _declaredFunctionNames_, then
-                1. If _varEnv_ is a global Environment Record, then
+                1. If _varEnv_ is a Global Environment Record, then
                   1. Let _fnDefinable_ be ? _varEnv_.CanDeclareGlobalFunction(_fn_).
                   1. If _fnDefinable_ is *false*, throw a *TypeError* exception.
                 1. Append _fn_ to _declaredFunctionNames_.
@@ -28760,12 +28760,12 @@
             1. If _d_ is a |VariableDeclaration|, a |ForBinding|, or a |BindingIdentifier|, then
               1. For each String _vn_ of the BoundNames of _d_, do
                 1. If _vn_ is not an element of _declaredFunctionNames_, then
-                  1. If _varEnv_ is a global Environment Record, then
+                  1. If _varEnv_ is a Global Environment Record, then
                     1. Let _vnDefinable_ be ? _varEnv_.CanDeclareGlobalVar(_vn_).
                     1. If _vnDefinable_ is *false*, throw a *TypeError* exception.
                   1. If _vn_ is not an element of _declaredVarNames_, then
                     1. Append _vn_ to _declaredVarNames_.
-          1. [id="step-evaldeclarationinstantiation-post-validation"] NOTE: No abnormal terminations occur after this algorithm step unless _varEnv_ is a global Environment Record and the global object is a Proxy exotic object.
+          1. [id="step-evaldeclarationinstantiation-post-validation"] NOTE: No abnormal terminations occur after this algorithm step unless _varEnv_ is a Global Environment Record and the global object is a Proxy exotic object.
           1. Let _lexDeclarations_ be the LexicallyScopedDeclarations of _body_.
           1. For each element _d_ of _lexDeclarations_, do
             1. NOTE: Lexically declared names are only instantiated here but not initialized.
@@ -28777,7 +28777,7 @@
           1. For each Parse Node _f_ of _functionsToInitialize_, do
             1. Let _fn_ be the sole element of the BoundNames of _f_.
             1. Let _fo_ be InstantiateFunctionObject of _f_ with arguments _lexEnv_ and _privateEnv_.
-            1. If _varEnv_ is a global Environment Record, then
+            1. If _varEnv_ is a Global Environment Record, then
               1. Perform ? _varEnv_.CreateGlobalFunctionBinding(_fn_, _fo_, *true*).
             1. Else,
               1. Let _bindingExists_ be ! _varEnv_.HasBinding(_fn_).
@@ -28788,7 +28788,7 @@
               1. Else,
                 1. Perform ! _varEnv_.SetMutableBinding(_fn_, _fo_, *false*).
           1. For each String _vn_ of _declaredVarNames_, do
-            1. If _varEnv_ is a global Environment Record, then
+            1. If _varEnv_ is a Global Environment Record, then
               1. Perform ? _varEnv_.CreateGlobalVarBinding(_vn_, *true*).
             1. Else,
               1. Let _bindingExists_ be ! _varEnv_.HasBinding(_vn_).
@@ -29338,7 +29338,7 @@
         <h1>Object ( [ _value_ ] )</h1>
         <p>This function performs the following steps when called:</p>
         <emu-alg>
-          1. If NewTarget is neither *undefined* nor the active function, then
+          1. If NewTarget is neither *undefined* nor the active function object, then
             1. Return ? OrdinaryCreateFromConstructor(NewTarget, *"%Object.prototype%"*).
           1. If _value_ is *undefined* or *null*, return OrdinaryObjectCreate(%Object.prototype%).
           1. Return ! ToObject(_value_).
@@ -29536,7 +29536,7 @@
             1. Let _nameList_ be a new empty List.
             1. For each element _nextKey_ of _keys_, do
               1. If Type(_nextKey_) is Symbol and _type_ is ~symbol~ or Type(_nextKey_) is String and _type_ is ~string~, then
-                1. Append _nextKey_ as the last element of _nameList_.
+                1. Append _nextKey_ to _nameList_.
             1. Return _nameList_.
           </emu-alg>
         </emu-clause>
@@ -33433,7 +33433,7 @@ THH:mm:ss.sss
           1. Let _elements_ be a new empty List.
           1. For each element _next_ of _codeUnits_, do
             1. Let _nextCU_ be ℝ(? ToUint16(_next_)).
-            1. Append _nextCU_ to the end of _elements_.
+            1. Append _nextCU_ to _elements_.
           1. Return the String value whose code units are the elements in the List _elements_. If _codeUnits_ is empty, the empty String is returned.
         </emu-alg>
         <p>The *"length"* property of this function is *1*<sub>𝔽</sub>.</p>
@@ -34041,7 +34041,7 @@ THH:mm:ss.sss
           1. Let _matchPositions_ be a new empty List.
           1. Let _position_ be StringIndexOf(_string_, _searchString_, 0).
           1. Repeat, while _position_ is not -1,
-            1. Append _position_ to the end of _matchPositions_.
+            1. Append _position_ to _matchPositions_.
             1. Set _position_ to StringIndexOf(_string_, _searchString_, _position_ + _advanceBy_).
           1. Let _endOfLastMatch_ be 0.
           1. Let _result_ be the empty String.
@@ -34131,7 +34131,7 @@ THH:mm:ss.sss
           1. Let _j_ be StringIndexOf(_S_, _R_, 0).
           1. Repeat, while _j_ is not -1,
             1. Let _T_ be the substring of _S_ from _i_ to _j_.
-            1. Append _T_ as the last element of _substrings_.
+            1. Append _T_ to _substrings_.
             1. If the number of elements of _substrings_ is _lim_, return CreateArrayFromList(_substrings_).
             1. Set _i_ to _j_ + _separatorLength_.
             1. Set _j_ to StringIndexOf(_S_, _R_, _i_).
@@ -36636,7 +36636,7 @@ THH:mm:ss.sss
             1. Let _result_ be ? RegExpExec(_rx_, _S_).
             1. If _result_ is *null*, set _done_ to *true*.
             1. Else,
-              1. Append _result_ to the end of _results_.
+              1. Append _result_ to _results_.
               1. If _global_ is *false*, set _done_ to *true*.
               1. Else,
                 1. Let _matchStr_ be ? ToString(? Get(_result_, *"0"*)).
@@ -36659,7 +36659,7 @@ THH:mm:ss.sss
               1. Let _capN_ be ? Get(_result_, ! ToString(𝔽(_n_))).
               1. If _capN_ is not *undefined*, then
                 1. Set _capN_ to ? ToString(_capN_).
-              1. Append _capN_ as the last element of _captures_.
+              1. Append _capN_ to _captures_.
               1. NOTE: When _n_ = 1, the preceding step puts the first element into _captures_ (at index 0). More generally, the _n_<sup>th</sup> capture (the characters captured by the _n_<sup>th</sup> set of capturing parentheses) is at _captures_[_n_ - 1].
               1. Set _n_ to _n_ + 1.
             1. Let _namedCaptures_ be ? Get(_result_, *"groups"*).
@@ -36668,7 +36668,7 @@ THH:mm:ss.sss
               1. Append in List order the elements of _captures_ to the end of the List _replacerArgs_.
               1. Append 𝔽(_position_) and _S_ to _replacerArgs_.
               1. If _namedCaptures_ is not *undefined*, then
-                1. Append _namedCaptures_ as the last element of _replacerArgs_.
+                1. Append _namedCaptures_ to _replacerArgs_.
               1. Let _replValue_ be ? Call(_replaceValue_, *undefined*, _replacerArgs_).
               1. Let _replacement_ be ? ToString(_replValue_).
             1. Else,
@@ -38885,7 +38885,7 @@ THH:mm:ss.sss
             1. Let _kValue_ be ! Get(_O_, _Pk_).
             1. Let _selected_ be ToBoolean(? Call(_callbackfn_, _thisArg_, &laquo; _kValue_, 𝔽(_k_), _O_ &raquo;)).
             1. If _selected_ is *true*, then
-              1. Append _kValue_ to the end of _kept_.
+              1. Append _kValue_ to _kept_.
               1. Set _captured_ to _captured_ + 1.
             1. Set _k_ to _k_ + 1.
           1. Let _A_ be ? TypedArraySpeciesCreate(_O_, &laquo; 𝔽(_captured_) &raquo;).
@@ -40103,7 +40103,7 @@ THH:mm:ss.sss
               1. Return _M_.
           1. If _key_ is *-0*<sub>𝔽</sub>, set _key_ to *+0*<sub>𝔽</sub>.
           1. Let _p_ be the Record { [[Key]]: _key_, [[Value]]: _value_ }.
-          1. Append _p_ as the last element of _entries_.
+          1. Append _p_ to _entries_.
           1. Return _M_.
         </emu-alg>
       </emu-clause>
@@ -40297,7 +40297,7 @@ THH:mm:ss.sss
             1. If _e_ is not ~empty~ and SameValueZero(_e_, _value_) is *true*, then
               1. Return _S_.
           1. If _value_ is *-0*<sub>𝔽</sub>, set _value_ to *+0*<sub>𝔽</sub>.
-          1. Append _value_ as the last element of _entries_.
+          1. Append _value_ to _entries_.
           1. Return _S_.
         </emu-alg>
       </emu-clause>
@@ -40631,7 +40631,7 @@ THH:mm:ss.sss
               1. Set _p_.[[Value]] to _value_.
               1. Return _M_.
           1. Let _p_ be the Record { [[Key]]: _key_, [[Value]]: _value_ }.
-          1. Append _p_ as the last element of _entries_.
+          1. Append _p_ to _entries_.
           1. Return _M_.
         </emu-alg>
       </emu-clause>
@@ -40726,7 +40726,7 @@ THH:mm:ss.sss
           1. For each element _e_ of _entries_, do
             1. If _e_ is not ~empty~ and SameValue(_e_, _value_) is *true*, then
               1. Return _S_.
-          1. Append _value_ as the last element of _entries_.
+          1. Append _value_ to _entries_.
           1. Return _S_.
         </emu-alg>
       </emu-clause>
@@ -41945,7 +41945,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Assert: _W_ is not on the list of waiters in any WaiterList.
-          1. Add _W_ to the end of the list of waiters in _WL_.
+          1. Append _W_ to _WL_.
           1. Return ~unused~.
         </emu-alg>
       </emu-clause>
@@ -41980,9 +41980,9 @@ THH:mm:ss.sss
           1. Assert: The surrounding agent is in the critical section for _WL_.
           1. Let _L_ be a new empty List.
           1. Let _S_ be a reference to the list of waiters in _WL_.
-          1. Repeat, while _c_ &gt; 0 and _S_ is not an empty List,
+          1. Repeat, while _c_ &gt; 0 and _S_ is not empty,
             1. Let _W_ be the first waiter in _S_.
-            1. Add _W_ to the end of _L_.
+            1. Append _W_ to _L_.
             1. Remove _W_ from _S_.
             1. If _c_ is finite, set _c_ to _c_ - 1.
           1. Return _L_.
@@ -42077,7 +42077,7 @@ THH:mm:ss.sss
             1. Else if _op_ is `^`, let _resultByte_ be the result of applying the bitwise exclusive OR (XOR) operation to _xByte_ and _yByte_.
             1. Else, _op_ is `|`. Let _resultByte_ be the result of applying the bitwise inclusive OR operation to _xByte_ and _yByte_.
             1. Set _i_ to _i_ + 1.
-            1. Append _resultByte_ to the end of _result_.
+            1. Append _resultByte_ to _result_.
           1. Return _result_.
         </emu-alg>
       </emu-clause>
@@ -42317,7 +42317,7 @@ THH:mm:ss.sss
         1. Let _n_ be 0.
         1. Perform EnterCriticalSection(_WL_).
         1. Let _S_ be RemoveWaiters(_WL_, _c_).
-        1. Repeat, while _S_ is not an empty List,
+        1. Repeat, while _S_ is not empty,
           1. Let _W_ be the first agent in _S_.
           1. Remove _W_ from the front of _S_.
           1. Perform NotifyWaiter(_WL_, _W_).
@@ -42459,7 +42459,7 @@ THH:mm:ss.sss
                 1. Else if Type(_v_) is Object, then
                   1. If _v_ has a [[StringData]] or [[NumberData]] internal slot, set _item_ to ? ToString(_v_).
                 1. If _item_ is not *undefined* and _item_ is not currently an element of _PropertyList_, then
-                  1. Append _item_ to the end of _PropertyList_.
+                  1. Append _item_ to _PropertyList_.
                 1. Set _k_ to _k_ + 1.
         1. If Type(_space_) is Object, then
           1. If _space_ has a [[NumberData]] internal slot, then
@@ -42731,10 +42731,8 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _n_ be the numeric value of _C_.
           1. Assert: _n_ &le; 0xFFFF.
-          1. Return the string-concatenation of:
-            * the code unit 0x005C (REVERSE SOLIDUS)
-            * *"u"*
-            * the String representation of _n_, formatted as a four-digit lowercase hexadecimal number, padded to the left with zeroes if necessary
+          1. Let _hex_ be the String representation of _n_, formatted as a lowercase hexadecimal number.
+          1. Return the string-concatenation of the code unit 0x005C (REVERSE SOLIDUS), *"u"*, and ! StringPad(_hex_, *4*<sub>𝔽</sub>, *"0"*, ~start~).
         </emu-alg>
       </emu-clause>
 
@@ -44560,8 +44558,8 @@ THH:mm:ss.sss
             1. Let _fulfillReaction_ be the PromiseReaction { [[Capability]]: _resultCapability_, [[Type]]: ~Fulfill~, [[Handler]]: _onFulfilledJobCallback_ }.
             1. Let _rejectReaction_ be the PromiseReaction { [[Capability]]: _resultCapability_, [[Type]]: ~Reject~, [[Handler]]: _onRejectedJobCallback_ }.
             1. If _promise_.[[PromiseState]] is ~pending~, then
-              1. Append _fulfillReaction_ as the last element of the List that is _promise_.[[PromiseFulfillReactions]].
-              1. Append _rejectReaction_ as the last element of the List that is _promise_.[[PromiseRejectReactions]].
+              1. Append _fulfillReaction_ to _promise_.[[PromiseFulfillReactions]].
+              1. Append _rejectReaction_ to _promise_.[[PromiseRejectReactions]].
             1. Else if _promise_.[[PromiseState]] is ~fulfilled~, then
               1. Let _value_ be _promise_.[[PromiseResult]].
               1. Let _fulfillJob_ be NewPromiseReactionJob(_fulfillReaction_, _value_).
@@ -45409,7 +45407,7 @@ THH:mm:ss.sss
         </dl>
         <emu-alg>
           1. Let _request_ be AsyncGeneratorRequest { [[Completion]]: _completion_, [[Capability]]: _promiseCapability_ }.
-          1. Append _request_ to the end of _generator_.[[AsyncGeneratorQueue]].
+          1. Append _request_ to _generator_.[[AsyncGeneratorQueue]].
           1. Return ~unused~.
         </emu-alg>
       </emu-clause>
@@ -47918,11 +47916,11 @@ THH:mm:ss.sss
                 1. Let _thisEnv_ be _lexEnv_.
                 1. Assert: The following loop will terminate.
                 1. Repeat, while _thisEnv_ is not the same as _varEnv_,
-                  1. If _thisEnv_ is not an object Environment Record, then
+                  1. If _thisEnv_ is not an Object Environment Record, then
                     1. If ! _thisEnv_.HasBinding(_F_) is *true*, then
                       1. [id="step-evaldeclarationinstantiation-web-compat-bindingexists"] Let _bindingExists_ be *true*.
                   1. Set _thisEnv_ to _thisEnv_.[[OuterEnv]].
-                1. If _bindingExists_ is *false* and _varEnv_ is a global Environment Record, then
+                1. If _bindingExists_ is *false* and _varEnv_ is a Global Environment Record, then
                   1. If _varEnv_.HasLexicalDeclaration(_F_) is *false*, then
                     1. Let _fnDefinable_ be ? _varEnv_.CanDeclareGlobalVar(_F_).
                   1. Else,
@@ -47931,7 +47929,7 @@ THH:mm:ss.sss
                   1. Let _fnDefinable_ be *true*.
                 1. If _bindingExists_ is *false* and _fnDefinable_ is *true*, then
                   1. If _declaredFunctionOrVarNames_ does not contain _F_, then
-                    1. If _varEnv_ is a global Environment Record, then
+                    1. If _varEnv_ is a Global Environment Record, then
                       1. Perform ? _varEnv_.CreateGlobalVarBinding(_F_, *true*).
                     1. Else,
                       1. Let _bindingExists_ be ! _varEnv_.HasBinding(_F_).
