@@ -532,8 +532,8 @@
 
     <emu-clause id="sec-numeric-string-grammar">
       <h1>The Numeric String Grammar</h1>
-      <p>Another grammar is used for translating Strings into numeric values. This grammar is similar to the part of the lexical grammar having to do with numeric literals and has as its terminal symbols |SourceCharacter|. This grammar appears in <emu-xref href="#sec-tonumber-applied-to-the-string-type"></emu-xref>.</p>
-      <p>Productions of the numeric string grammar are distinguished by having three colons &ldquo;<b>:::</b>&rdquo; as punctuation.</p>
+      <p>A <em>numeric string grammar</em> appears in <emu-xref href="#sec-tonumber-applied-to-the-string-type"></emu-xref>. It has as its terminal symbols |SourceCharacter|, and is used for translating Strings into numeric values starting from the goal symbol |StringNumericLiteral| (which is similar to but distinct from the <emu-xref href="#sec-literals-numeric-literals">lexical grammar for numeric literals</emu-xref>).</p>
+      <p>Productions of the numeric string grammar are distinguished by having three colons &ldquo;<b>:::</b>&rdquo; as punctuation, and are never used for parsing source text.</p>
     </emu-clause>
 
     <emu-clause id="sec-syntactic-grammar">
@@ -1028,8 +1028,7 @@
 
     <emu-clause id="sec-value-notation">
       <h1>Value Notation</h1>
-      <p>In this specification, ECMAScript language values are displayed in *bold*. Examples include *null*, *true*, or *"hello"*. These are distinguished from longer ECMAScript code sequences such as `Function.prototype.apply` or `let n = 42;`.</p>
-      <p>Values which are internal to the specification and not directly observable from ECMAScript code are indicated with a ~sans-serif~ typeface. For instance, a Completion Record's [[Type]] field takes on values like ~normal~, ~return~, or ~throw~.</p>
+      <p>In this specification, ECMAScript language values are displayed in *bold*. Examples include *null*, *true*, or *"hello"*. These are distinguished from ECMAScript source text such as `Function.prototype.apply` or `let n = 42;`.</p>
     </emu-clause>
   </emu-clause>
 </emu-clause>
@@ -3900,6 +3899,11 @@
     <h1>ECMAScript Specification Types</h1>
     <p>A specification type corresponds to meta-values that are used within algorithms to describe the semantics of ECMAScript language constructs and ECMAScript language types. The specification types include Reference, List, Completion Record, Property Descriptor, Environment Record, Abstract Closure, and Data Block. Specification type values are specification artefacts that do not necessarily correspond to any specific entity within an ECMAScript implementation. Specification type values may be used to describe intermediate results of ECMAScript expression evaluation but such values cannot be stored as properties of objects or values of ECMAScript language variables.</p>
 
+    <emu-clause id="sec-enum-specification-type">
+      <h1>The Enum Specification Type</h1>
+      <p><dfn variants="enum,enums">Enums</dfn> are values which are internal to the specification and not directly observable from ECMAScript code. Enums are denoted using a ~sans-serif~ typeface. For instance, a Completion Record's [[Type]] field takes on values like ~normal~, ~return~, or ~throw~. Enums have no characteristics other than their name. The name of an enum serves no purpose other than to distinguish it from other enums, and implies nothing about its usage or meaning in context.</p>
+    </emu-clause>
+
     <emu-clause id="sec-list-and-record-specification-type">
       <h1>The List and Record Specification Types</h1>
       <p>The <dfn variants="Lists">List</dfn> type is used to explain the evaluation of argument lists (see <emu-xref href="#sec-argument-lists"></emu-xref>) in `new` expressions, in function calls, and in other algorithms where a simple ordered list of values is needed. Values of the List type are simply ordered sequences of list elements containing the individual values. These sequences may be of any length. The elements of a list may be randomly accessed using 0-origin indices. For notational convenience an array-like syntax can be used to access List elements. For example, _arguments_[2] is shorthand for saying the 3<sup>rd</sup> element of the List _arguments_.</p>
@@ -6325,11 +6329,11 @@
       <emu-alg>
         1. Assert: _O_ is an ordinary, extensible object with no non-configurable properties.
         1. Let _newDesc_ be the PropertyDescriptor { [[Value]]: _V_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.
-        1. Perform ! _O_.[[DefineOwnProperty]](_P_, _newDesc_).
+        1. Perform ! DefinePropertyOrThrow(_O_, _P_, _newDesc_).
         1. Return ~unused~.
       </emu-alg>
       <emu-note>
-        <p>This abstract operation creates a property whose attributes are set to the same defaults used for built-in methods and methods defined using class declaration syntax. Normally, the property will not already exist. If it does exist and is not configurable or if _O_ is not extensible, [[DefineOwnProperty]] will return *false*.</p>
+        <p>This abstract operation creates a property whose attributes are set to the same defaults used for built-in methods and methods defined using class declaration syntax. Normally, the property will not already exist. If it does exist, DefinePropertyOrThrow is guaranteed to complete normally.</p>
       </emu-note>
     </emu-clause>
 
@@ -6374,7 +6378,7 @@
         1. Return ~unused~.
       </emu-alg>
       <emu-note>
-        <p>This abstract operation creates a property whose attributes are set to the same defaults used for properties created by the ECMAScript language assignment operator except it is not enumerable. Normally, the property will not already exist. If it does exist and is not configurable or if _O_ is not extensible, [[DefineOwnProperty]] will return *false* causing this operation to throw a *TypeError* exception.</p>
+        <p>This abstract operation creates a property whose attributes are set to the same defaults used for properties created by the ECMAScript language assignment operator except it is not enumerable. Normally, the property will not already exist. If it does exist, DefinePropertyOrThrow is guaranteed to complete normally.</p>
       </emu-note>
     </emu-clause>
 
@@ -6816,6 +6820,8 @@
       <dl class="header">
       </dl>
       <emu-alg>
+        1. If the host is a web browser, then
+          1. Perform ? HostEnsureCanAddPrivateElement(_O_).
         1. Let _entry_ be PrivateElementFind(_O_, _P_).
         1. If _entry_ is not ~empty~, throw a *TypeError* exception.
         1. Append PrivateElement { [[Key]]: _P_, [[Kind]]: ~field~, [[Value]]: _value_ } to _O_.[[PrivateElements]].
@@ -6834,6 +6840,8 @@
       </dl>
       <emu-alg>
         1. Assert: _method_.[[Kind]] is either ~method~ or ~accessor~.
+        1. If the host is a web browser, then
+          1. Perform ? HostEnsureCanAddPrivateElement(_O_).
         1. Let _entry_ be PrivateElementFind(_O_, _method_.[[Key]]).
         1. If _entry_ is not ~empty~, throw a *TypeError* exception.
         1. Append _method_ to _O_.[[PrivateElements]].
@@ -6842,6 +6850,25 @@
       <emu-note>
         <p>The values for private methods and accessors are shared across instances. This operation does not create a new copy of the method or accessor.</p>
       </emu-note>
+    </emu-clause>
+
+    <emu-clause id="sec-hostensurecanaddprivateelement" type="host-defined abstract operation">
+      <h1>
+        HostEnsureCanAddPrivateElement (
+          _O_: an Object,
+        ): either a normal completion containing ~unused~ or a throw completion
+      </h1>
+      <dl class="header">
+        <dt>description</dt>
+        <dd>It allows host environments to prevent the addition of private elements to particular host-defined exotic objects.</dd>
+      </dl>
+      <p>An implementation of HostEnsureCanAddPrivateElement must conform to the following requirements:</p>
+      <ul>
+        <li>If _O_ is not a host-defined exotic object, this abstract operation must return NormalCompletion(~unused~) and perform no other steps.</li>
+        <li>Any two calls of this abstract operation with the same argument must return the same kind of Completion Record.</li>
+      </ul>
+      <p>The default implementation of HostEnsureCanAddPrivateElement is to return NormalCompletion(~unused~).</p>
+      <p>This abstract operation is only invoked by ECMAScript hosts that are web browsers.</p>
     </emu-clause>
 
     <emu-clause id="sec-privateget" type="abstract operation">
@@ -14648,8 +14675,10 @@
           1. If Type(_P_) is String, then
             1. Let _numericIndex_ be CanonicalNumericIndexString(_P_).
             1. If _numericIndex_ is not *undefined*, then
-              1. Perform ? IntegerIndexedElementSet(_O_, _numericIndex_, _V_).
-              1. Return *true*.
+              1. If SameValue(_O_, _Receiver_) is *true*, then
+                1. Perform ? IntegerIndexedElementSet(_O_, _numericIndex_, _V_).
+                1. Return *true*.
+              1. If IsValidIntegerIndex(_O_, _numericIndex_) is *false*, return *true*.
           1. Return ? OrdinarySet(_O_, _P_, _V_, _Receiver_).
         </emu-alg>
       </emu-clause>
@@ -15813,7 +15842,7 @@
       SourceCharacter ::
         &gt; any Unicode code point
     </emu-grammar>
-    <p>ECMAScript code is expressed using Unicode. ECMAScript source text is a sequence of code points. All Unicode code point values from U+0000 to U+10FFFF, including surrogate code points, may occur in source text where permitted by the ECMAScript grammars. The actual encodings used to store and interchange ECMAScript source text is not relevant to this specification. Regardless of the external source text encoding, a conforming ECMAScript implementation processes the source text as if it was an equivalent sequence of |SourceCharacter| values, each |SourceCharacter| being a Unicode code point. Conforming ECMAScript implementations are not required to perform any normalization of source text, or behave as though they were performing normalization of source text.</p>
+    <p><dfn>ECMAScript source text</dfn> is a sequence of Unicode code points. All Unicode code point values from U+0000 to U+10FFFF, including surrogate code points, may occur in ECMAScript source text where permitted by the ECMAScript grammars. The actual encodings used to store and interchange ECMAScript source text is not relevant to this specification. Regardless of the external source text encoding, a conforming ECMAScript implementation processes the source text as if it was an equivalent sequence of |SourceCharacter| values, each |SourceCharacter| being a Unicode code point. Conforming ECMAScript implementations are not required to perform any normalization of source text, or behave as though they were performing normalization of source text.</p>
     <p>The components of a combining character sequence are treated as individual Unicode code points even though a user might think of the whole sequence as a single character.</p>
     <emu-note>
       <p>In string literals, regular expression literals, template literals and identifiers, any Unicode code point may also be expressed using Unicode escape sequences that explicitly express a code point's numeric value. Within a comment, such an escape sequence is effectively ignored as part of the comment.</p>
@@ -16016,7 +16045,7 @@
 
     <emu-clause id="sec-non-ecmascript-functions">
       <h1>Non-ECMAScript Functions</h1>
-      <p>An ECMAScript implementation may support the evaluation of function exotic objects whose evaluative behaviour is expressed in some host-defined form of executable code other than via ECMAScript code. Whether a function object is an ECMAScript code function or a non-ECMAScript function is not semantically observable from the perspective of an ECMAScript code function that calls or is called by such a non-ECMAScript function.</p>
+      <p>An ECMAScript implementation may support the evaluation of function exotic objects whose evaluative behaviour is expressed in some host-defined form of executable code other than ECMAScript source text. Whether a function object is defined within ECMAScript code or is a built-in function is not observable from the perspective of ECMAScript code that calls or is called by such a function object.</p>
     </emu-clause>
   </emu-clause>
 </emu-clause>
@@ -28688,7 +28717,7 @@
         </h1>
         <dl class="header">
           <dt>description</dt>
-          <dd>It allows host environments to block certain ECMAScript functions which allow developers to compile strings into ECMAScript code.</dd>
+          <dd>It allows host environments to block certain ECMAScript functions which allow developers to interpret and evaluate strings as ECMAScript code.</dd>
         </dl>
         <p>An implementation of HostEnsureCanCompileStrings must conform to the following requirements:</p>
         <ul>
@@ -30161,7 +30190,7 @@
 
       <emu-clause id="sec-function-instances-name">
         <h1>name</h1>
-        <p>The value of the *"name"* property is a String that is descriptive of the function. The name has no semantic significance but is typically a variable or property name that is used to refer to the function at its point of definition in ECMAScript code. This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
+        <p>The value of the *"name"* property is a String that is descriptive of the function. The name has no semantic significance but is typically a variable or property name that is used to refer to the function at its point of definition in ECMAScript source text. This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
         <p>Anonymous functions objects that do not have a contextual name associated with them by this specification use the empty String as the value of the *"name"* property.</p>
       </emu-clause>
 
@@ -30336,7 +30365,7 @@
           1. Append the Record { [[Key]]: _stringKey_, [[Symbol]]: _newSymbol_ } to the GlobalSymbolRegistry List.
           1. Return _newSymbol_.
         </emu-alg>
-        <p>The GlobalSymbolRegistry is a List that is globally available. It is shared by all realms. Prior to the evaluation of any ECMAScript code it is initialized as a new empty List. Elements of the GlobalSymbolRegistry are Records with the structure defined in <emu-xref href="#table-globalsymbolregistry-record-fields"></emu-xref>.</p>
+        <p>The GlobalSymbolRegistry is a List that is globally available. It is shared by all realms. Prior to the evaluation of any ECMAScript code, it is initialized as a new empty List. Elements of the GlobalSymbolRegistry are Records with the structure defined in <emu-xref href="#table-globalsymbolregistry-record-fields"></emu-xref>.</p>
         <emu-table id="table-globalsymbolregistry-record-fields" caption="GlobalSymbolRegistry Record Fields" oldids="table-44">
           <table>
             <tr>
@@ -34516,10 +34545,10 @@ THH:mm:ss.sss
           [+UnicodeMode] `u{` CodePoint `}`
 
         UnicodeLeadSurrogate ::
-          &gt; any Unicode code point in the inclusive range 0xD800 to 0xDBFF
+          &gt; any Unicode code point in the inclusive range U+D800 to U+DBFF
 
         UnicodeTrailSurrogate ::
-          &gt; any Unicode code point in the inclusive range 0xDC00 to 0xDFFF
+          &gt; any Unicode code point in the inclusive range U+DC00 to U+DFFF
       </emu-grammar>
       <p>Each `\\u` |HexTrailSurrogate| for which the choice of associated `u` |HexLeadSurrogate| is ambiguous shall be associated with the nearest possible `u` |HexLeadSurrogate| that would otherwise have no corresponding `\\u` |HexTrailSurrogate|.</p>
       <emu-grammar type="definition">
@@ -35084,7 +35113,7 @@ THH:mm:ss.sss
       <p>A |Pattern| is either a BMP pattern or a Unicode pattern depending upon whether or not its associated flags contain a `u`. A BMP pattern matches against a String interpreted as consisting of a sequence of 16-bit values that are Unicode code points in the range of the Basic Multilingual Plane. A Unicode pattern matches against a String interpreted as consisting of Unicode code points encoded using UTF-16. In the context of describing the behaviour of a BMP pattern &ldquo;character&rdquo; means a single 16-bit Unicode BMP code point. In the context of describing the behaviour of a Unicode pattern &ldquo;character&rdquo; means a UTF-16 encoded code point (<emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>). In either context, &ldquo;character value&rdquo; means the numeric value of the corresponding non-encoded code point.</p>
       <p>The syntax and semantics of |Pattern| is defined as if the source text for the |Pattern| was a List of |SourceCharacter| values where each |SourceCharacter| corresponds to a Unicode code point. If a BMP pattern contains a non-BMP |SourceCharacter| the entire pattern is encoded using UTF-16 and the individual code units of that encoding are used as the elements of the List.</p>
       <emu-note>
-        <p>For example, consider a pattern expressed in source text as the single non-BMP character U+1D11E (MUSICAL SYMBOL G CLEF). Interpreted as a Unicode pattern, it would be a single element (character) List consisting of the single code point 0x1D11E. However, interpreted as a BMP pattern, it is first UTF-16 encoded to produce a two element List consisting of the code units 0xD834 and 0xDD1E.</p>
+        <p>For example, consider a pattern expressed in source text as the single non-BMP character U+1D11E (MUSICAL SYMBOL G CLEF). Interpreted as a Unicode pattern, it would be a single element (character) List consisting of the single code point U+1D11E. However, interpreted as a BMP pattern, it is first UTF-16 encoded to produce a two element List consisting of the code units 0xD834 and 0xDD1E.</p>
         <p>Patterns are passed to the RegExp constructor as ECMAScript String values in which non-BMP characters are UTF-16 encoded. For example, the single character MUSICAL SYMBOL G CLEF pattern, expressed as a String value, is a String of length 2 whose elements were the code units 0xD834 and 0xDD1E. So no further translation of the string would be necessary to process it as a BMP pattern consisting of two pattern characters. However, to process it as a Unicode pattern UTF16SurrogatePairToCodePoint must be used in producing a List whose sole element is a single pattern character, the code point U+1D11E.</p>
         <p>An implementation may not actually perform such translations to or from UTF-16, but the semantics of this specification requires that the result of pattern matching be as if such translations were performed.</p>
       </emu-note>
@@ -40042,9 +40071,15 @@ THH:mm:ss.sss
           1. Perform ? RequireInternalSlot(_M_, [[MapData]]).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
           1. Let _entries_ be the List that is _M_.[[MapData]].
-          1. For each Record { [[Key]], [[Value]] } _e_ of _entries_, do
+          1. Let _numEntries_ be the number of elements of _entries_.
+          1. Let _index_ be 0.
+          1. Repeat, while _index_ &lt; _numEntries_,
+            1. Let _e_ be the Record { [[Key]], [[Value]] } that is the value of _entries_[_index_].
+            1. Set _index_ to _index_ + 1.
             1. If _e_.[[Key]] is not ~empty~, then
               1. Perform ? Call(_callbackfn_, _thisArg_, &laquo; _e_.[[Value]], _e_.[[Key]], _M_ &raquo;).
+              1. NOTE: The number of elements in _entries_ may have increased during execution of _callbackfn_.
+              1. Set _numEntries_ to the number of elements of _entries_.
           1. Return *undefined*.
         </emu-alg>
         <emu-note>
@@ -40179,7 +40214,7 @@ THH:mm:ss.sss
                   1. Assert: _kind_ is ~key+value~.
                   1. Let _result_ be CreateArrayFromList(&laquo; _e_.[[Key]], _e_.[[Value]] &raquo;).
                 1. Perform ? GeneratorYield(CreateIterResultObject(_result_, *false*)).
-                1. NOTE: The number of elements in _entries_ may have changed while execution of this abstract operation was paused by Yield.
+                1. NOTE: The number of elements in _entries_ may have increased while execution of this abstract operation was paused by Yield.
                 1. Set _numEntries_ to the number of elements of _entries_.
             1. Return *undefined*.
           1. Return CreateIteratorFromClosure(_closure_, *"%MapIteratorPrototype%"*, %MapIteratorPrototype%).
@@ -40360,10 +40395,16 @@ THH:mm:ss.sss
           1. Let _S_ be the *this* value.
           1. Perform ? RequireInternalSlot(_S_, [[SetData]]).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. Let _entries_ be the List that is _S_.[[SetData]].
-          1. For each element _e_ of _entries_, do
+          1. Let _entries_ be the List that is _set_.[[SetData]].
+          1. Let _numEntries_ be the number of elements of _entries_.
+          1. Let _index_ be 0.
+          1. Repeat, while _index_ &lt; _numEntries_,
+            1. Let _e_ be _entries_[_index_].
+            1. Set _index_ to _index_ + 1.
             1. If _e_ is not ~empty~, then
               1. Perform ? Call(_callbackfn_, _thisArg_, &laquo; _e_, _e_, _S_ &raquo;).
+              1. NOTE: The number of elements in _entries_ may have increased during execution of _callbackfn_.
+              1. Set _numEntries_ to the number of elements of _entries_.
           1. Return *undefined*.
         </emu-alg>
         <emu-note>
@@ -40468,7 +40509,7 @@ THH:mm:ss.sss
                 1. Else,
                   1. Assert: _kind_ is ~value~.
                   1. Perform ? GeneratorYield(CreateIterResultObject(_e_, *false*)).
-                1. NOTE: The number of elements in _entries_ may have changed while execution of this abstract operation was paused by Yield.
+                1. NOTE: The number of elements in _entries_ may have increased while execution of this abstract operation was paused by Yield.
                 1. Set _numEntries_ to the number of elements of _entries_.
             1. Return *undefined*.
           1. Return CreateIteratorFromClosure(_closure_, *"%SetIteratorPrototype%"*, %SetIteratorPrototype%).
@@ -42515,7 +42556,7 @@ THH:mm:ss.sss
         <p>Values that do not have a JSON representation (such as *undefined* and functions) do not produce a String. Instead they produce the *undefined* value. In arrays these values are represented as the String *"null"*. In objects an unrepresentable value causes the property to be excluded from stringification.</p>
       </emu-note>
       <emu-note>
-        <p>An object is rendered as U+007B (LEFT CURLY BRACKET) followed by zero or more properties, separated with a U+002C (COMMA), closed with a U+007D (RIGHT CURLY BRACKET). A property is a quoted String representing the key or property name, a U+003A (COLON), and then the stringified property value. An array is rendered as an opening U+005B (LEFT SQUARE BRACKET followed by zero or more values, separated with a U+002C (COMMA), closed with a U+005D (RIGHT SQUARE BRACKET).</p>
+        <p>An object is rendered as U+007B (LEFT CURLY BRACKET) followed by zero or more properties, separated with a U+002C (COMMA), closed with a U+007D (RIGHT CURLY BRACKET). A property is a quoted String representing the property name, a U+003A (COLON), and then the stringified property value. An array is rendered as an opening U+005B (LEFT SQUARE BRACKET) followed by zero or more values, separated with a U+002C (COMMA), closed with a U+005D (RIGHT SQUARE BRACKET).</p>
       </emu-note>
 
       <emu-clause id="sec-json-serialization-record">
@@ -47796,7 +47837,7 @@ THH:mm:ss.sss
 
     <emu-annex id="sec-block-level-function-declarations-web-legacy-compatibility-semantics">
       <h1>Block-Level Function Declarations Web Legacy Compatibility Semantics</h1>
-      <p>Prior to ECMAScript 2015, the ECMAScript specification did not define the occurrence of a |FunctionDeclaration| as an element of a |Block| statement's |StatementList|. However, support for that form of |FunctionDeclaration| was an allowable extension and most browser-hosted ECMAScript implementations permitted them. Unfortunately, the semantics of such declarations differ among those implementations. Because of these semantic differences, existing web ECMAScript code that uses |Block| level function declarations is only portable among browser implementations if the usage only depends upon the semantic intersection of all of the browser implementations for such declarations. The following are the use cases that fall within that intersection semantics:</p>
+      <p>Prior to ECMAScript 2015, the ECMAScript specification did not define the occurrence of a |FunctionDeclaration| as an element of a |Block| statement's |StatementList|. However, support for that form of |FunctionDeclaration| was an allowable extension and most browser-hosted ECMAScript implementations permitted them. Unfortunately, the semantics of such declarations differ among those implementations. Because of these semantic differences, existing web ECMAScript source text that uses |Block| level function declarations is only portable among browser implementations if the usage only depends upon the semantic intersection of all of the browser implementations for such declarations. The following are the use cases that fall within that intersection semantics:</p>
       <ol>
         <li>
           <p>A function is declared and only referenced within a single block.</p>
@@ -47850,7 +47891,7 @@ THH:mm:ss.sss
           </ul>
         </li>
       </ol>
-      <p>The first use case is interoperable with the semantics of |Block| level function declarations provided by ECMAScript 2015. Any pre-existing ECMAScript code that employs that use case will operate using the Block level function declarations semantics defined by clauses <emu-xref href="#sec-ordinary-and-exotic-objects-behaviours"></emu-xref>, <emu-xref href="#sec-ecmascript-language-statements-and-declarations"></emu-xref>, and <emu-xref href="#sec-ecmascript-language-functions-and-classes"></emu-xref>.</p>
+      <p>The first use case is interoperable with the semantics of |Block| level function declarations provided by ECMAScript 2015. Any pre-existing ECMAScript source text that employs that use case will operate using the Block level function declarations semantics defined by clauses <emu-xref href="#sec-ordinary-and-exotic-objects-behaviours"></emu-xref>, <emu-xref href="#sec-ecmascript-language-statements-and-declarations"></emu-xref>, and <emu-xref href="#sec-ecmascript-language-functions-and-classes"></emu-xref>.</p>
       <p>ECMAScript 2015 interoperability for the second and third use cases requires the following extensions to the clause <emu-xref href="#sec-ordinary-and-exotic-objects-behaviours"></emu-xref>, clause <emu-xref href="#sec-ecmascript-language-functions-and-classes"></emu-xref>, clause <emu-xref href="#sec-eval-x"></emu-xref> and clause <emu-xref href="#sec-globaldeclarationinstantiation"></emu-xref> semantics.</p>
       <p>If an ECMAScript implementation has a mechanism for reporting diagnostic warning messages, a warning should be produced when code contains a |FunctionDeclaration| for which these compatibility semantics are applied and introduce observable differences from non-compatibility semantics. For example, if a var binding is not introduced because its introduction would create an early error, a warning message should not be produced.</p>
 
@@ -48131,6 +48172,16 @@ THH:mm:ss.sss
           1. If Type(_val_) is Object and _val_ has an [[IsHTMLDDA]] internal slot, return *"undefined"*.
         </emu-alg>
       </emu-annex>
+    </emu-annex>
+
+    <emu-annex id="sec-web-compat-host-make-job-callback">
+      <h1>Non-default behaviour in HostMakeJobCallback</h1>
+      <p>The HostMakeJobCallback abstract operation allows hosts which are web browsers to specify non-default behaviour.</p>
+    </emu-annex>
+
+    <emu-annex id="sec-web-compat-host-ensure-can-add-private-field">
+      <h1>Non-default behaviour in HostEnsureCanAddPrivateElement</h1>
+      <p>The HostEnsureCanAddPrivateElement abstract operation allows hosts which are web browsers to specify non-default behaviour.</p>
     </emu-annex>
   </emu-annex>
 </emu-annex>
