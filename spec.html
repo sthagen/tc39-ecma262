@@ -524,7 +524,7 @@
 
     <emu-clause id="sec-lexical-and-regexp-grammars">
       <h1>The Lexical and RegExp Grammars</h1>
-      <p>A <em>lexical grammar</em> for ECMAScript is given in clause <emu-xref href="#sec-ecmascript-language-lexical-grammar"></emu-xref>. This grammar has as its terminal symbols Unicode code points that conform to the rules for |SourceCharacter| defined in <emu-xref href="#sec-source-text"></emu-xref>. It defines a set of productions, starting from the goal symbol |InputElementDiv|, |InputElementTemplateTail|, or |InputElementRegExp|, or |InputElementRegExpOrTemplateTail|, that describe how sequences of such code points are translated into a sequence of input elements.</p>
+      <p>A <em>lexical grammar</em> for ECMAScript is given in clause <emu-xref href="#sec-ecmascript-language-lexical-grammar"></emu-xref>. This grammar has as its terminal symbols Unicode code points that conform to the rules for |SourceCharacter| defined in <emu-xref href="#sec-source-text"></emu-xref>. It defines a set of productions, starting from the goal symbol |InputElementDiv|, |InputElementTemplateTail|, |InputElementRegExp|, |InputElementRegExpOrTemplateTail|, or |InputElementHashbangOrRegExp|, that describe how sequences of such code points are translated into a sequence of input elements.</p>
       <p>Input elements other than white space and comments form the terminal symbols for the syntactic grammar for ECMAScript and are called ECMAScript <em>tokens</em>. These tokens are the reserved words, identifiers, literals, and punctuators of the ECMAScript language. Moreover, line terminators, although not considered to be tokens, also become part of the stream of input elements and guide the process of automatic semicolon insertion (<emu-xref href="#sec-automatic-semicolon-insertion"></emu-xref>). Simple white space and single-line comments are discarded and do not appear in the stream of input elements for the syntactic grammar. A |MultiLineComment| (that is, a comment of the form `/*`&hellip;`*/` regardless of whether it spans more than one line) is likewise simply discarded if it contains no line terminator; but if a |MultiLineComment| contains one or more line terminators, then it is replaced by a single line terminator, which becomes part of the stream of input elements for the syntactic grammar.</p>
       <p>A <em>RegExp grammar</em> for ECMAScript is given in <emu-xref href="#sec-patterns"></emu-xref>. This grammar also has as its terminal symbols the code points as defined by |SourceCharacter|. It defines a set of productions, starting from the goal symbol |Pattern|, that describe how sequences of code points are translated into regular expression patterns.</p>
       <p>Productions of the lexical and RegExp grammars are distinguished by having two colons &ldquo;<b>::</b>&rdquo; as separating punctuation. The lexical and RegExp grammars share some productions.</p>
@@ -895,8 +895,9 @@
         </emu-alg>
         <p>mean the same thing as:</p>
         <emu-alg example>
+          1. Assert: _argument_ is a Completion Record.
           1. If _argument_ is an abrupt completion, return Completion(_argument_).
-          1. Else if _argument_ is a Completion Record, set _argument_ to _argument_.[[Value]].
+          1. Else, set _argument_ to _argument_.[[Value]].
         </emu-alg>
         <p>Algorithms steps that say or are otherwise equivalent to:</p>
         <emu-alg example>
@@ -905,8 +906,9 @@
         <p>mean the same thing as:</p>
         <emu-alg example>
           1. Let _hygienicTemp_ be AbstractOperation().
+          1. Assert: _hygienicTemp_ is a Completion Record.
           1. If _hygienicTemp_ is an abrupt completion, return Completion(_hygienicTemp_).
-          1. Else if _hygienicTemp_ is a Completion Record, set _hygienicTemp_ to _hygienicTemp_.[[Value]].
+          1. Else, set _hygienicTemp_ to _hygienicTemp_.[[Value]].
         </emu-alg>
         <p>Where _hygienicTemp_ is ephemeral and visible only in the steps pertaining to ReturnIfAbrupt.</p>
         <p>Algorithms steps that say or are otherwise equivalent to:</p>
@@ -915,8 +917,9 @@
         </emu-alg>
         <p>mean the same thing as:</p>
         <emu-alg example>
+          1. Assert: _argument_ is a Completion Record.
           1. If _argument_ is an abrupt completion, return Completion(_argument_).
-          1. If _argument_ is a Completion Record, set _argument_ to _argument_.[[Value]].
+          1. Else, set _argument_ to _argument_.[[Value]].
           1. Let _result_ be AbstractOperation(_argument_).
         </emu-alg>
       </emu-clause>
@@ -946,8 +949,8 @@
         <p>is equivalent to the following steps:</p>
         <emu-alg example>
           1. Let _val_ be OperationName().
-          1. Assert: _val_ is never an abrupt completion.
-          1. If _val_ is a Completion Record, set _val_ to _val_.[[Value]].
+          1. Assert: _val_ is a normal completion.
+          1. Set _val_ to _val_.[[Value]].
         </emu-alg>
         <p>Syntax-directed operations for runtime semantics make use of this shorthand by placing `!` or `?` before the invocation of the operation:</p>
         <emu-alg example>
@@ -1036,7 +1039,7 @@
 <emu-clause id="sec-ecmascript-data-types-and-values" aoid="Type">
   <h1>ECMAScript Data Types and Values</h1>
   <p>Algorithms within this specification manipulate values each of which has an associated type. The possible value types are exactly those defined in this clause. Types are further subclassified into ECMAScript language types and specification types.</p>
-  <p>Within this specification, the notation &ldquo;Type(_x_)&rdquo; is used as shorthand for &ldquo;the <em>type</em> of _x_&rdquo; where &ldquo;type&rdquo; refers to the ECMAScript language and specification types defined in this clause. When the term &ldquo;empty&rdquo; is used as if it was naming a value, it is equivalent to saying &ldquo;no value of any type&rdquo;.</p>
+  <p>Within this specification, the notation &ldquo;Type(_x_)&rdquo; is used as shorthand for &ldquo;the <em>type</em> of _x_&rdquo; where &ldquo;type&rdquo; refers to the ECMAScript language and specification types defined in this clause.</p>
 
   <emu-clause id="sec-ecmascript-language-types">
     <h1>ECMAScript Language Types</h1>
@@ -2184,42 +2187,55 @@
           <h1>
             Number::toString (
               _x_: a Number,
+              _radix_: an integer in the inclusive interval from 2 to 36,
             ): a String
           </h1>
           <dl class="header">
             <dt>description</dt>
-            <dd>It converts _x_ to String format.</dd>
+            <dd>It represents _x_ as a String using a positional numeral system with radix _radix_. The digits used in the representation of a number using radix _r_ are taken from the first _r_ code units of *"0123456789abcdefghijklmnopqrstuvwxyz"* in order. The representation of numbers with magnitude greater than or equal to *1*<sub>𝔽</sub> never includes leading zeroes.</dd>
           </dl>
           <emu-alg>
             1. If _x_ is *NaN*, return the String *"NaN"*.
             1. If _x_ is *+0*<sub>𝔽</sub> or *-0*<sub>𝔽</sub>, return the String *"0"*.
-            1. If _x_ &lt; *-0*<sub>𝔽</sub>, return the string-concatenation of *"-"* and Number::toString(-_x_).
+            1. If _x_ &lt; *-0*<sub>𝔽</sub>, return the string-concatenation of *"-"* and Number::toString(-_x_, _radix_).
             1. If _x_ is *+&infin;*<sub>𝔽</sub>, return the String *"Infinity"*.
-            1. [id="step-number-tostring-intermediate-values"] Otherwise, let _n_, _k_, and _s_ be integers such that _k_ &ge; 1, 10<sup>_k_ - 1</sup> &le; _s_ &lt; 10<sup>_k_</sup>, 𝔽(_s_ &times; 10<sup>_n_ - _k_</sup>) is _x_, and _k_ is as small as possible. Note that _k_ is the number of digits in the decimal representation of _s_, that _s_ is not divisible by 10, and that the least significant digit of _s_ is not necessarily uniquely determined by these criteria.
-            1. If _k_ &le; _n_ &le; 21, return the string-concatenation of:
-              * the code units of the _k_ digits of the decimal representation of _s_ (in order, with no leading zeroes)
-              * _n_ - _k_ occurrences of the code unit 0x0030 (DIGIT ZERO)
-            1. If 0 &lt; _n_ &le; 21, return the string-concatenation of:
-              * the code units of the most significant _n_ digits of the decimal representation of _s_
-              * the code unit 0x002E (FULL STOP)
-              * the code units of the remaining _k_ - _n_ digits of the decimal representation of _s_
-            1. If -6 &lt; _n_ &le; 0, return the string-concatenation of:
-              * the code unit 0x0030 (DIGIT ZERO)
-              * the code unit 0x002E (FULL STOP)
-              * -_n_ occurrences of the code unit 0x0030 (DIGIT ZERO)
-              * the code units of the _k_ digits of the decimal representation of _s_
-            1. Otherwise, if _k_ = 1, return the string-concatenation of:
-              * the code unit of the single digit of _s_
-              * the code unit 0x0065 (LATIN SMALL LETTER E)
-              * the code unit 0x002B (PLUS SIGN) or the code unit 0x002D (HYPHEN-MINUS) according to whether _n_ - 1 is positive or negative
-              * the code units of the decimal representation of the integer abs(_n_ - 1) (with no leading zeroes)
+            1. [id="step-number-tostring-intermediate-values"] Let _n_, _k_, and _s_ be integers such that _k_ &ge; 1, _radix_<sup>_k_ - 1</sup> &le; _s_ &lt; _radix_<sup>_k_</sup>, 𝔽(_s_ &times; _radix_<sup>_n_ - _k_</sup>) is _x_, and _k_ is as small as possible. Note that _k_ is the number of digits in the representation of _s_ using radix _radix_, that _s_ is not divisible by _radix_, and that the least significant digit of _s_ is not necessarily uniquely determined by these criteria.
+            1. If _radix_ &ne; 10 or _n_ is in the inclusive interval from -5 to 21, then
+              1. If _n_ &ge; _k_, then
+                1. Return the string-concatenation of:
+                  * the code units of the _k_ digits of the representation of _s_ using radix _radix_
+                  * _n_ - _k_ occurrences of the code unit 0x0030 (DIGIT ZERO)
+              1. Else if _n_ &gt; 0, then
+                1. Return the string-concatenation of:
+                  * the code units of the most significant _n_ digits of the representation of _s_ using radix _radix_
+                  * the code unit 0x002E (FULL STOP)
+                  * the code units of the remaining _k_ - _n_ digits of the representation of _s_ using radix _radix_
+              1. Else,
+                1. Assert: _n_ &le; 0.
+                1. Return the string-concatenation of:
+                  * the code unit 0x0030 (DIGIT ZERO)
+                  * the code unit 0x002E (FULL STOP)
+                  * -_n_ occurrences of the code unit 0x0030 (DIGIT ZERO)
+                  * the code units of the _k_ digits of the representation of _s_ using radix _radix_
+            1. NOTE: In this case, the input will be represented using scientific E notation, such as `1.2e+3`.
+            1. Assert: _radix_ is 10.
+            1. If _n_ &lt; 0, then
+              1. Let _exponentSign_ be the code unit 0x002D (HYPHEN-MINUS).
+            1. Else,
+              1. Let _exponentSign_ be the code unit 0x002B (PLUS SIGN).
+            1. If _k_ is 1, then
+              1. Return the string-concatenation of:
+                * the code unit of the single digit of _s_
+                * the code unit 0x0065 (LATIN SMALL LETTER E)
+                * _exponentSign_
+                * the code units of the decimal representation of abs(_n_ - 1)
             1. Return the string-concatenation of:
-              * the code units of the most significant digit of the decimal representation of _s_
+              * the code unit of the most significant digit of the decimal representation of _s_
               * the code unit 0x002E (FULL STOP)
               * the code units of the remaining _k_ - 1 digits of the decimal representation of _s_
               * the code unit 0x0065 (LATIN SMALL LETTER E)
-              * the code unit 0x002B (PLUS SIGN) or the code unit 0x002D (HYPHEN-MINUS) according to whether _n_ - 1 is positive or negative
-              * the code units of the decimal representation of the integer abs(_n_ - 1) (with no leading zeroes)
+              * _exponentSign_
+              * the code units of the decimal representation of abs(_n_ - 1)
           </emu-alg>
           <emu-note>
             <p>The following observations may be useful as guidelines for implementations, but are not part of the normative requirements of this Standard:</p>
@@ -2235,7 +2251,7 @@
           <emu-note>
             <p>For implementations that provide more accurate conversions than required by the rules above, it is recommended that the following alternative version of step <emu-xref href="#step-number-tostring-intermediate-values"></emu-xref> be used as a guideline:</p>
             <emu-alg replaces-step="step-number-tostring-intermediate-values">
-              1. Otherwise, let _n_, _k_, and _s_ be integers such that _k_ &ge; 1, 10<sup>_k_ - 1</sup> &le; _s_ &lt; 10<sup>_k_</sup>, 𝔽(_s_ &times; 10<sup>_n_ - _k_</sup>) is _x_, and _k_ is as small as possible. If there are multiple possibilities for _s_, choose the value of _s_ for which _s_ &times; 10<sup>_n_ - _k_</sup> is closest in value to ℝ(_x_). If there are two such possible values of _s_, choose the one that is even. Note that _k_ is the number of digits in the decimal representation of _s_ and that _s_ is not divisible by 10.
+              1. Let _n_, _k_, and _s_ be integers such that _k_ &ge; 1, _radix_<sup>_k_ - 1</sup> &le; _s_ &lt; _radix_<sup>_k_</sup>, 𝔽(_s_ &times; _radix_<sup>_n_ - _k_</sup>) is _x_, and _k_ is as small as possible. If there are multiple possibilities for _s_, choose the value of _s_ for which _s_ &times; _radix_<sup>_n_ - _k_</sup> is closest in value to ℝ(_x_). If there are two such possible values of _s_, choose the one that is even. Note that _k_ is the number of digits in the representation of _s_ using radix _radix_ and that _s_ is not divisible by _radix_.
             </emu-alg>
           </emu-note>
           <emu-note>
@@ -4205,13 +4221,12 @@
       <emu-clause id="sec-getvalue" type="abstract operation">
         <h1>
           GetValue (
-            _V_: unknown,
+            _V_: a Reference Record or an ECMAScript language value,
           ): either a normal completion containing an ECMAScript language value or an abrupt completion
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. ReturnIfAbrupt(_V_).
           1. If _V_ is not a Reference Record, return _V_.
           1. If IsUnresolvableReference(_V_) is *true*, throw a *ReferenceError* exception.
           1. If IsPropertyReference(_V_) is *true*, then
@@ -4232,15 +4247,13 @@
       <emu-clause id="sec-putvalue" type="abstract operation">
         <h1>
           PutValue (
-            _V_: unknown,
-            _W_: unknown,
+            _V_: a Reference Record or an ECMAScript language value,
+            _W_: an ECMAScript language value,
           ): either a normal completion containing ~unused~ or an abrupt completion
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. ReturnIfAbrupt(_V_).
-          1. ReturnIfAbrupt(_W_).
           1. If _V_ is not a Reference Record, throw a *ReferenceError* exception.
           1. If IsUnresolvableReference(_V_) is *true*, then
             1. If _V_.[[Strict]] is *true*, throw a *ReferenceError* exception.
@@ -4281,16 +4294,13 @@
       <emu-clause id="sec-initializereferencedbinding" type="abstract operation">
         <h1>
           InitializeReferencedBinding (
-            _V_: unknown,
-            _W_: unknown,
+            _V_: a Reference Record,
+            _W_: an ECMAScript language value,
           ): either a normal completion containing ~unused~ or an abrupt completion
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. ReturnIfAbrupt(_V_).
-          1. ReturnIfAbrupt(_W_).
-          1. Assert: _V_ is a Reference Record.
           1. Assert: IsUnresolvableReference(_V_) is *false*.
           1. Let _base_ be _V_.[[Base]].
           1. Assert: _base_ is an Environment Record.
@@ -5580,7 +5590,7 @@
               Number
             </td>
             <td>
-              Return Number::toString(_argument_).
+              Return Number::toString(_argument_, 10).
             </td>
           </tr>
           <tr>
@@ -7146,8 +7156,9 @@
       </emu-alg>
       <p>means the same thing as:</p>
       <emu-alg>
+        1. Assert: _value_ is a Completion Record.
         1. If _value_ is an abrupt completion, return ? IteratorClose(_iteratorRecord_, _value_).
-        1. Else if _value_ is a Completion Record, set _value_ to _value_.[[Value]].
+        1. Else, set _value_ to _value_.[[Value]].
       </emu-alg>
     </emu-clause>
 
@@ -16053,7 +16064,7 @@
 <emu-clause id="sec-ecmascript-language-lexical-grammar">
   <h1>ECMAScript Language: Lexical Grammar</h1>
   <p>The source text of an ECMAScript |Script| or |Module| is first converted into a sequence of input elements, which are tokens, line terminators, comments, or white space. The source text is scanned from left to right, repeatedly taking the longest possible sequence of code points as the next input element.</p>
-  <p>There are several situations where the identification of lexical input elements is sensitive to the syntactic grammar context that is consuming the input elements. This requires multiple goal symbols for the lexical grammar. The |InputElementRegExpOrTemplateTail| goal is used in syntactic grammar contexts where a |RegularExpressionLiteral|, a |TemplateMiddle|, or a |TemplateTail| is permitted. The |InputElementRegExp| goal symbol is used in all syntactic grammar contexts where a |RegularExpressionLiteral| is permitted but neither a |TemplateMiddle|, nor a |TemplateTail| is permitted. The |InputElementTemplateTail| goal is used in all syntactic grammar contexts where a |TemplateMiddle| or a |TemplateTail| is permitted but a |RegularExpressionLiteral| is not permitted. In all other contexts, |InputElementDiv| is used as the lexical goal symbol.</p>
+  <p>There are several situations where the identification of lexical input elements is sensitive to the syntactic grammar context that is consuming the input elements. This requires multiple goal symbols for the lexical grammar. The |InputElementHashbangOrRegExp| goal is used at the start of a |Script| or |Module|. The |InputElementRegExpOrTemplateTail| goal is used in syntactic grammar contexts where a |RegularExpressionLiteral|, a |TemplateMiddle|, or a |TemplateTail| is permitted. The |InputElementRegExp| goal symbol is used in all syntactic grammar contexts where a |RegularExpressionLiteral| is permitted but neither a |TemplateMiddle|, nor a |TemplateTail| is permitted. The |InputElementTemplateTail| goal is used in all syntactic grammar contexts where a |TemplateMiddle| or a |TemplateTail| is permitted but a |RegularExpressionLiteral| is not permitted. In all other contexts, |InputElementDiv| is used as the lexical goal symbol.</p>
   <emu-note>
     <p>The use of multiple lexical goals ensures that there are no lexical ambiguities that would affect automatic semicolon insertion. For example, there are no syntactic grammar contexts where both a leading division or division-assignment, and a leading |RegularExpressionLiteral| are permitted. This is not affected by semicolon insertion (see <emu-xref href="#sec-automatic-semicolon-insertion"></emu-xref>); in examples such as the following:</p>
     <pre><code class="javascript">
@@ -16098,6 +16109,14 @@
       CommonToken
       DivPunctuator
       TemplateSubstitutionTail
+
+    InputElementHashbangOrRegExp ::
+      WhiteSpace
+      LineTerminator
+      Comment
+      CommonToken
+      HashbangComment
+      RegularExpressionLiteral
   </emu-grammar>
 
   <emu-clause id="sec-unicode-format-control-characters">
@@ -16381,6 +16400,18 @@
         SourceCharacter but not LineTerminator
     </emu-grammar>
     <p>A number of productions in this section are given alternative definitions in section <emu-xref href="#sec-html-like-comments"></emu-xref></p>
+  </emu-clause>
+
+  <emu-clause id="sec-hashbang">
+    <h1>Hashbang Comments</h1>
+
+    <p>Hashbang Comments are location-sensitive and like other types of comments are discarded from the stream of input elements for the syntactic grammar.</p>
+
+    <h2>Syntax</h2>
+    <emu-grammar type="definition">
+      HashbangComment ::
+        `#!` SingleLineCommentChars?
+    </emu-grammar>
   </emu-clause>
 
   <emu-clause id="sec-tokens">
@@ -21211,8 +21242,8 @@
         </emu-alg>
         <emu-grammar>LexicalBinding : BindingIdentifier</emu-grammar>
         <emu-alg>
-          1. Let _lhs_ be Completion(ResolveBinding(StringValue of |BindingIdentifier|)).
-          1. Perform ? InitializeReferencedBinding(_lhs_, *undefined*).
+          1. Let _lhs_ be ! ResolveBinding(StringValue of |BindingIdentifier|).
+          1. Perform ! InitializeReferencedBinding(_lhs_, *undefined*).
           1. Return ~empty~.
         </emu-alg>
         <emu-note>
@@ -21221,13 +21252,13 @@
         <emu-grammar>LexicalBinding : BindingIdentifier Initializer</emu-grammar>
         <emu-alg>
           1. Let _bindingId_ be StringValue of |BindingIdentifier|.
-          1. Let _lhs_ be Completion(ResolveBinding(_bindingId_)).
+          1. Let _lhs_ be ! ResolveBinding(_bindingId_).
           1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
             1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _bindingId_.
           1. Else,
             1. Let _rhs_ be ? Evaluation of |Initializer|.
             1. Let _value_ be ? GetValue(_rhs_).
-          1. Perform ? InitializeReferencedBinding(_lhs_, _value_).
+          1. Perform ! InitializeReferencedBinding(_lhs_, _value_).
           1. Return ~empty~.
         </emu-alg>
         <emu-grammar>LexicalBinding : BindingPattern Initializer</emu-grammar>
@@ -21730,12 +21761,16 @@
           1. If the first |Expression| is present, then
             1. Let _exprRef_ be ? Evaluation of the first |Expression|.
             1. Perform ? GetValue(_exprRef_).
-          1. Return ? ForBodyEvaluation(the second |Expression|, the third |Expression|, |Statement|, &laquo; &raquo;, _labelSet_).
+          1. If the second |Expression| is present, let _test_ be the second |Expression|; otherwise, let _test_ be ~empty~.
+          1. If the third |Expression| is present, let _increment_ be the third |Expression|; otherwise, let _increment_ be ~empty~.
+          1. Return ? ForBodyEvaluation(_test_, _increment_, |Statement|, &laquo; &raquo;, _labelSet_).
         </emu-alg>
         <emu-grammar>ForStatement : `for` `(` `var` VariableDeclarationList `;` Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
           1. Let _varDcl_ be ? Evaluation of |VariableDeclarationList|.
-          1. Return ? ForBodyEvaluation(the first |Expression|, the second |Expression|, |Statement|, &laquo; &raquo;, _labelSet_).
+          1. If the first |Expression| is present, let _test_ be the first |Expression|; otherwise, let _test_ be ~empty~.
+          1. If the second |Expression| is present, let _increment_ be the second |Expression|; otherwise, let _increment_ be ~empty~.
+          1. Return ? ForBodyEvaluation(_test_, _increment_, |Statement|, &laquo; &raquo;, _labelSet_).
         </emu-alg>
         <emu-grammar>ForStatement : `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
@@ -21754,7 +21789,9 @@
             1. Set the running execution context's LexicalEnvironment to _oldEnv_.
             1. Return ? _forDcl_.
           1. If _isConst_ is *false*, let _perIterationLets_ be _boundNames_; otherwise let _perIterationLets_ be a new empty List.
-          1. Let _bodyResult_ be Completion(ForBodyEvaluation(the first |Expression|, the second |Expression|, |Statement|, _perIterationLets_, _labelSet_)).
+          1. If the first |Expression| is present, let _test_ be the first |Expression|; otherwise, let _test_ be ~empty~.
+          1. If the second |Expression| is present, let _increment_ be the second |Expression|; otherwise, let _increment_ be ~empty~.
+          1. Let _bodyResult_ be Completion(ForBodyEvaluation(_test_, _increment_, |Statement|, _perIterationLets_, _labelSet_)).
           1. Set the running execution context's LexicalEnvironment to _oldEnv_.
           1. Return ? _bodyResult_.
         </emu-alg>
@@ -21776,7 +21813,7 @@
           1. Let _V_ be *undefined*.
           1. Perform ? CreatePerIterationEnvironment(_perIterationBindings_).
           1. Repeat,
-            1. If _test_ is not ~[empty]~, then
+            1. If _test_ is not ~empty~, then
               1. Let _testRef_ be ? Evaluation of _test_.
               1. Let _testValue_ be ? GetValue(_testRef_).
               1. If ToBoolean(_testValue_) is *false*, return _V_.
@@ -21784,7 +21821,7 @@
             1. If LoopContinues(_result_, _labelSet_) is *false*, return ? UpdateEmpty(_result_, _V_).
             1. If _result_.[[Value]] is not ~empty~, set _V_ to _result_.[[Value]].
             1. Perform ? CreatePerIterationEnvironment(_perIterationBindings_).
-            1. If _increment_ is not ~[empty]~, then
+            1. If _increment_ is not ~empty~, then
               1. Let _incRef_ be ? Evaluation of _increment_.
               1. Perform ? GetValue(_incRef_).
         </emu-alg>
@@ -22067,7 +22104,7 @@
             1. Set the running execution context's LexicalEnvironment to _newEnv_.
           1. Let _exprRef_ be Completion(Evaluation of _expr_).
           1. Set the running execution context's LexicalEnvironment to _oldEnv_.
-          1. Let _exprValue_ be ? GetValue(_exprRef_).
+          1. Let _exprValue_ be ? GetValue(? _exprRef_).
           1. If _iterationKind_ is ~enumerate~, then
             1. If _exprValue_ is *undefined* or *null*, then
               1. Return Completion Record { [[Type]]: ~break~, [[Value]]: ~empty~, [[Target]]: ~empty~ }.
@@ -22113,35 +22150,32 @@
             1. If _done_ is *true*, return _V_.
             1. Let _nextValue_ be ? IteratorValue(_nextResult_).
             1. If _lhsKind_ is either ~assignment~ or ~varBinding~, then
-              1. If _destructuring_ is *false*, then
+              1. If _destructuring_ is *true*, then
+                1. If _lhsKind_ is ~assignment~, then
+                  1. Let _status_ be Completion(DestructuringAssignmentEvaluation of _assignmentPattern_ with argument _nextValue_).
+                1. Else,
+                  1. Assert: _lhsKind_ is ~varBinding~.
+                  1. Assert: _lhs_ is a |ForBinding|.
+                  1. Let _status_ be Completion(BindingInitialization of _lhs_ with arguments _nextValue_ and *undefined*).
+              1. Else,
                 1. Let _lhsRef_ be Completion(Evaluation of _lhs_). (It may be evaluated repeatedly.)
+                1. If _lhsRef_ is an abrupt completion, then
+                  1. Let _status_ be _lhsRef_.
+                1. Else,
+                  1. Let _status_ be Completion(PutValue(_lhsRef_.[[Value]], _nextValue_)).
             1. Else,
               1. Assert: _lhsKind_ is ~lexicalBinding~.
               1. Assert: _lhs_ is a |ForDeclaration|.
               1. Let _iterationEnv_ be NewDeclarativeEnvironment(_oldEnv_).
               1. Perform ForDeclarationBindingInstantiation of _lhs_ with argument _iterationEnv_.
               1. Set the running execution context's LexicalEnvironment to _iterationEnv_.
-              1. If _destructuring_ is *false*, then
+              1. If _destructuring_ is *true*, then
+                1. Let _status_ be Completion(ForDeclarationBindingInitialization of _lhs_ with arguments _nextValue_ and _iterationEnv_).
+              1. Else,
                 1. Assert: _lhs_ binds a single name.
                 1. Let _lhsName_ be the sole element of BoundNames of _lhs_.
                 1. Let _lhsRef_ be ! ResolveBinding(_lhsName_).
-            1. If _destructuring_ is *false*, then
-              1. If _lhsRef_ is an abrupt completion, then
-                1. Let _status_ be _lhsRef_.
-              1. Else if _lhsKind_ is ~lexicalBinding~, then
                 1. Let _status_ be Completion(InitializeReferencedBinding(_lhsRef_, _nextValue_)).
-              1. Else,
-                1. Let _status_ be Completion(PutValue(_lhsRef_, _nextValue_)).
-            1. Else,
-              1. If _lhsKind_ is ~assignment~, then
-                1. Let _status_ be Completion(DestructuringAssignmentEvaluation of _assignmentPattern_ with argument _nextValue_).
-              1. Else if _lhsKind_ is ~varBinding~, then
-                1. Assert: _lhs_ is a |ForBinding|.
-                1. Let _status_ be Completion(BindingInitialization of _lhs_ with arguments _nextValue_ and *undefined*).
-              1. Else,
-                1. Assert: _lhsKind_ is ~lexicalBinding~.
-                1. Assert: _lhs_ is a |ForDeclaration|.
-                1. Let _status_ be Completion(ForDeclarationBindingInitialization of _lhs_ with arguments _nextValue_ and _iterationEnv_).
             1. If _status_ is an abrupt completion, then
               1. Set the running execution context's LexicalEnvironment to _oldEnv_.
               1. If _iteratorKind_ is ~async~, return ? AsyncIteratorClose(_iteratorRecord_, _status_).
@@ -24801,7 +24835,7 @@
           1. NOTE: The running execution context's PrivateEnvironment is _outerPrivateEnvironment_ when evaluating |ClassHeritage|.
           1. Let _superclassRef_ be Completion(Evaluation of |ClassHeritage|).
           1. Set the running execution context's LexicalEnvironment to _env_.
-          1. Let _superclass_ be ? GetValue(_superclassRef_).
+          1. Let _superclass_ be ? GetValue(? _superclassRef_).
           1. If _superclass_ is *null*, then
             1. Let _protoParent_ be *null*.
             1. Let _constructorParent_ be %Function.prototype%.
@@ -31091,7 +31125,7 @@
           1. Let _x_ be ? thisNumberValue(*this* value).
           1. Let _f_ be ? ToIntegerOrInfinity(_fractionDigits_).
           1. Assert: If _fractionDigits_ is *undefined*, then _f_ is 0.
-          1. If _x_ is not finite, return Number::toString(_x_).
+          1. If _x_ is not finite, return Number::toString(_x_, 10).
           1. If _f_ &lt; 0 or _f_ &gt; 100, throw a *RangeError* exception.
           1. Set _x_ to ℝ(_x_).
           1. Let _s_ be the empty String.
@@ -31144,7 +31178,7 @@
           1. Assert: If _fractionDigits_ is *undefined*, then _f_ is 0.
           1. If _f_ is not finite, throw a *RangeError* exception.
           1. If _f_ &lt; 0 or _f_ &gt; 100, throw a *RangeError* exception.
-          1. If _x_ is not finite, return Number::toString(_x_).
+          1. If _x_ is not finite, return Number::toString(_x_, 10).
           1. Set _x_ to ℝ(_x_).
           1. Let _s_ be the empty String.
           1. If _x_ &lt; 0, then
@@ -31190,7 +31224,7 @@
           1. Let _x_ be ? thisNumberValue(*this* value).
           1. If _precision_ is *undefined*, return ! ToString(_x_).
           1. Let _p_ be ? ToIntegerOrInfinity(_precision_).
-          1. If _x_ is not finite, return Number::toString(_x_).
+          1. If _x_ is not finite, return Number::toString(_x_, 10).
           1. If _p_ &lt; 1 or _p_ &gt; 100, throw a *RangeError* exception.
           1. Set _x_ to ℝ(_x_).
           1. Let _s_ be the empty String.
@@ -31236,9 +31270,8 @@
           1. Let _x_ be ? thisNumberValue(*this* value).
           1. If _radix_ is *undefined*, let _radixMV_ be 10.
           1. Else, let _radixMV_ be ? ToIntegerOrInfinity(_radix_).
-          1. If _radixMV_ &lt; 2 or _radixMV_ &gt; 36, throw a *RangeError* exception.
-          1. If _radixMV_ = 10, return ! ToString(_x_).
-          1. Return the String representation of this Number value using the radix specified by _radixMV_. Letters `a`-`z` are used for digits with values 10 through 35. The precise algorithm is implementation-defined, however the algorithm should be a generalization of that specified in <emu-xref href="#sec-numeric-types-number-tostring"></emu-xref>.
+          1. If _radixMV_ is not in the inclusive interval from 2 to 36, throw a *RangeError* exception.
+          1. Return Number::toString(_x_, _radixMV_).
         </emu-alg>
         <p>This method is not generic; it throws a *TypeError* exception if its *this* value is not a Number or a Number object. Therefore, it cannot be transferred to other kinds of objects for use as a method.</p>
         <p>The *"length"* property of this method is *1*<sub>𝔽</sub>.</p>
@@ -40395,7 +40428,7 @@ THH:mm:ss.sss
           1. Let _S_ be the *this* value.
           1. Perform ? RequireInternalSlot(_S_, [[SetData]]).
           1. If IsCallable(_callbackfn_) is *false*, throw a *TypeError* exception.
-          1. Let _entries_ be the List that is _set_.[[SetData]].
+          1. Let _entries_ be the List that is _S_.[[SetData]].
           1. Let _numEntries_ be the number of elements of _entries_.
           1. Let _index_ be 0.
           1. Repeat, while _index_ &lt; _numEntries_,
@@ -43667,10 +43700,11 @@ THH:mm:ss.sss
           </emu-alg>
           <p>means the same thing as:</p>
           <emu-alg>
+            1. Assert: _value_ is a Completion Record.
             1. If _value_ is an abrupt completion, then
               1. Perform ? Call(_capability_.[[Reject]], *undefined*, &laquo; _value_.[[Value]] &raquo;).
               1. Return _capability_.[[Promise]].
-            1. Else if _value_ is a Completion Record, set _value_ to _value_.[[Value]].
+            1. Else, set _value_ to _value_.[[Value]].
           </emu-alg>
         </emu-clause>
       </emu-clause>
@@ -46715,6 +46749,7 @@ THH:mm:ss.sss
     <emu-prodref name="InputElementRegExp"></emu-prodref>
     <emu-prodref name="InputElementRegExpOrTemplateTail"></emu-prodref>
     <emu-prodref name="InputElementTemplateTail"></emu-prodref>
+    <emu-prodref name="InputElementHashbangOrRegExp"></emu-prodref>
     <emu-prodref name="WhiteSpace"></emu-prodref>
     <emu-prodref name="LineTerminator"></emu-prodref>
     <emu-prodref name="LineTerminatorSequence"></emu-prodref>
@@ -46727,6 +46762,7 @@ THH:mm:ss.sss
     <emu-prodref name="SingleLineComment"></emu-prodref>
     <emu-prodref name="SingleLineCommentChars"></emu-prodref>
     <emu-prodref name="SingleLineCommentChar"></emu-prodref>
+    <emu-prodref name="HashbangComment"></emu-prodref>
     <emu-prodref name="CommonToken"></emu-prodref>
     <emu-prodref name="PrivateIdentifier"></emu-prodref>
     <emu-prodref name="IdentifierName"></emu-prodref>
