@@ -2248,10 +2248,10 @@
             <dd>It represents _x_ as a String using a positional numeral system with radix _radix_. The digits used in the representation of a number using radix _r_ are taken from the first _r_ code units of *"0123456789abcdefghijklmnopqrstuvwxyz"* in order. The representation of numbers with magnitude greater than or equal to *1*<sub>𝔽</sub> never includes leading zeroes.</dd>
           </dl>
           <emu-alg>
-            1. If _x_ is *NaN*, return the String *"NaN"*.
-            1. If _x_ is *+0*<sub>𝔽</sub> or *-0*<sub>𝔽</sub>, return the String *"0"*.
+            1. If _x_ is *NaN*, return *"NaN"*.
+            1. If _x_ is *+0*<sub>𝔽</sub> or *-0*<sub>𝔽</sub>, return *"0"*.
             1. If _x_ &lt; *-0*<sub>𝔽</sub>, return the string-concatenation of *"-"* and Number::toString(-_x_, _radix_).
-            1. If _x_ is *+&infin;*<sub>𝔽</sub>, return the String *"Infinity"*.
+            1. If _x_ is *+&infin;*<sub>𝔽</sub>, return *"Infinity"*.
             1. [id="step-number-tostring-intermediate-values"] Let _n_, _k_, and _s_ be integers such that _k_ &ge; 1, _radix_<sup>_k_ - 1</sup> &le; _s_ &lt; _radix_<sup>_k_</sup>, 𝔽(_s_ &times; _radix_<sup>_n_ - _k_</sup>) is _x_, and _k_ is as small as possible. Note that _k_ is the number of digits in the representation of _s_ using radix _radix_, that _s_ is not divisible by _radix_, and that the least significant digit of _s_ is not necessarily uniquely determined by these criteria.
             1. If _radix_ &ne; 10 or _n_ is in the inclusive interval from -5 to 21, then
               1. If _n_ &ge; _k_, then
@@ -2657,7 +2657,7 @@
             <dd>It represents _x_ as a String using a positional numeral system with radix _radix_. The digits used in the representation of a BigInt using radix _r_ are taken from the first _r_ code units of *"0123456789abcdefghijklmnopqrstuvwxyz"* in order. The representation of BigInts other than *0*<sub>ℤ</sub> never includes leading zeroes.</dd>
           </dl>
           <emu-alg>
-            1. If _x_ &lt; *0*<sub>ℤ</sub>, return the string-concatenation of the String *"-"* and BigInt::toString(-_x_, _radix_).
+            1. If _x_ &lt; *0*<sub>ℤ</sub>, return the string-concatenation of *"-"* and BigInt::toString(-_x_, _radix_).
             1. Return the String value consisting of the representation of _x_ using radix _radix_.
           </emu-alg>
         </emu-clause>
@@ -5794,7 +5794,7 @@
       </h1>
       <dl class="header">
         <dt>description</dt>
-        <dd>It returns _argument_ converted to a Number value if it is a String representation of a Number that would be produced by ToString, or the string *"-0"*. Otherwise, it returns *undefined*.</dd>
+        <dd>If _argument_ is either *"-0"* or exactly matches the result of ToString(_n_) for some Number value _n_, it returns the respective Number value. Otherwise, it returns *undefined*.</dd>
       </dl>
       <emu-alg>
         1. If _argument_ is *"-0"*, return *-0*<sub>𝔽</sub>.
@@ -7305,7 +7305,7 @@
       <dl class="header">
       </dl>
       <emu-note id="note-star-default-star">
-        <p>*"\*default\*"* is used within this specification as a synthetic name for a module's default export when it does not have another name. An entry in the module's [[Environment]] is created with that name and holds the corresponding value, and resolving the export named *"default"* by calling <emu-xref href="#sec-resolveexport" title></emu-xref> for the module will return a ResolvedBinding Record whose [[BindingName]] is *"\*default\*"*, which will then resolve in the module's [[Environment]] to the above-mentioned value. This is done only for ease of specification, so that anonymous default exports can be resolved like any other export. The string *"\*default\*"* is never accessible to user code or to the module linking algorithm.</p>
+        <p>*"\*default\*"* is used within this specification as a synthetic name for a module's default export when it does not have another name. An entry in the module's [[Environment]] is created with that name and holds the corresponding value, and resolving the export named *"default"* by calling <emu-xref href="#sec-resolveexport" title></emu-xref> for the module will return a ResolvedBinding Record whose [[BindingName]] is *"\*default\*"*, which will then resolve in the module's [[Environment]] to the above-mentioned value. This is done only for ease of specification, so that anonymous default exports can be resolved like any other export. This *"\*default\*"* string is never accessible to ECMAScript code or to the module linking algorithm.</p>
       </emu-note>
       <emu-grammar>BindingIdentifier : Identifier</emu-grammar>
       <emu-alg>
@@ -31167,7 +31167,7 @@
             1. Let _m_ be ! ToString(𝔽(_x_)).
           1. Else,
             1. Let _n_ be an integer for which _n_ / 10<sup>_f_</sup> - _x_ is as close to zero as possible. If there are two such _n_, pick the larger _n_.
-            1. If _n_ = 0, let _m_ be the String *"0"*. Otherwise, let _m_ be the String value consisting of the digits of the decimal representation of _n_ (in order, with no leading zeroes).
+            1. If _n_ = 0, let _m_ be *"0"*. Otherwise, let _m_ be the String value consisting of the digits of the decimal representation of _n_ (in order, with no leading zeroes).
             1. If _f_ &ne; 0, then
               1. Let _k_ be the length of _m_.
               1. If _k_ &le; _f_, then
@@ -37652,7 +37652,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
-          1. If _separator_ is *undefined*, let _sep_ be the single-element String *","*.
+          1. If _separator_ is *undefined*, let _sep_ be *","*.
           1. Else, let _sep_ be ? ToString(_separator_).
           1. Let _R_ be the empty String.
           1. Let _k_ be 0.
@@ -39098,7 +39098,7 @@ THH:mm:ss.sss
           1. Let _O_ be the *this* value.
           1. Perform ? ValidateTypedArray(_O_).
           1. Let _len_ be _O_.[[ArrayLength]].
-          1. If _separator_ is *undefined*, let _sep_ be the single-element String *","*.
+          1. If _separator_ is *undefined*, let _sep_ be *","*.
           1. Else, let _sep_ be ? ToString(_separator_).
           1. Let _R_ be the empty String.
           1. Let _k_ be 0.
@@ -42311,8 +42311,7 @@ THH:mm:ss.sss
 
     <emu-clause id="sec-atomics.wait">
       <h1>Atomics.wait ( _typedArray_, _index_, _value_, _timeout_ )</h1>
-      <p>This function puts the surrounding agent in a wait queue and puts it to sleep until it is notified or the sleep times out.</p>
-      <p>It performs the following steps when called:</p>
+      <p>`Atomics.wait` puts the calling agent in a wait queue and suspends it until notified or until the wait times out, returning a String differentiating those cases. The following steps are taken:</p>
       <emu-alg>
         1. Let _buffer_ be ? ValidateIntegerTypedArray(_typedArray_, *true*).
         1. If IsSharedArrayBuffer(_buffer_) is *false*, throw a *TypeError* exception.
@@ -42330,7 +42329,7 @@ THH:mm:ss.sss
         1. Let _w_ be GetValueFromBuffer(_buffer_, _indexedPosition_, _elementType_, *true*, ~SeqCst~).
         1. If _v_ &ne; _w_, then
           1. Perform LeaveCriticalSection(_WL_).
-          1. Return the String *"not-equal"*.
+          1. Return *"not-equal"*.
         1. Let _W_ be AgentSignifier().
         1. Perform AddWaiter(_WL_, _W_).
         1. Let _notified_ be SuspendAgent(_WL_, _W_, _t_).
@@ -42339,8 +42338,8 @@ THH:mm:ss.sss
         1. Else,
           1. Perform RemoveWaiter(_WL_, _W_).
         1. Perform LeaveCriticalSection(_WL_).
-        1. If _notified_ is *true*, return the String *"ok"*.
-        1. Return the String *"timed-out"*.
+        1. If _notified_ is *true*, return *"ok"*.
+        1. Return *"timed-out"*.
       </emu-alg>
     </emu-clause>
 
@@ -42537,16 +42536,16 @@ THH:mm:ss.sss
         <p>Symbolic primitive values are rendered as follows:</p>
         <ul>
           <li>
-            The *null* value is rendered in JSON text as the String *"null"*.
+            The *null* value is rendered in JSON text as the String value *"null"*.
           </li>
           <li>
             The *undefined* value is not rendered.
           </li>
           <li>
-            The *true* value is rendered in JSON text as the String *"true"*.
+            The *true* value is rendered in JSON text as the String value *"true"*.
           </li>
           <li>
-            The *false* value is rendered in JSON text as the String *"false"*.
+            The *false* value is rendered in JSON text as the String value *"false"*.
           </li>
         </ul>
       </emu-note>
@@ -42554,10 +42553,10 @@ THH:mm:ss.sss
         <p>String values are wrapped in QUOTATION MARK (`"`) code units. The code units `"` and `\\` are escaped with `\\` prefixes. Control characters code units are replaced with escape sequences `\\u`HHHH, or with the shorter forms, `\\b` (BACKSPACE), `\\f` (FORM FEED), `\\n` (LINE FEED), `\\r` (CARRIAGE RETURN), `\\t` (CHARACTER TABULATION).</p>
       </emu-note>
       <emu-note>
-        <p>Finite numbers are stringified as if by calling ToString(_number_). *NaN* and *Infinity* regardless of sign are represented as the String *"null"*.</p>
+        <p>Finite numbers are stringified as if by calling ToString(_number_). *NaN* and *Infinity* regardless of sign are represented as the String value *"null"*.</p>
       </emu-note>
       <emu-note>
-        <p>Values that do not have a JSON representation (such as *undefined* and functions) do not produce a String. Instead they produce the *undefined* value. In arrays these values are represented as the String *"null"*. In objects an unrepresentable value causes the property to be excluded from stringification.</p>
+        <p>Values that do not have a JSON representation (such as *undefined* and functions) do not produce a String. Instead they produce the *undefined* value. In arrays these values are represented as the String value *"null"*. In objects an unrepresentable value causes the property to be excluded from stringification.</p>
       </emu-note>
       <emu-note>
         <p>An object is rendered as U+007B (LEFT CURLY BRACKET) followed by zero or more properties, separated with a U+002C (COMMA), closed with a U+007D (RIGHT CURLY BRACKET). A property is a quoted String representing the property name, a U+003A (COLON), and then the stringified property value. An array is rendered as an opening U+005B (LEFT SQUARE BRACKET) followed by zero or more values, separated with a U+002C (COMMA), closed with a U+005D (RIGHT SQUARE BRACKET).</p>
