@@ -1085,10 +1085,11 @@
 
     <emu-clause id="sec-identity">
       <h1>Identity</h1>
-      <p>In this specification, the word “is” is used to compare two values through equality, as in “If _bool_ is *true*, then”. For the purposes of this equality comparison, all values within this specification fall into one of the following two categories.</p>
-      <p><dfn variants="values without identity,value without identity">Values without identity</dfn> are equal to other values without identity if all of their innate characteristics are the same — characteristics such as the magnitude of an integer or the length of a sequence. Because of this, values without identity may be manifest anywhere simply by fully describing their characteristics. It is not meaningful to change the characteristics of a value that does not have identity. Examples of values without identity include, but are not limited to: <emu-xref href="#sec-ecmascript-language-types-boolean-type">Booleans</emu-xref>; mathematical values and extended mathematical values; <emu-xref href="#sec-ecmascript-language-types-number-type">Numbers</emu-xref>; <emu-xref href="#sec-ecmascript-language-types-bigint-type">BigInts</emu-xref>; *null*; *undefined*; sequences, including <emu-xref href="#sec-ecmascript-language-types-string-type">Strings</emu-xref>, ECMAScript source text, surrogate pairs, Directive Prologues, etc; UTF-16 code units; Unicode code points; enums; abstract operations, including syntax-directed operations, host hooks, etc; and ordered pairs. The preceding list is exhaustive for ECMAScript language values.</p>
-      <p>In contrast, each <dfn variants="values with identity">value with identity</dfn> is unique and therefore only equal to itself. Values with identity are like values without identity but with an additional unguessable, unchangeable, universally-unique characteristic called <em>identity</em>. References to existing values with identity cannot be manifest simply by describing them, as the identity itself is indescribable; instead, references to these values must be explicitly passed from one place to another. Some values with identity are mutable and therefore can have their characteristics (except their identity) changed in-place, causing all holders of the value to observe the new characteristics. Examples of values with identity include, but are not limited to: <emu-xref href="#sec-object-type">Objects</emu-xref>, including function objects, exotic objects, etc; any kind of Records, including Property Descriptors, PrivateElements, etc; <emu-xref href="#sec-ecmascript-language-types-symbol-type">symbols</emu-xref>; Parse Nodes; Lists; <emu-xref href="#sec-set-and-relation-specification-type">Sets</emu-xref> and Relations; Abstract Closures; Data Blocks; Private Names; execution contexts and execution context stacks; agent signifiers; and WaiterLists. The preceding list is exhaustive for ECMAScript language values.</p>
-      <p>A value without identity is never equal to a value with identity.</p>
+      <p>In this specification, both specification values and ECMAScript language values are compared for equality. When comparing for equality, values fall into one of two categories. <dfn variants="values without identity,value without identity">Values without identity</dfn> are equal to other values without identity if all of their innate characteristics are the same — characteristics such as the magnitude of an integer or the length of a sequence. Values without identity may be manifest without prior reference by fully describing their characteristics. In contrast, each <dfn variants="values with identity">value with identity</dfn> is unique and therefore only equal to itself. Values with identity are like values without identity but with an additional unguessable, unchangeable, universally-unique characteristic called <em>identity</em>. References to existing values with identity cannot be manifest simply by describing them, as the identity itself is indescribable; instead, references to these values must be explicitly passed from one place to another. Some values with identity are mutable and therefore can have their characteristics (except their identity) changed in-place, causing all holders of the value to observe the new characteristics. A value without identity is never equal to a value with identity.</p>
+      <p>From the perspective of this specification, the word “is” is used to compare two values for equality, as in “If _bool_ is *true*, then ...”, and the word “contains” is used to search for a value inside lists using equality comparisons, as in "If _list_ contains a Record _r_ such that _r_.[[Foo]] is *true*, then ...". The <em>specification identity</em> of values determines the result of these comparisons and is axiomatic in this specification.</p>
+      <p>From the perspective of the ECMAScript language, language values are compared for equality using the SameValue abstract operation and the abstract operations it transitively calls. The algorithms of these comparison abstract operations determine <em>language identity</em> of ECMAScript language values.</p>
+      <p>For specification values, examples of values without specification identity include, but are not limited to: mathematical values and extended mathematical values; ECMAScript source text, surrogate pairs, Directive Prologues, etc; UTF-16 code units; Unicode code points; enums; abstract operations, including syntax-directed operations, host hooks, etc; and ordered pairs. Examples of specification values with specification identity include, but are not limited to: any kind of Records, including Property Descriptors, PrivateElements, etc; Parse Nodes; Lists; <emu-xref href="#sec-set-and-relation-specification-type">Sets</emu-xref> and Relations; Abstract Closures; Data Blocks; Private Names; execution contexts and execution context stacks; agent signifiers; and WaiterLists.</p>
+      <p>Specification identity agrees with language identity for all ECMAScript language values except Symbol values produced by <emu-xref href="#sec-symbol.for">Symbol.for</emu-xref>. The ECMAScript language values without specification identity and without language identity are <emu-xref href="#sec-ecmascript-language-types-undefined-type">*undefined*</emu-xref>, <emu-xref href="#sec-ecmascript-language-types-null-type">*null*</emu-xref>, <emu-xref href="#sec-ecmascript-language-types-boolean-type">Booleans</emu-xref>, <emu-xref href="#sec-ecmascript-language-types-string-type">Strings</emu-xref>, <emu-xref href="#sec-ecmascript-language-types-number-type">Numbers</emu-xref>, and <emu-xref href="#sec-ecmascript-language-types-bigint-type">BigInts</emu-xref>. The ECMAScript language values with specification identity and language identity are <emu-xref href="#sec-ecmascript-language-types-symbol-type">Symbols</emu-xref> not produced by <emu-xref href="#sec-symbol.for">Symbol.for</emu-xref> and <emu-xref href="#sec-object-type">Objects</emu-xref>. Symbol values produced by <emu-xref href="#sec-symbol.for">Symbol.for</emu-xref> have specification identity, but not language identity.</p>
     </emu-clause>
   </emu-clause>
 </emu-clause>
@@ -5786,9 +5787,9 @@
         <dd>It interprets _string_ as a sequence of UTF-16 encoded code points, as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, and determines whether it is a <a href="http://www.unicode.org/glossary/#well_formed_code_unit_sequence">well formed</a> UTF-16 sequence.</dd>
       </dl>
       <emu-alg>
-        1. Let _strLen_ be the length of _string_.
+        1. Let _len_ be the length of _string_.
         1. Let _k_ be 0.
-        1. Repeat, while _k_ ≠ _strLen_,
+        1. Repeat, while _k_ &lt; _len_,
           1. Let _cp_ be CodePointAt(_string_, _k_).
           1. If _cp_.[[IsUnpairedSurrogate]] is *true*, return *false*.
           1. Set _k_ to _k_ + _cp_.[[CodeUnitCount]].
@@ -12011,8 +12012,8 @@
         </tr>
         <tr>
           <td>[[KeptAlive]]</td>
-          <td>a List of Objects</td>
-          <td>Initially a new empty List, representing the list of objects to be kept alive until the end of the current Job</td>
+          <td>a List of either Objects or Symbols</td>
+          <td>Initially a new empty List, representing the list of objects and/or symbols to be kept alive until the end of the current Job</td>
         </tr>
       </table>
     </emu-table>
@@ -12127,22 +12128,22 @@
   </emu-clause>
 
   <emu-clause id="sec-weakref-processing-model">
-    <h1>Processing Model of WeakRef and FinalizationRegistry Objects</h1>
+    <h1>Processing Model of WeakRef and FinalizationRegistry Targets</h1>
 
     <emu-clause id="sec-weakref-invariants">
       <h1>Objectives</h1>
 
-      <p>This specification does not make any guarantees that any object will be garbage collected. Objects which are not live may be released after long periods of time, or never at all. For this reason, this specification uses the term "may" when describing behaviour triggered by garbage collection.</p>
+      <p>This specification does not make any guarantees that any object or symbol will be garbage collected. Objects or symbols which are not live may be released after long periods of time, or never at all. For this reason, this specification uses the term "may" when describing behaviour triggered by garbage collection.</p>
 
       <p>The semantics of WeakRefs and FinalizationRegistrys is based on two operations which happen at particular points in time:</p>
 
       <ul>
         <li>
-          When `WeakRef.prototype.deref` is called, the referent (if *undefined* is not returned) is kept alive so that subsequent, synchronous accesses also return the object. This list is reset when synchronous work is done using the ClearKeptObjects abstract operation.
+          When `WeakRef.prototype.deref` is called, the referent (if *undefined* is not returned) is kept alive so that subsequent, synchronous accesses also return the same value. This list is reset when synchronous work is done using the ClearKeptObjects abstract operation.
         </li>
 
         <li>
-          When an object which is registered with a FinalizationRegistry becomes unreachable, a call of the FinalizationRegistry's cleanup callback may eventually be made, after synchronous ECMAScript execution completes. The FinalizationRegistry cleanup is performed with the CleanupFinalizationRegistry abstract operation.
+          When an object or symbol which is registered with a FinalizationRegistry becomes unreachable, a call of the FinalizationRegistry's cleanup callback may eventually be made, after synchronous ECMAScript execution completes. The FinalizationRegistry cleanup is performed with the CleanupFinalizationRegistry abstract operation.
         </li>
       </ul>
 
@@ -12154,33 +12155,33 @@
     <emu-clause id="sec-liveness">
       <h1>Liveness</h1>
 
-      <p>For some set of objects _S_, a <dfn>hypothetical WeakRef-oblivious</dfn> execution with respect to _S_ is an execution whereby the abstract operation WeakRefDeref of a WeakRef whose referent is an element of _S_ always returns *undefined*.</p>
+      <p>For some set of objects and/or symbols _S_ a <dfn>hypothetical WeakRef-oblivious</dfn> execution with respect to _S_ is an execution whereby the abstract operation WeakRefDeref of a WeakRef whose referent is an element of _S_ always returns *undefined*.</p>
 
       <emu-note>
-        WeakRef-obliviousness, together with liveness, capture two notions. One, that a WeakRef itself does not keep an object alive. Two, that cycles in liveness does not imply that an object is live. To be concrete, if determining _obj_'s liveness depends on determining the liveness of another WeakRef referent, _obj2_, _obj2_'s liveness cannot assume _obj_'s liveness, which would be circular reasoning.
+        WeakRef-obliviousness, together with liveness, capture two notions. One, that a WeakRef itself does not keep its referent alive. Two, that cycles in liveness does not imply that a value is live. To be concrete, if determining _v_'s liveness depends on determining the liveness of a WeakRef referent, _r_, _r_'s liveness cannot assume _v_'s liveness, which would be circular reasoning.
       </emu-note>
       <emu-note>
-        WeakRef-obliviousness is defined on sets of objects instead of individual objects to account for cycles. If it were defined on individual objects, then an object in a cycle will be considered live even though its Object value is only observed via WeakRefs of other objects in the cycle.
+        WeakRef-obliviousness is defined on sets of objects or symbols instead of individual values to account for cycles. If it were defined on individual values, then a WeakRef referent in a cycle will be considered live even though its identity is only observed via other WeakRef referents in the cycle.
       </emu-note>
       <emu-note>
-        Colloquially, we say that an individual object is live if every set of objects containing it is live.
+        Colloquially, we say that an individual object or symbol is live if every set containing it is live.
       </emu-note>
 
-      <p>At any point during evaluation, a set of objects _S_ is considered <dfn>live</dfn> if either of the following conditions is met:</p>
+      <p>At any point during evaluation, a set of objects and/or symbols _S_ is considered <dfn>live</dfn> if either of the following conditions is met:</p>
 
       <ul>
         <li>
           Any element in _S_ is included in any agent's [[KeptAlive]] List.
         </li>
         <li>
-          There exists a valid future hypothetical WeakRef-oblivious execution with respect to _S_ that observes the Object value of any object in _S_.
+          There exists a valid future hypothetical WeakRef-oblivious execution with respect to _S_ that observes the identity of any value in _S_.
         </li>
       </ul>
       <emu-note>
-        The second condition above intends to capture the intuition that an object is live if its identity is observable via non-WeakRef means. An object's identity may be observed by observing a strict equality comparison between objects or observing the object being used as key in a Map.
+        The second condition above intends to capture the intuition that a value is live if its identity is observable via non-WeakRef means. A value's identity may be observed by observing a strict equality comparison or observing the value being used as key in a Map.
       </emu-note>
       <emu-note>
-        <p>Presence of an object in a field, an internal slot, or a property does not imply that the object is live. For example if the object in question is never passed back to the program, then it cannot be observed.</p>
+        <p>Presence of an object or a symbol in a field, an internal slot, or a property does not imply that the value is live. For example if the value in question is never passed back to the program, then it cannot be observed.</p>
 
         <p>This is the case for keys in a WeakMap, members of a WeakSet, as well as the [[WeakRefTarget]] and [[UnregisterToken]] fields of a FinalizationRegistry Cell record.</p>
 
@@ -12194,20 +12195,20 @@
     <emu-clause id="sec-weakref-execution">
       <h1>Execution</h1>
 
-      <p>At any time, if a set of objects _S_ is not live, an ECMAScript implementation may perform the following steps atomically:</p>
+      <p>At any time, if a set of objects and/or symbols _S_ is not live, an ECMAScript implementation may perform the following steps atomically:</p>
 
       <emu-alg>
-        1. For each element _obj_ of _S_, do
-          1. For each WeakRef _ref_ such that _ref_.[[WeakRefTarget]] is _obj_, do
+        1. For each element _value_ of _S_, do
+          1. For each WeakRef _ref_ such that _ref_.[[WeakRefTarget]] is _value_, do
             1. Set _ref_.[[WeakRefTarget]] to ~empty~.
-          1. For each FinalizationRegistry _fg_ such that _fg_.[[Cells]] contains a Record _cell_ such that _cell_.[[WeakRefTarget]] is _obj_, do
+          1. For each FinalizationRegistry _fg_ such that _fg_.[[Cells]] contains a Record _cell_ such that _cell_.[[WeakRefTarget]] is _value_, do
             1. Set _cell_.[[WeakRefTarget]] to ~empty~.
             1. Optionally, perform HostEnqueueFinalizationRegistryCleanupJob(_fg_).
-          1. For each WeakMap _map_ such that _map_.[[WeakMapData]] contains a Record _r_ such that _r_.[[Key]] is _obj_, do
+          1. For each WeakMap _map_ such that _map_.[[WeakMapData]] contains a Record _r_ such that _r_.[[Key]] is _value_, do
             1. Set _r_.[[Key]] to ~empty~.
             1. Set _r_.[[Value]] to ~empty~.
-          1. For each WeakSet _set_ such that _set_.[[WeakSetData]] contains _obj_, do
-            1. Replace the element of _set_.[[WeakSetData]] whose value is _obj_ with an element whose value is ~empty~.
+          1. For each WeakSet _set_ such that _set_.[[WeakSetData]] contains _value_, do
+            1. Replace the element of _set_.[[WeakSetData]] whose value is _value_ with an element whose value is ~empty~.
       </emu-alg>
 
       <emu-note>
@@ -12220,8 +12221,8 @@
         <p>Because calling HostEnqueueFinalizationRegistryCleanupJob is optional, registered objects in a FinalizationRegistry do not necessarily hold that FinalizationRegistry live. Implementations may omit FinalizationRegistry callbacks for any reason, e.g., if the FinalizationRegistry itself becomes dead, or if the application is shutting down.</p>
       </emu-note>
       <emu-note>
-        <p>Implementations are not obligated to empty WeakRefs for maximal sets of non-live objects.</p>
-        <p>If an implementation chooses a non-live set _S_ in which to empty WeakRefs, this definition requires that it empties WeakRefs for all objects in _S_ simultaneously. In other words, it is not conformant for an implementation to empty a WeakRef pointing to an object _obj_ without emptying out other WeakRefs that, if not emptied, could result in an execution that observes the Object value of _obj_.</p>
+        <p>Implementations are not obligated to empty WeakRefs for maximal sets of non-live objects or symbols.</p>
+        <p>If an implementation chooses a non-live set _S_ in which to empty WeakRefs, this definition requires that it empties WeakRefs for all values in _S_ simultaneously. In other words, it is not conformant for an implementation to empty a WeakRef pointing to a value _v_ without emptying out other WeakRefs that, if not emptied, could result in an execution that observes the value of _v_.</p>
       </emu-note>
     </emu-clause>
 
@@ -12263,18 +12264,18 @@
   <emu-clause id="sec-addtokeptobjects" type="abstract operation">
     <h1>
       AddToKeptObjects (
-        _object_: an Object,
+        _value_: an Object or a Symbol,
       ): ~unused~
     </h1>
     <dl class="header">
     </dl>
     <emu-alg>
       1. Let _agentRecord_ be the surrounding agent's Agent Record.
-      1. Append _object_ to _agentRecord_.[[KeptAlive]].
+      1. Append _value_ to _agentRecord_.[[KeptAlive]].
       1. Return ~unused~.
     </emu-alg>
     <emu-note>
-      When the abstract operation AddToKeptObjects is called with a target object reference, it adds the target to a list that will point strongly at the target until ClearKeptObjects is called.
+      When the abstract operation AddToKeptObjects is called with a target object or symbol, it adds the target to a list that will point strongly at the target until ClearKeptObjects is called.
     </emu-note>
   </emu-clause>
 
@@ -12295,6 +12296,26 @@
         1. Perform ? HostCallJobCallback(_callback_, *undefined*, « _cell_.[[HeldValue]] »).
       1. Return ~unused~.
     </emu-alg>
+  </emu-clause>
+
+  <emu-clause id="sec-canbeheldweakly" type="abstract operation">
+    <h1>
+      CanBeHeldWeakly (
+        _v_: an ECMAScript language value,
+      ): a Boolean
+    </h1>
+    <dl class="header">
+      <dt>description</dt>
+      <dd>It returns *true* if and only if _v_ is suitable for use as a weak reference. Only values that are suitable for use as a weak reference may be a key of a WeakMap, an element of a WeakSet, the target of a WeakRef, or one of the targets of a FinalizationRegistry.</dd>
+    </dl>
+    <emu-alg>
+      1. If _v_ is an Object, return *true*.
+      1. If _v_ is a Symbol and KeyForSymbol(_v_) is *undefined*, return *true*.
+      1. Return *false*.
+    </emu-alg>
+    <emu-note>
+      <p>A language value without <emu-xref href="#sec-identity">language identity</emu-xref> can be manifested without prior reference and is unsuitable for use as a weak reference. A Symbol value produced by <emu-xref href="#sec-symbol.for">Symbol.for</emu-xref>, unlike other Symbol values, does not have language identity and is unsuitable for use as a weak reference. <emu-xref href="#sec-well-known-symbols">Well-known symbols</emu-xref> are likely to never be collected, but are nonetheless treated as suitable for use as a weak reference because they are limited in number and therefore manageable by a variety of implementation approaches. However, any value associated to a well-known symbol in a live WeakMap is unlikely to be collected and could “leak” memory resources in implementations.</p>
+    </emu-note>
   </emu-clause>
 </emu-clause>
 
@@ -15664,9 +15685,9 @@
       </dl>
       <emu-alg>
         1. Assert: 0 ≤ _cp_ ≤ 0x10FFFF.
-        1. If _cp_ ≤ 0xFFFF, return the String value consisting of the code unit whose value is _cp_.
-        1. Let _cu1_ be the code unit whose value is floor((_cp_ - 0x10000) / 0x400) + 0xD800.
-        1. Let _cu2_ be the code unit whose value is ((_cp_ - 0x10000) modulo 0x400) + 0xDC00.
+        1. If _cp_ ≤ 0xFFFF, return the String value consisting of the code unit whose numeric value is _cp_.
+        1. Let _cu1_ be the code unit whose numeric value is floor((_cp_ - 0x10000) / 0x400) + 0xD800.
+        1. Let _cu2_ be the code unit whose numeric value is ((_cp_ - 0x10000) modulo 0x400) + 0xDC00.
         1. Return the string-concatenation of _cu1_ and _cu2_.
       </emu-alg>
     </emu-clause>
@@ -16906,7 +16927,7 @@
             The SV of <emu-grammar>EscapeSequence :: `0`</emu-grammar> is the String value consisting of the code unit 0x0000 (NULL).
           </li>
           <li>
-            The SV of <emu-grammar>CharacterEscapeSequence :: SingleEscapeCharacter</emu-grammar> is the String value consisting of the code unit whose value is determined by the |SingleEscapeCharacter| according to <emu-xref href="#table-string-single-character-escape-sequences"></emu-xref>.
+            The SV of <emu-grammar>CharacterEscapeSequence :: SingleEscapeCharacter</emu-grammar> is the String value consisting of the code unit whose numeric value is determined by the |SingleEscapeCharacter| according to <emu-xref href="#table-string-single-character-escape-sequences"></emu-xref>.
           </li>
         </ul>
         <emu-table id="table-string-single-character-escape-sequences" caption="String Single Character Escape Sequences" oldids="table-34">
@@ -17058,7 +17079,7 @@
             The SV of <emu-grammar>NonEscapeCharacter :: SourceCharacter but not one of EscapeCharacter or LineTerminator</emu-grammar> is the result of performing UTF16EncodeCodePoint on the code point matched by |SourceCharacter|.
           </li>
           <li>
-            The SV of <emu-grammar>EscapeSequence :: LegacyOctalEscapeSequence</emu-grammar> is the String value consisting of the code unit whose value is the MV of |LegacyOctalEscapeSequence|.
+            The SV of <emu-grammar>EscapeSequence :: LegacyOctalEscapeSequence</emu-grammar> is the String value consisting of the code unit whose numeric value is the MV of |LegacyOctalEscapeSequence|.
           </li>
           <li>
             The SV of <emu-grammar>NonOctalDecimalEscapeSequence :: `8`</emu-grammar> is the String value consisting of the code unit 0x0038 (DIGIT EIGHT).
@@ -17067,10 +17088,10 @@
             The SV of <emu-grammar>NonOctalDecimalEscapeSequence :: `9`</emu-grammar> is the String value consisting of the code unit 0x0039 (DIGIT NINE).
           </li>
           <li>
-            The SV of <emu-grammar>HexEscapeSequence :: `x` HexDigit HexDigit</emu-grammar> is the String value consisting of the code unit whose value is the MV of |HexEscapeSequence|.
+            The SV of <emu-grammar>HexEscapeSequence :: `x` HexDigit HexDigit</emu-grammar> is the String value consisting of the code unit whose numeric value is the MV of |HexEscapeSequence|.
           </li>
           <li>
-            The SV of <emu-grammar>Hex4Digits :: HexDigit HexDigit HexDigit HexDigit</emu-grammar> is the String value consisting of the code unit whose value is the MV of |Hex4Digits|.
+            The SV of <emu-grammar>Hex4Digits :: HexDigit HexDigit HexDigit HexDigit</emu-grammar> is the String value consisting of the code unit whose numeric value is the MV of |Hex4Digits|.
           </li>
           <li>
             The SV of <emu-grammar>UnicodeEscapeSequence :: `u{` CodePoint `}`</emu-grammar> is the result of performing UTF16EncodeCodePoint on the MV of |CodePoint|.
@@ -19633,7 +19654,7 @@
     <emu-clause id="sec-unary-minus-operator">
       <h1>Unary `-` Operator</h1>
       <emu-note>
-        <p>The unary `-` operator converts its operand to Number type and then negates it. Negating *+0*<sub>𝔽</sub> produces *-0*<sub>𝔽</sub>, and negating *-0*<sub>𝔽</sub> produces *+0*<sub>𝔽</sub>.</p>
+        <p>The unary `-` operator converts its operand to a numeric value and then negates it. Negating *+0*<sub>𝔽</sub> produces *-0*<sub>𝔽</sub>, and negating *-0*<sub>𝔽</sub> produces *+0*<sub>𝔽</sub>.</p>
       </emu-note>
 
       <emu-clause id="sec-unary-minus-operator-runtime-semantics-evaluation" type="sdo">
@@ -28815,9 +28836,9 @@
       <emu-alg>
         1. Let _inputString_ be ? ToString(_string_).
         1. Let _trimmedString_ be ! TrimString(_inputString_, ~start~).
-        1. If neither _trimmedString_ nor any prefix of _trimmedString_ satisfies the syntax of a |StrDecimalLiteral| (see <emu-xref href="#sec-tonumber-applied-to-the-string-type"></emu-xref>), return *NaN*.
-        1. Let _numberString_ be the longest prefix of _trimmedString_, which might be _trimmedString_ itself, that satisfies the syntax of a |StrDecimalLiteral|.
-        1. Let _parsedNumber_ be ParseText(StringToCodePoints(_numberString_), |StrDecimalLiteral|).
+        1. Let _trimmed_ be StringToCodePoints(_trimmedString_).
+        1. Let _trimmedPrefix_ be the longest prefix of _trimmed_ that satisfies the syntax of a |StrDecimalLiteral|, which might be _trimmed_ itself. If there is no such prefix, return *NaN*.
+        1. Let _parsedNumber_ be ParseText(_trimmedPrefix_, |StrDecimalLiteral|).
         1. Assert: _parsedNumber_ is a Parse Node.
         1. Return StringNumericValue of _parsedNumber_.
       </emu-alg>
@@ -28932,13 +28953,12 @@
           <dd>It performs URI encoding and escaping, interpreting _string_ as a sequence of UTF-16 encoded code points as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>. If a character is identified as unreserved in RFC 2396 or appears in _extraUnescaped_, it is not escaped.</dd>
         </dl>
         <emu-alg>
-          1. Let _strLen_ be the length of _string_.
+          1. Let _len_ be the length of _string_.
           1. Let _R_ be the empty String.
           1. Let _alwaysUnescaped_ be the string-concatenation of the ASCII word characters and *"-.!~\*'()"*.
           1. Let _unescapedSet_ be the string-concatenation of _alwaysUnescaped_ and _extraUnescaped_.
           1. Let _k_ be 0.
-          1. Repeat,
-            1. If _k_ = _strLen_, return _R_.
+          1. Repeat, while _k_ &lt; _len_,
             1. Let _C_ be the code unit at index _k_ within _string_.
             1. If _unescapedSet_ contains _C_, then
               1. Set _k_ to _k_ + 1.
@@ -28951,6 +28971,7 @@
               1. For each element _octet_ of _Octets_, do
                 1. Let _hex_ be the String representation of _octet_, formatted as an uppercase hexadecimal number.
                 1. Set _R_ to the string-concatenation of _R_, *"%"*, and ! StringPad(_hex_, *2*<sub>𝔽</sub>, *"0"*, ~start~).
+          1. Return _R_.
         </emu-alg>
         <emu-note>
           <p>Because percent-encoding is used to represent individual octets, a single code point may be expressed as multiple consecutive escape sequences (one for each of its 8-bit UTF-8 code units).</p>
@@ -28969,50 +28990,69 @@
           <dd>It performs URI unescaping and decoding, preserving any escape sequences that correspond to Basic Latin characters in _preserveEscapeSet_.</dd>
         </dl>
         <emu-alg>
-          1. Let _strLen_ be the length of _string_.
+          1. Let _len_ be the length of _string_.
           1. Let _R_ be the empty String.
           1. Let _k_ be 0.
-          1. Repeat,
-            1. If _k_ = _strLen_, return _R_.
+          1. Repeat, while _k_ &lt; _len_,
             1. Let _C_ be the code unit at index _k_ within _string_.
-            1. If _C_ is not the code unit 0x0025 (PERCENT SIGN), then
-              1. Let _S_ be the String value containing only the code unit _C_.
-            1. Else,
-              1. Let _start_ be _k_.
-              1. If _k_ + 2 ≥ _strLen_, throw a *URIError* exception.
-              1. If the code units at index (_k_ + 1) and (_k_ + 2) within _string_ do not represent hexadecimal digits, throw a *URIError* exception.
-              1. Let _B_ be the 8-bit value represented by the two hexadecimal digits at index (_k_ + 1) and (_k_ + 2).
+            1. Let _S_ be _C_.
+            1. If _C_ is the code unit 0x0025 (PERCENT SIGN), then
+              1. If _k_ + 3 > _len_, throw a *URIError* exception.
+              1. Let _escape_ be the substring of _string_ from _k_ to _k_ + 3.
+              1. Let _B_ be ParseHexOctet(_string_, _k_ + 1).
+              1. If _B_ is not an integer, throw a *URIError* exception.
               1. Set _k_ to _k_ + 2.
               1. Let _n_ be the number of leading 1 bits in _B_.
               1. If _n_ = 0, then
-                1. Let _C_ be the code unit whose value is _B_.
-                1. If _C_ is not in _preserveEscapeSet_, then
-                  1. Let _S_ be the String value containing only the code unit _C_.
-                1. Else,
-                  1. Let _S_ be the substring of _string_ from _start_ to _k_ + 1.
+                1. Let _asciiChar_ be the code unit whose numeric value is _B_.
+                1. If _preserveEscapeSet_ contains _asciiChar_, set _S_ to _escape_. Otherwise, set _S_ to _asciiChar_.
               1. Else,
                 1. If _n_ = 1 or _n_ > 4, throw a *URIError* exception.
-                1. If _k_ + (3 × (_n_ - 1)) ≥ _strLen_, throw a *URIError* exception.
                 1. Let _Octets_ be « _B_ ».
                 1. Let _j_ be 1.
                 1. Repeat, while _j_ &lt; _n_,
                   1. Set _k_ to _k_ + 1.
+                  1. If _k_ + 3 > _len_, throw a *URIError* exception.
                   1. If the code unit at index _k_ within _string_ is not the code unit 0x0025 (PERCENT SIGN), throw a *URIError* exception.
-                  1. If the code units at index (_k_ + 1) and (_k_ + 2) within _string_ do not represent hexadecimal digits, throw a *URIError* exception.
-                  1. Let _B_ be the 8-bit value represented by the two hexadecimal digits at index (_k_ + 1) and (_k_ + 2).
+                  1. Let _continuationByte_ be ParseHexOctet(_string_, _k_ + 1).
+                  1. If _continuationByte_ is not an integer, throw a *URIError* exception.
+                  1. Append _continuationByte_ to _Octets_.
                   1. Set _k_ to _k_ + 2.
-                  1. Append _B_ to _Octets_.
                   1. Set _j_ to _j_ + 1.
                 1. Assert: The length of _Octets_ is _n_.
                 1. If _Octets_ does not contain a valid UTF-8 encoding of a Unicode code point, throw a *URIError* exception.
                 1. Let _V_ be the code point obtained by applying the UTF-8 transformation to _Octets_, that is, from a List of octets into a 21-bit value.
-                1. Let _S_ be UTF16EncodeCodePoint(_V_).
+                1. Set _S_ to UTF16EncodeCodePoint(_V_).
             1. Set _R_ to the string-concatenation of _R_ and _S_.
             1. Set _k_ to _k_ + 1.
+          1. Return _R_.
         </emu-alg>
         <emu-note>
           <p>RFC 3629 prohibits the decoding of invalid UTF-8 octet sequences. For example, the invalid sequence 0xC0 0x80 must not decode into the code unit 0x0000. Implementations of the Decode algorithm are required to throw a *URIError* when encountering such invalid sequences.</p>
         </emu-note>
+      </emu-clause>
+
+      <emu-clause id="sec-parsehexoctet" type="abstract operation">
+        <h1>
+          ParseHexOctet (
+            _string_: a String,
+            _position_: a non-negative integer,
+          ): either a non-negative integer or a non-empty List of *SyntaxError* objects
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It parses a sequence of two hexadecimal characters at the specified _position_ in _string_ into an unsigned 8-bit integer.</dd>
+        </dl>
+        <emu-alg>
+          1. Let _len_ be the length of _string_.
+          1. Assert: _position_ + 2 ≤ _len_.
+          1. Let _hexDigits_ be the substring of _string_ from _position_ to _position_ + 2.
+          1. Let _parseResult_ be ParseText(StringToCodePoints(_hexDigits_), |HexDigits[~Sep]|).
+          1. If _parseResult_ is not a Parse Node, return _parseResult_.
+          1. Let _n_ be the MV of _parseResult_.
+          1. Assert: _n_ is in the inclusive interval from 0 to 255.
+          1. Return _n_.
+        </emu-alg>
       </emu-clause>
     </emu-clause>
   </emu-clause>
@@ -30262,7 +30302,7 @@
           1. Append the Record { [[Key]]: _stringKey_, [[Symbol]]: _newSymbol_ } to the GlobalSymbolRegistry List.
           1. Return _newSymbol_.
         </emu-alg>
-        <p>The GlobalSymbolRegistry is a List that is globally available. It is shared by all realms. Prior to the evaluation of any ECMAScript code, it is initialized as a new empty List. Elements of the GlobalSymbolRegistry are Records with the structure defined in <emu-xref href="#table-globalsymbolregistry-record-fields"></emu-xref>.</p>
+        <p>The GlobalSymbolRegistry is an append-only List that is globally available. It is shared by all realms. Prior to the evaluation of any ECMAScript code, it is initialized as a new empty List. Elements of the GlobalSymbolRegistry are Records with the structure defined in <emu-xref href="#table-globalsymbolregistry-record-fields"></emu-xref>.</p>
         <emu-table id="table-globalsymbolregistry-record-fields" caption="GlobalSymbolRegistry Record Fields" oldids="table-44">
           <table>
             <tr>
@@ -30325,10 +30365,7 @@
         <p>This function performs the following steps when called:</p>
         <emu-alg>
           1. If _sym_ is not a Symbol, throw a *TypeError* exception.
-          1. For each element _e_ of the GlobalSymbolRegistry List (see <emu-xref href="#sec-symbol.for"></emu-xref>), do
-            1. If SameValue(_e_.[[Symbol]], _sym_) is *true*, return _e_.[[Key]].
-          1. Assert: GlobalSymbolRegistry does not currently contain an entry for _sym_.
-          1. Return *undefined*.
+          1. Return KeyForSymbol(_sym_).
         </emu-alg>
       </emu-clause>
 
@@ -30484,6 +30521,28 @@
     <emu-clause id="sec-properties-of-symbol-instances">
       <h1>Properties of Symbol Instances</h1>
       <p>Symbol instances are ordinary objects that inherit properties from the Symbol prototype object. Symbol instances have a [[SymbolData]] internal slot. The [[SymbolData]] internal slot is the Symbol value represented by this Symbol object.</p>
+    </emu-clause>
+
+    <emu-clause id="sec-abstract-operations-for-symbols">
+      <h1>Abstract Operations for Symbols</h1>
+
+      <emu-clause id="sec-keyforsymbol" type="abstract operation">
+        <h1>
+          KeyForSymbol (
+            _sym_: a Symbol,
+          ): a String or *undefined*
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>If _sym_ is in the GlobalSymbolRegistry (see <emu-xref href="#sec-symbol.for"></emu-xref>) the String used to register _sym_ will be returned.</dd>
+        </dl>
+        <emu-alg>
+          1. For each element _e_ of the GlobalSymbolRegistry List, do
+            1. If SameValue(_e_.[[Symbol]], _sym_) is *true*, return _e_.[[Key]].
+          1. Assert: GlobalSymbolRegistry does not currently contain an entry for _sym_.
+          1. Return *undefined*.
+        </emu-alg>
+      </emu-clause>
     </emu-clause>
   </emu-clause>
 
@@ -38188,24 +38247,21 @@ THH:mm:ss.sss
           1. Let _obj_ be ? ToObject(*this* value).
           1. [id="step-array-sort-len"] Let _len_ be ? LengthOfArrayLike(_obj_).
           1. Let _SortCompare_ be a new Abstract Closure with parameters (_x_, _y_) that captures _comparefn_ and performs the following steps when called:
-            1. If _x_ and _y_ are both *undefined*, return *+0*<sub>𝔽</sub>.
-            1. If _x_ is *undefined*, return *1*<sub>𝔽</sub>.
-            1. If _y_ is *undefined*, return *-1*<sub>𝔽</sub>.
-            1. If _comparefn_ is not *undefined*, then
-              1. Let _v_ be ? ToNumber(? Call(_comparefn_, *undefined*, « _x_, _y_ »)).
-              1. If _v_ is *NaN*, return *+0*<sub>𝔽</sub>.
-              1. Return _v_.
-            1. [id="step-sortcompare-tostring-x"] Let _xString_ be ? ToString(_x_).
-            1. [id="step-sortcompare-tostring-y"] Let _yString_ be ? ToString(_y_).
-            1. Let _xSmaller_ be ! IsLessThan(_xString_, _yString_, *true*).
-            1. If _xSmaller_ is *true*, return *-1*<sub>𝔽</sub>.
-            1. Let _ySmaller_ be ! IsLessThan(_yString_, _xString_, *true*).
-            1. If _ySmaller_ is *true*, return *1*<sub>𝔽</sub>.
-            1. Return *+0*<sub>𝔽</sub>.
-          1. Return ? SortIndexedProperties(_obj_, _len_, _SortCompare_).
+            1. Return ? CompareArrayElements(_x_, _y_, _comparefn_).
+          1. [id="step-array-sortindexedproperties"] Let _sortedList_ be ? SortIndexedProperties(_obj_, _len_, _SortCompare_, ~skip-holes~).
+          1. Let _itemCount_ be the number of elements in _sortedList_.
+          1. Let _j_ be 0.
+          1. Repeat, while _j_ &lt; _itemCount_,
+            1. Perform ? Set(_obj_, ! ToString(𝔽(_j_)), _sortedList_[_j_], *true*).
+            1. Set _j_ to _j_ + 1.
+          1. NOTE: The call to SortIndexedProperties in step <emu-xref href="#step-array-sortindexedproperties"></emu-xref> uses ~skip-holes~. The remaining indices are deleted to preserve the number of holes that were detected and excluded from the sort.
+          1. Repeat, while _j_ &lt; _len_,
+            1. Perform ? DeletePropertyOrThrow(_obj_, ! ToString(𝔽(_j_))).
+            1. Set _j_ to _j_ + 1.
+          1. Return _obj_.
         </emu-alg>
         <emu-note>
-          <p>Because non-existent property values always compare greater than *undefined* property values, and *undefined* always compares greater than any other value, *undefined* property values always sort to the end of the result, followed by non-existent property values.</p>
+          <p>Because non-existent property values always compare greater than *undefined* property values, and *undefined* always compares greater than any other value (see CompareArrayElements), *undefined* property values always sort to the end of the result, followed by non-existent property values.</p>
         </emu-note>
         <emu-note>
           <p>Method calls performed by the ToString abstract operations in steps <emu-xref href="#step-sortcompare-tostring-x"></emu-xref> and <emu-xref href="#step-sortcompare-tostring-y"></emu-xref> have the potential to cause _SortCompare_ to not behave as a consistent comparator.</p>
@@ -38220,7 +38276,8 @@ THH:mm:ss.sss
               _obj_: an Object,
               _len_: a non-negative integer,
               _SortCompare_: an Abstract Closure with two parameters,
-            ): either a normal completion containing an Object or an abrupt completion
+              _holes_: ~skip-holes~ or ~read-through-holes~,
+            ): either a normal completion containing a List of ECMAScript language values or a throw completion
           </h1>
           <dl class="header">
           </dl>
@@ -38229,21 +38286,17 @@ THH:mm:ss.sss
             1. Let _k_ be 0.
             1. Repeat, while _k_ &lt; _len_,
               1. Let _Pk_ be ! ToString(𝔽(_k_)).
-              1. Let _kPresent_ be ? HasProperty(_obj_, _Pk_).
-              1. If _kPresent_ is *true*, then
+              1. If _holes_ is ~skip-holes~, then
+                1. Let _kRead_ be ? HasProperty(_obj_, _Pk_).
+              1. Else,
+                1. Assert: _holes_ is ~read-through-holes~.
+                1. Let _kRead_ be *true*.
+              1. If _kRead_ is *true*, then
                 1. Let _kValue_ be ? Get(_obj_, _Pk_).
                 1. Append _kValue_ to _items_.
               1. Set _k_ to _k_ + 1.
-            1. Let _itemCount_ be the number of elements in _items_.
             1. [id="step-array-sort"] Sort _items_ using an implementation-defined sequence of <emu-meta effects="user-code">calls to _SortCompare_</emu-meta>. If any such call returns an abrupt completion, stop before performing any further calls to _SortCompare_ and return that Completion Record.
-            1. Let _j_ be 0.
-            1. Repeat, while _j_ &lt; _itemCount_,
-              1. Perform ? Set(_obj_, ! ToString(𝔽(_j_)), _items_[_j_], *true*).
-              1. Set _j_ to _j_ + 1.
-            1. Repeat, while _j_ &lt; _len_,
-              1. Perform ? DeletePropertyOrThrow(_obj_, ! ToString(𝔽(_j_))).
-              1. Set _j_ to _j_ + 1.
-            1. Return _obj_.
+            1. Return _items_.
           </emu-alg>
           <p>The <dfn id="sort-order">sort order</dfn> is the ordering of _items_ after completion of step <emu-xref href="#step-array-sort"></emu-xref> of the algorithm above. The sort order is implementation-defined if _SortCompare_ is not a consistent comparator for the elements of _items_. When SortIndexedProperties is invoked by <emu-xref href="#sec-array.prototype.sort">Array.prototype.sort</emu-xref>, the sort order is also implementation-defined if _comparefn_ is *undefined*, and all applications of ToString, to any specific value passed as an argument to _SortCompare_, do not produce the same result.</p>
           <p>Unless the sort order is specified to be implementation-defined, it must satisfy all of the following conditions:</p>
@@ -38283,6 +38336,34 @@ THH:mm:ss.sss
           <emu-note>
             <p>The above conditions are necessary and sufficient to ensure that _comparator_ divides the set _S_ into equivalence classes and that these equivalence classes are totally ordered.</p>
           </emu-note>
+        </emu-clause>
+
+        <emu-clause id="sec-comparearrayelements" type="abstract operation">
+          <h1>
+            CompareArrayElements (
+              _x_: an ECMAScript language value,
+              _y_: an ECMAScript language value,
+              _comparefn_: a function object or *undefined*,
+            ): either a normal completion containing a Number or an abrupt completion
+          </h1>
+          <dl class="header">
+          </dl>
+          <emu-alg>
+            1. If _x_ and _y_ are both *undefined*, return *+0*<sub>𝔽</sub>.
+            1. If _x_ is *undefined*, return *1*<sub>𝔽</sub>.
+            1. If _y_ is *undefined*, return *-1*<sub>𝔽</sub>.
+            1. If _comparefn_ is not *undefined*, then
+              1. Let _v_ be ? ToNumber(? Call(_comparefn_, *undefined*, « _x_, _y_ »)).
+              1. If _v_ is *NaN*, return *+0*<sub>𝔽</sub>.
+              1. Return _v_.
+            1. [id="step-sortcompare-tostring-x"] Let _xString_ be ? ToString(_x_).
+            1. [id="step-sortcompare-tostring-y"] Let _yString_ be ? ToString(_y_).
+            1. Let _xSmaller_ be ! IsLessThan(_xString_, _yString_, *true*).
+            1. If _xSmaller_ is *true*, return *-1*<sub>𝔽</sub>.
+            1. Let _ySmaller_ be ! IsLessThan(_yString_, _xString_, *true*).
+            1. If _ySmaller_ is *true*, return *1*<sub>𝔽</sub>.
+            1. Return *+0*<sub>𝔽</sub>.
+          </emu-alg>
         </emu-clause>
       </emu-clause>
 
@@ -38390,6 +38471,86 @@ THH:mm:ss.sss
         </emu-note>
       </emu-clause>
 
+      <emu-clause id="sec-array.prototype.toreversed">
+        <h1>Array.prototype.toReversed ( )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be ? ToObject(*this* value).
+          1. Let _len_ be ? LengthOfArrayLike(_O_).
+          1. Let _A_ be ? ArrayCreate(_len_).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _from_ be ! ToString(𝔽(_len_ - _k_ - 1)).
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _fromValue_ be ? Get(_O_, _from_).
+            1. Perform ! CreateDataPropertyOrThrow(_A_, _Pk_, _fromValue_).
+            1. Set _k_ to _k_ + 1.
+          1. Return _A_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-array.prototype.tosorted">
+        <h1>Array.prototype.toSorted ( _comparefn_ )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. If _comparefn_ is not *undefined* and IsCallable(_comparefn_) is *false*, throw a *TypeError* exception.
+          1. Let _O_ be ? ToObject(*this* value).
+          1. Let _len_ be ? LengthOfArrayLike(_O_).
+          1. Let _A_ be ? ArrayCreate(_len_).
+          1. Let _SortCompare_ be a new Abstract Closure with parameters (_x_, _y_) that captures _comparefn_ and performs the following steps when called:
+            1. Return ? CompareArrayElements(_x_, _y_, _comparefn_).
+          1. Let _sortedList_ be ? SortIndexedProperties(_O_, _len_, _SortCompare_, ~read-through-holes~).
+          1. Let _j_ be 0.
+          1. Repeat, while _j_ &lt; _len_,
+            1. Perform ! CreateDataPropertyOrThrow(_A_, ! ToString(𝔽(_j_)), _sortedList_[_j_]).
+            1. Set _j_ to _j_ + 1.
+          1. Return _A_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-array.prototype.tospliced">
+        <h1>Array.prototype.toSpliced ( _start_, _skipCount_, ..._items_ )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be ? ToObject(*this* value).
+          1. Let _len_ be ? LengthOfArrayLike(_O_).
+          1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
+          1. If _relativeStart_ is -∞, let _actualStart_ be 0.
+          1. Else if _relativeStart_ &lt; 0, let _actualStart_ be max(_len_ + _relativeStart_, 0).
+          1. Else, let _actualStart_ be min(_relativeStart_, _len_).
+          1. Let _insertCount_ be the number of elements in _items_.
+          1. If _start_ is not present, then
+            1. Let _actualSkipCount_ be 0.
+          1. Else if _skipCount_ is not present, then
+            1. Let _actualSkipCount_ be _len_ - _actualStart_.
+          1. Else,
+            1. Let _sc_ be ? ToIntegerOrInfinity(_skipCount_).
+            1. Let _actualSkipCount_ be the result of clamping _sc_ between 0 and _len_ - _actualStart_.
+          1. Let _newLen_ be _len_ + _insertCount_ - _actualSkipCount_.
+          1. If _newLen_ > 2<sup>53</sup> - 1, throw a *TypeError* exception.
+          1. Let _A_ be ? ArrayCreate(_newLen_).
+          1. Let _i_ be 0.
+          1. Let _r_ be _actualStart_ + _actualSkipCount_.
+          1. Repeat, while _i_ &lt; _actualStart_,
+            1. Let _Pi_ be ! ToString(𝔽(_i_)).
+            1. Let _iValue_ be ? Get(_O_, _Pi_).
+            1. Perform ! CreateDataPropertyOrThrow(_A_, _Pi_, _iValue_).
+            1. Set _i_ to _i_ + 1.
+          1. For each element _E_ of _items_, do
+            1. Let _Pi_ be ! ToString(𝔽(_i_)).
+            1. Perform ! CreateDataPropertyOrThrow(_A_, _Pi_, _E_).
+            1. Set _i_ to _i_ + 1.
+          1. Repeat, while _i_ &lt; _newLen_,
+            1. Let _Pi_ be ! ToString(𝔽(_i_)).
+            1. Let _from_ be ! ToString(𝔽(_r_)).
+            1. Let _fromValue_ be ? Get(_O_, _from_).
+            1. Perform ! CreateDataPropertyOrThrow(_A_, _Pi_, _fromValue_).
+            1. Set _i_ to _i_ + 1.
+            1. Set _r_ to _r_ + 1.
+          1. Return _A_.
+        </emu-alg>
+      </emu-clause>
+
       <emu-clause id="sec-array.prototype.tostring">
         <h1>Array.prototype.toString ( )</h1>
         <p>This method performs the following steps when called:</p>
@@ -38448,6 +38609,28 @@ THH:mm:ss.sss
         </emu-alg>
       </emu-clause>
 
+      <emu-clause id="sec-array.prototype.with">
+        <h1>Array.prototype.with ( _index_, _value_ )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be ? ToObject(*this* value).
+          1. Let _len_ be ? LengthOfArrayLike(_O_).
+          1. Let _relativeIndex_ be ? ToIntegerOrInfinity(_index_).
+          1. If _relativeIndex_ ≥ 0, let _actualIndex_ be _relativeIndex_.
+          1. Else, let _actualIndex_ be _len_ + _relativeIndex_.
+          1. If _actualIndex_ ≥ _len_ or _actualIndex_ &lt; 0, throw a *RangeError* exception.
+          1. Let _A_ be ? ArrayCreate(_len_).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. If _k_ is _actualIndex_, let _fromValue_ be _value_.
+            1. Else, let _fromValue_ be ? Get(_O_, _Pk_).
+            1. Perform ! CreateDataPropertyOrThrow(_A_, _Pk_, _fromValue_).
+            1. Set _k_ to _k_ + 1.
+          1. Return _A_.
+        </emu-alg>
+      </emu-clause>
+
       <emu-clause id="sec-array.prototype-@@iterator">
         <h1>Array.prototype [ @@iterator ] ( )</h1>
         <p>The initial value of the @@iterator property is %Array.prototype.values%, defined in <emu-xref href="#sec-array.prototype.values"></emu-xref>.</p>
@@ -38470,12 +38653,16 @@ THH:mm:ss.sss
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"flatMap"*, *true*).
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"includes"*, *true*).
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"keys"*, *true*).
+          1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"toReversed"*, *true*).
+          1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"toSorted"*, *true*).
+          1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"toSpliced"*, *true*).
           1. Perform ! CreateDataPropertyOrThrow(_unscopableList_, *"values"*, *true*).
           1. Return _unscopableList_.
         </emu-alg>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
         <emu-note>
           <p>The own property names of this object are property names that were not included as standard properties of `Array.prototype` prior to the ECMAScript 2015 specification. These names are ignored for `with` statement binding purposes in order to preserve the behaviour of existing code that might use one of these names as a binding in an outer scope that is shadowed by a `with` statement whose binding object is an Array.</p>
+          <p>The reason that *"with"* is not included in the _unscopableList_ is because it is already a <emu-xref href="#sec-keywords-and-reserved-words">reserved word</emu-xref>.</p>
         </emu-note>
       </emu-clause>
     </emu-clause>
@@ -39591,23 +39778,16 @@ THH:mm:ss.sss
           1. Let _len_ be _obj_.[[ArrayLength]].
           1. NOTE: The following closure performs a numeric comparison rather than the string comparison used in <emu-xref href="#sec-array.prototype.sort"></emu-xref>.
           1. Let _SortCompare_ be a new Abstract Closure with parameters (_x_, _y_) that captures _comparefn_ and performs the following steps when called:
-            1. Assert: _x_ is a Number and _y_ is a Number, or _x_ is a BigInt and _y_ is a BigInt.
-            1. If _comparefn_ is not *undefined*, then
-              1. Let _v_ be ? ToNumber(? Call(_comparefn_, *undefined*, « _x_, _y_ »)).
-              1. If _v_ is *NaN*, return *+0*<sub>𝔽</sub>.
-              1. Return _v_.
-            1. If _x_ and _y_ are both *NaN*, return *+0*<sub>𝔽</sub>.
-            1. If _x_ is *NaN*, return *1*<sub>𝔽</sub>.
-            1. If _y_ is *NaN*, return *-1*<sub>𝔽</sub>.
-            1. If _x_ &lt; _y_, return *-1*<sub>𝔽</sub>.
-            1. If _x_ > _y_, return *1*<sub>𝔽</sub>.
-            1. If _x_ is *-0*<sub>𝔽</sub> and _y_ is *+0*<sub>𝔽</sub>, return *-1*<sub>𝔽</sub>.
-            1. If _x_ is *+0*<sub>𝔽</sub> and _y_ is *-0*<sub>𝔽</sub>, return *1*<sub>𝔽</sub>.
-            1. Return *+0*<sub>𝔽</sub>.
-          1. Return ? SortIndexedProperties(_obj_, _len_, _SortCompare_).
+            1. Return ? CompareTypedArrayElements(_x_, _y_, _comparefn_).
+          1. Let _sortedList_ be ? SortIndexedProperties(_obj_, _len_, _SortCompare_, ~read-through-holes~).
+          1. Let _j_ be 0.
+          1. Repeat, while _j_ &lt; _len_,
+            1. Perform ! Set(_obj_, ! ToString(𝔽(_j_)), _sortedList_[_j_], *true*).
+            1. Set _j_ to _j_ + 1.
+          1. Return _obj_.
         </emu-alg>
         <emu-note>
-          <p>Because *NaN* always compares greater than any other value, *NaN* property values always sort to the end of the result when _comparefn_ is not provided.</p>
+          <p>Because *NaN* always compares greater than any other value (see CompareTypedArrayElements), *NaN* property values always sort to the end of the result when _comparefn_ is not provided.</p>
         </emu-note>
       </emu-clause>
 
@@ -39648,6 +39828,46 @@ THH:mm:ss.sss
         </emu-note>
       </emu-clause>
 
+      <emu-clause id="sec-%typedarray%.prototype.toreversed">
+        <h1>%TypedArray%.prototype.toReversed ( )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be the *this* value.
+          1. Perform ? ValidateTypedArray(_O_).
+          1. Let _length_ be _O_.[[ArrayLength]].
+          1. Let _A_ be ? TypedArrayCreateSameType(_O_, « 𝔽(_length_) »).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _length_,
+            1. Let _from_ be ! ToString(𝔽(_length_ - _k_ - 1)).
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _fromValue_ be ! Get(_O_, _from_).
+            1. Perform ! Set(_A_, _Pk_, _fromValue_, *true*).
+            1. Set _k_ to _k_ + 1.
+          1. Return _A_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-%typedarray%.prototype.tosorted">
+        <h1>%TypedArray%.prototype.toSorted ( _comparefn_ )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. If _comparefn_ is not *undefined* and IsCallable(_comparefn_) is *false*, throw a *TypeError* exception.
+          1. Let _O_ be the *this* value.
+          1. Perform ? ValidateTypedArray(_O_).
+          1. Let _len_ be _O_.[[ArrayLength]].
+          1. Let _A_ be ? TypedArrayCreateSameType(_O_, « 𝔽(_len_) »).
+          1. NOTE: The following closure performs a numeric comparison rather than the string comparison used in <emu-xref href="#sec-array.prototype.tosorted"></emu-xref>.
+          1. Let _SortCompare_ be a new Abstract Closure with parameters (_x_, _y_) that captures _comparefn_ and performs the following steps when called:
+            1. Return ? CompareTypedArrayElements(_x_, _y_, _comparefn_).
+          1. Let _sortedList_ be ? SortIndexedProperties(_O_, _len_, _SortCompare_, ~read-through-holes~).
+          1. Let _j_ be 0.
+          1. Repeat, while _j_ &lt; _len_,
+            1. Perform ! Set(_A_, ! ToString(𝔽(_j_)), _sortedList_[_j_], *true*).
+            1. Set _j_ to _j_ + 1.
+          1. Return _A_.
+        </emu-alg>
+      </emu-clause>
+
       <emu-clause id="sec-%typedarray%.prototype.tostring">
         <h1>%TypedArray%.prototype.toString ( )</h1>
         <p>The initial value of the *"toString"* property is %Array.prototype.toString%, defined in <emu-xref href="#sec-array.prototype.tostring"></emu-xref>.</p>
@@ -39660,6 +39880,31 @@ THH:mm:ss.sss
           1. Let _O_ be the *this* value.
           1. Perform ? ValidateTypedArray(_O_).
           1. Return CreateArrayIterator(_O_, ~value~).
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-%typedarray%.prototype.with">
+        <h1>%TypedArray%.prototype.with ( _index_, _value_ )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be the *this* value.
+          1. Perform ? ValidateTypedArray(_O_).
+          1. Let _len_ be _O_.[[ArrayLength]].
+          1. Let _relativeIndex_ be ? ToIntegerOrInfinity(_index_).
+          1. If _relativeIndex_ ≥ 0, let _actualIndex_ be _relativeIndex_.
+          1. Else, let _actualIndex_ be _len_ + _relativeIndex_.
+          1. If _O_.[[ContentType]] is ~BigInt~, let _numericValue_ be ? ToBigInt(_value_).
+          1. Else, let _numericValue_ be ? ToNumber(_value_).
+          1. If IsValidIntegerIndex(_O_, 𝔽(_actualIndex_)) is *false*, throw a *RangeError* exception.
+          1. Let _A_ be ? TypedArrayCreateSameType(_O_, « 𝔽(_len_) »).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. If _k_ is _actualIndex_, let _fromValue_ be _numericValue_.
+            1. Else, let _fromValue_ be ! Get(_O_, _Pk_).
+            1. Perform ! Set(_A_, _Pk_, _fromValue_, *true*).
+            1. Set _k_ to _k_ + 1.
+          1. Return _A_.
         </emu-alg>
       </emu-clause>
 
@@ -39699,7 +39944,7 @@ THH:mm:ss.sss
           <dd>It is used to specify the creation of a new TypedArray using a constructor function that is derived from _exemplar_. Unlike ArraySpeciesCreate, which can create non-Array objects through the use of @@species, this operation enforces that the constructor function creates an actual TypedArray.</dd>
         </dl>
         <emu-alg>
-          1. Let _defaultConstructor_ be the intrinsic object listed in column one of <emu-xref href="#table-the-typedarray-constructors"></emu-xref> for _exemplar_.[[TypedArrayName]].
+          1. Let _defaultConstructor_ be the intrinsic object associated with the constructor name _exemplar_.[[TypedArrayName]] in <emu-xref href="#table-the-typedarray-constructors"></emu-xref>.
           1. Let _constructor_ be ? SpeciesConstructor(_exemplar_, _defaultConstructor_).
           1. Let _result_ be ? TypedArrayCreate(_constructor_, _argumentList_).
           1. Assert: _result_ has [[TypedArrayName]] and [[ContentType]] internal slots.
@@ -39725,6 +39970,26 @@ THH:mm:ss.sss
           1. If the number of elements in _argumentList_ is 1 and _argumentList_[0] is a Number, then
             1. If _newTypedArray_.[[ArrayLength]] &lt; ℝ(_argumentList_[0]), throw a *TypeError* exception.
           1. Return _newTypedArray_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-typedarray-create-same-type" type="abstract operation">
+        <h1>
+          TypedArrayCreateSameType (
+            _exemplar_: a TypedArray,
+            _argumentList_: a List of ECMAScript language values,
+          ): either a normal completion containing a TypedArray or a throw completion
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It is used to specify the creation of a new TypedArray using a constructor function that is derived from _exemplar_. Unlike TypedArraySpeciesCreate, which can construct custom TypedArray subclasses through the use of @@species, this operation always uses one of the built-in TypedArray constructors.</dd>
+        </dl>
+        <emu-alg>
+          1. Let _constructor_ be the intrinsic object associated with the constructor name _exemplar_.[[TypedArrayName]] in <emu-xref href="#table-the-typedarray-constructors"></emu-xref>.
+          1. Let _result_ be ? TypedArrayCreate(_constructor_, _argumentList_).
+          1. Assert: _result_ has [[TypedArrayName]] and [[ContentType]] internal slots.
+          1. Assert: _result_.[[ContentType]] is _exemplar_.[[ContentType]].
+          1. Return _result_.
         </emu-alg>
       </emu-clause>
 
@@ -39769,6 +40034,36 @@ THH:mm:ss.sss
         <emu-alg>
           1. Return the Element Type value specified in <emu-xref href="#table-the-typedarray-constructors"></emu-xref> for _O_.[[TypedArrayName]].
         </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-comparetypedarrayelements" type="abstract operation">
+        <h1>
+          CompareTypedArrayElements (
+            _x_: a Number or a BigInt,
+            _y_: a Number or a BigInt,
+            _comparefn_: a function object or *undefined*,
+          ): either a normal completion containing a Number or an abrupt completion
+        </h1>
+        <dl class="header">
+        </dl>
+        <emu-alg>
+          1. Assert: _x_ is a Number and _y_ is a Number, or _x_ is a BigInt and _y_ is a BigInt.
+          1. If _comparefn_ is not *undefined*, then
+            1. Let _v_ be ? ToNumber(? Call(_comparefn_, *undefined*, « _x_, _y_ »)).
+            1. If _v_ is *NaN*, return *+0*<sub>𝔽</sub>.
+            1. Return _v_.
+          1. If _x_ and _y_ are both *NaN*, return *+0*<sub>𝔽</sub>.
+          1. If _x_ is *NaN*, return *1*<sub>𝔽</sub>.
+          1. If _y_ is *NaN*, return *-1*<sub>𝔽</sub>.
+          1. If _x_ &lt; _y_, return *-1*<sub>𝔽</sub>.
+          1. If _x_ > _y_, return *1*<sub>𝔽</sub>.
+          1. If _x_ is *-0*<sub>𝔽</sub> and _y_ is *+0*<sub>𝔽</sub>, return *-1*<sub>𝔽</sub>.
+          1. If _x_ is *+0*<sub>𝔽</sub> and _y_ is *-0*<sub>𝔽</sub>, return *1*<sub>𝔽</sub>.
+          1. Return *+0*<sub>𝔽</sub>.
+        </emu-alg>
+        <emu-note>
+          This performs a numeric comparison rather than the string comparison used in <emu-xref href="#sec-comparearrayelements"></emu-xref>.
+        </emu-note>
       </emu-clause>
     </emu-clause>
 
@@ -40673,11 +40968,11 @@ THH:mm:ss.sss
 
   <emu-clause id="sec-weakmap-objects">
     <h1>WeakMap Objects</h1>
-    <p>WeakMaps are collections of key/value pairs where the keys are objects and values may be arbitrary ECMAScript language values. A WeakMap may be queried to see if it contains a key/value pair with a specific key, but no mechanism is provided for enumerating the objects it holds as keys. In certain conditions, objects which are not live are removed as WeakMap keys, as described in <emu-xref href="#sec-weakref-execution"></emu-xref>.</p>
+    <p>WeakMaps are collections of key/value pairs where the keys are objects and/or symbols and values may be arbitrary ECMAScript language values. A WeakMap may be queried to see if it contains a key/value pair with a specific key, but no mechanism is provided for enumerating the values it holds as keys. In certain conditions, values which are not live are removed as WeakMap keys, as described in <emu-xref href="#sec-weakref-execution"></emu-xref>.</p>
     <p>An implementation may impose an arbitrarily determined latency between the time a key/value pair of a WeakMap becomes inaccessible and the time when the key/value pair is removed from the WeakMap. If this latency was observable to ECMAScript program, it would be a source of indeterminacy that could impact program execution. For that reason, an ECMAScript implementation must not provide any means to observe a key of a WeakMap that does not require the observer to present the observed key.</p>
     <p>WeakMaps must be implemented using either hash tables or other mechanisms that, on average, provide access times that are sublinear on the number of key/value pairs in the collection. The data structure used in this specification is only intended to describe the required observable semantics of WeakMaps. It is not intended to be a viable implementation model.</p>
     <emu-note>
-      <p>WeakMap and WeakSets are intended to provide mechanisms for dynamically associating state with an object in a manner that does not “leak” memory resources if, in the absence of the WeakMap or WeakSet, the object otherwise became inaccessible and subject to resource reclamation by the implementation's garbage collection mechanisms. This characteristic can be achieved by using an inverted per-object mapping of weak map instances to keys. Alternatively each weak map may internally store its key to value mappings but this approach requires coordination between the WeakMap or WeakSet implementation and the garbage collector. The following references describe mechanism that may be useful to implementations of WeakMap and WeakSets:</p>
+      <p>WeakMap and WeakSet are intended to provide mechanisms for dynamically associating state with an object or symbol in a manner that does not “leak” memory resources if, in the absence of the WeakMap or WeakSet instance, the object or symbol otherwise became inaccessible and subject to resource reclamation by the implementation's garbage collection mechanisms. This characteristic can be achieved by using an inverted per-object/symbol mapping of WeakMap or WeakSet instances to keys. Alternatively, each WeakMap or WeakSet instance may internally store its key and value data, but this approach requires coordination between the WeakMap or WeakSet implementation and the garbage collector. The following references describe mechanism that may be useful to implementations of WeakMap and WeakSet:</p>
       <p>Barry Hayes. 1997. Ephemerons: a new finalization mechanism. In <i>Proceedings of the 12th ACM SIGPLAN conference on Object-oriented programming, systems, languages, and applications (OOPSLA '97)</i>, A. Michael Berman (Ed.). ACM, New York, NY, USA, 176-183, <a href="http://doi.acm.org/10.1145/263698.263733">http://doi.acm.org/10.1145/263698.263733</a>.</p>
       <p>Alexandra Barros, Roberto Ierusalimschy, Eliminating Cycles in Weak Tables. Journal of Universal Computer Science - J.UCS, vol. 14, no. 21, pp. 3481-3497, 2008, <a href="http://www.jucs.org/jucs_14_21/eliminating_cycles_in_weak">http://www.jucs.org/jucs_14_21/eliminating_cycles_in_weak</a></p>
     </emu-note>
@@ -40747,7 +41042,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _M_ be the *this* value.
           1. Perform ? RequireInternalSlot(_M_, [[WeakMapData]]).
-          1. If _key_ is not an Object, return *false*.
+          1. If CanBeHeldWeakly(_key_) is *false*, return *false*.
           1. For each Record { [[Key]], [[Value]] } _p_ of _M_.[[WeakMapData]], do
             1. If _p_.[[Key]] is not ~empty~ and SameValue(_p_.[[Key]], _key_) is *true*, then
               1. Set _p_.[[Key]] to ~empty~.
@@ -40766,7 +41061,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _M_ be the *this* value.
           1. Perform ? RequireInternalSlot(_M_, [[WeakMapData]]).
-          1. If _key_ is not an Object, return *undefined*.
+          1. If CanBeHeldWeakly(_key_) is *false*, return *undefined*.
           1. For each Record { [[Key]], [[Value]] } _p_ of _M_.[[WeakMapData]], do
             1. If _p_.[[Key]] is not ~empty~ and SameValue(_p_.[[Key]], _key_) is *true*, return _p_.[[Value]].
           1. Return *undefined*.
@@ -40779,7 +41074,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _M_ be the *this* value.
           1. Perform ? RequireInternalSlot(_M_, [[WeakMapData]]).
-          1. If _key_ is not an Object, return *false*.
+          1. If CanBeHeldWeakly(_key_) is *false*, return *false*.
           1. For each Record { [[Key]], [[Value]] } _p_ of _M_.[[WeakMapData]], do
             1. If _p_.[[Key]] is not ~empty~ and SameValue(_p_.[[Key]], _key_) is *true*, return *true*.
           1. Return *false*.
@@ -40792,7 +41087,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _M_ be the *this* value.
           1. Perform ? RequireInternalSlot(_M_, [[WeakMapData]]).
-          1. If _key_ is not an Object, throw a *TypeError* exception.
+          1. If CanBeHeldWeakly(_key_) is *false*, throw a *TypeError* exception.
           1. For each Record { [[Key]], [[Value]] } _p_ of _M_.[[WeakMapData]], do
             1. If _p_.[[Key]] is not ~empty~ and SameValue(_p_.[[Key]], _key_) is *true*, then
               1. Set _p_.[[Value]] to _value_.
@@ -40818,8 +41113,8 @@ THH:mm:ss.sss
 
   <emu-clause id="sec-weakset-objects">
     <h1>WeakSet Objects</h1>
-    <p>WeakSets are collections of objects. A distinct object may only occur once as an element of a WeakSet's collection. A WeakSet may be queried to see if it contains a specific object, but no mechanism is provided for enumerating the objects it holds. In certain conditions, objects which are not live are removed as WeakSet elements, as described in <emu-xref href="#sec-weakref-execution"></emu-xref>.</p>
-    <p>An implementation may impose an arbitrarily determined latency between the time an object contained in a WeakSet becomes inaccessible and the time when the object is removed from the WeakSet. If this latency was observable to ECMAScript program, it would be a source of indeterminacy that could impact program execution. For that reason, an ECMAScript implementation must not provide any means to determine if a WeakSet contains a particular object that does not require the observer to present the observed object.</p>
+    <p>WeakSets are collections of objects and/or symbols. A distinct object or symbol may only occur once as an element of a WeakSet's collection. A WeakSet may be queried to see if it contains a specific value, but no mechanism is provided for enumerating the values it holds. In certain conditions, values which are not live are removed as WeakSet elements, as described in <emu-xref href="#sec-weakref-execution"></emu-xref>.</p>
+    <p>An implementation may impose an arbitrarily determined latency between the time a value contained in a WeakSet becomes inaccessible and the time when the value is removed from the WeakSet. If this latency was observable to ECMAScript program, it would be a source of indeterminacy that could impact program execution. For that reason, an ECMAScript implementation must not provide any means to determine if a WeakSet contains a particular value that does not require the observer to present the observed value.</p>
     <p>WeakSets must be implemented using either hash tables or other mechanisms that, on average, provide access times that are sublinear on the number of elements in the collection. The data structure used in this specification is only intended to describe the required observable semantics of WeakSets. It is not intended to be a viable implementation model.</p>
     <emu-note>
       <p>See the NOTE in <emu-xref href="#sec-weakmap-objects"></emu-xref>.</p>
@@ -40888,7 +41183,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _S_ be the *this* value.
           1. Perform ? RequireInternalSlot(_S_, [[WeakSetData]]).
-          1. If _value_ is not an Object, throw a *TypeError* exception.
+          1. If CanBeHeldWeakly(_value_) is *false*, throw a *TypeError* exception.
           1. For each element _e_ of _S_.[[WeakSetData]], do
             1. If _e_ is not ~empty~ and SameValue(_e_, _value_) is *true*, then
               1. Return _S_.
@@ -40908,7 +41203,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _S_ be the *this* value.
           1. Perform ? RequireInternalSlot(_S_, [[WeakSetData]]).
-          1. If _value_ is not an Object, return *false*.
+          1. If CanBeHeldWeakly(_value_) is *false*, return *false*.
           1. For each element _e_ of _S_.[[WeakSetData]], do
             1. If _e_ is not ~empty~ and SameValue(_e_, _value_) is *true*, then
               1. Replace the element of _S_.[[WeakSetData]] whose value is _e_ with an element whose value is ~empty~.
@@ -40926,7 +41221,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _S_ be the *this* value.
           1. Perform ? RequireInternalSlot(_S_, [[WeakSetData]]).
-          1. If _value_ is not an Object, return *false*.
+          1. If CanBeHeldWeakly(_value_) is *false*, return *false*.
           1. For each element _e_ of _S_.[[WeakSetData]], do
             1. If _e_ is not ~empty~ and SameValue(_e_, _value_) is *true*, return *true*.
           1. Return *false*.
@@ -43006,7 +43301,7 @@ THH:mm:ss.sss
 
   <emu-clause id="sec-weak-ref-objects">
     <h1>WeakRef Objects</h1>
-    <p>A WeakRef is an object that is used to refer to a target object without preserving it from garbage collection. WeakRefs can be dereferenced to allow access to the target object, if the target object hasn't been reclaimed by garbage collection.</p>
+    <p>A WeakRef is an object that is used to refer to a target object or symbol without preserving it from garbage collection. WeakRefs can be dereferenced to allow access to the target value, if the target hasn't been reclaimed by garbage collection.</p>
 
     <emu-clause id="sec-weak-ref-constructor">
       <h1>The WeakRef Constructor</h1>
@@ -43032,7 +43327,7 @@ THH:mm:ss.sss
         <p>This function performs the following steps when called:</p>
         <emu-alg>
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
-          1. If _target_ is not an Object, throw a *TypeError* exception.
+          1. If CanBeHeldWeakly(_target_) is *false*, throw a *TypeError* exception.
           1. Let _weakRef_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakRef.prototype%"*, « [[WeakRefTarget]] »).
           1. Perform AddToKeptObjects(_target_).
           1. Set _weakRef_.[[WeakRefTarget]] to _target_.
@@ -43088,7 +43383,7 @@ THH:mm:ss.sss
         </emu-alg>
 
         <emu-note>
-          <p>If the WeakRef returns a _target_ Object that is not *undefined*, then this _target_ object should not be garbage collected until the current execution of ECMAScript code has completed. The AddToKeptObjects operation makes sure read consistency is maintained.</p>
+          <p>If the WeakRef returns a _target_ value that is not *undefined*, then this _target_ value should not be garbage collected until the current execution of ECMAScript code has completed. The AddToKeptObjects operation makes sure read consistency is maintained.</p>
 
           <pre><code class="javascript">
             let target = { foo() {} };
@@ -43144,7 +43439,7 @@ THH:mm:ss.sss
 
   <emu-clause id="sec-finalization-registry-objects">
     <h1>FinalizationRegistry Objects</h1>
-    <p>A FinalizationRegistry is an object that manages registration and unregistration of cleanup operations that are performed when target objects are garbage collected.</p>
+    <p>A FinalizationRegistry is an object that manages registration and unregistration of cleanup operations that are performed when target objects and symbols are garbage collected.</p>
 
     <emu-clause id="sec-finalization-registry-constructor">
       <h1>The FinalizationRegistry Constructor</h1>
@@ -43223,9 +43518,9 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _finalizationRegistry_ be the *this* value.
           1. Perform ? RequireInternalSlot(_finalizationRegistry_, [[Cells]]).
-          1. If _target_ is not an Object, throw a *TypeError* exception.
+          1. If CanBeHeldWeakly(_target_) is *false*, throw a *TypeError* exception.
           1. If SameValue(_target_, _heldValue_) is *true*, throw a *TypeError* exception.
-          1. If _unregisterToken_ is not an Object, then
+          1. If CanBeHeldWeakly(_unregisterToken_) is *false*, then
             1. If _unregisterToken_ is not *undefined*, throw a *TypeError* exception.
             1. Set _unregisterToken_ to ~empty~.
           1. Let _cell_ be the Record { [[WeakRefTarget]]: _target_, [[HeldValue]]: _heldValue_, [[UnregisterToken]]: _unregisterToken_ }.
@@ -43244,7 +43539,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _finalizationRegistry_ be the *this* value.
           1. Perform ? RequireInternalSlot(_finalizationRegistry_, [[Cells]]).
-          1. If _unregisterToken_ is not an Object, throw a *TypeError* exception.
+          1. If CanBeHeldWeakly(_unregisterToken_) is *false*, throw a *TypeError* exception.
           1. Let _removed_ be *false*.
           1. For each Record { [[WeakRefTarget]], [[HeldValue]], [[UnregisterToken]] } _cell_ of _finalizationRegistry_.[[Cells]], do
             1. If _cell_.[[UnregisterToken]] is not ~empty~ and SameValue(_cell_.[[UnregisterToken]], _unregisterToken_) is *true*, then
@@ -45179,7 +45474,7 @@ THH:mm:ss.sss
             1. Assert: If we return here, the generator either threw an exception or performed either an implicit or explicit return.
             1. Remove _acGenContext_ from the execution context stack and restore the execution context that is at the top of the execution context stack as the running execution context.
             1. Set _acGenerator_.[[GeneratorState]] to ~completed~.
-            1. Once a generator enters the ~completed~ state it never leaves it and its associated execution context is never resumed. Any execution state associated with _acGenerator_ can be discarded at this point.
+            1. NOTE: Once a generator enters the ~completed~ state it never leaves it and its associated execution context is never resumed. Any execution state associated with _acGenerator_ can be discarded at this point.
             1. If _result_.[[Type]] is ~normal~, let _resultValue_ be *undefined*.
             1. Else if _result_.[[Type]] is ~return~, let _resultValue_ be _result_.[[Value]].
             1. Else,
@@ -45252,7 +45547,7 @@ THH:mm:ss.sss
           1. Let _state_ be ? GeneratorValidate(_generator_, _generatorBrand_).
           1. If _state_ is ~suspendedStart~, then
             1. Set _generator_.[[GeneratorState]] to ~completed~.
-            1. Once a generator enters the ~completed~ state it never leaves it and its associated execution context is never resumed. Any execution state associated with _generator_ can be discarded at this point.
+            1. NOTE: Once a generator enters the ~completed~ state it never leaves it and its associated execution context is never resumed. Any execution state associated with _generator_ can be discarded at this point.
             1. Set _state_ to ~completed~.
           1. If _state_ is ~completed~, then
             1. If _abruptCompletion_.[[Type]] is ~return~, then
@@ -47675,16 +47970,16 @@ THH:mm:ss.sss
         <p>It performs the following steps when called:</p>
         <emu-alg>
           1. Set _string_ to ? ToString(_string_).
-          1. Let _length_ be the length of _string_.
+          1. Let _len_ be the length of _string_.
           1. Let _R_ be the empty String.
           1. Let _unescapedSet_ be the string-concatenation of the ASCII word characters and *"@\*+-./"*.
           1. Let _k_ be 0.
-          1. Repeat, while _k_ &lt; _length_,
-            1. Let _char_ be the code unit at index _k_ within _string_.
-            1. If _unescapedSet_ contains _char_, then
-              1. Let _S_ be the String value containing the single code unit _char_.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _C_ be the code unit at index _k_ within _string_.
+            1. If _unescapedSet_ contains _C_, then
+              1. Let _S_ be _C_.
             1. Else,
-              1. Let _n_ be the numeric value of _char_.
+              1. Let _n_ be the numeric value of _C_.
               1. If _n_ &lt; 256, then
                 1. Let _hex_ be the String representation of _n_, formatted as an uppercase hexadecimal number.
                 1. Let _S_ be the string-concatenation of *"%"* and ! StringPad(_hex_, *2*<sub>𝔽</sub>, *"0"*, ~start~).
@@ -47707,26 +48002,26 @@ THH:mm:ss.sss
         <p>It performs the following steps when called:</p>
         <emu-alg>
           1. Set _string_ to ? ToString(_string_).
-          1. Let _length_ be the length of _string_.
+          1. Let _len_ be the length of _string_.
           1. Let _R_ be the empty String.
           1. Let _k_ be 0.
-          1. Repeat, while _k_ ≠ _length_,
-            1. Let _c_ be the code unit at index _k_ within _string_.
-            1. If _c_ is the code unit 0x0025 (PERCENT SIGN), then
-              1. Let _hexEscape_ be the empty String.
-              1. Let _skip_ be 0.
-              1. If _k_ ≤ _length_ - 6 and the code unit at index _k_ + 1 within _string_ is the code unit 0x0075 (LATIN SMALL LETTER U), then
-                1. Set _hexEscape_ to the substring of _string_ from _k_ + 2 to _k_ + 6.
-                1. Set _skip_ to 5.
-              1. Else if _k_ ≤ _length_ - 3, then
-                1. Set _hexEscape_ to the substring of _string_ from _k_ + 1 to _k_ + 3.
-                1. Set _skip_ to 2.
-              1. If _hexEscape_ can be interpreted as an expansion of |HexDigits[~Sep]|, then
-                1. Let _hexIntegerLiteral_ be the string-concatenation of *"0x"* and _hexEscape_.
-                1. Let _n_ be ! ToNumber(_hexIntegerLiteral_).
-                1. Set _c_ to the code unit whose value is ℝ(_n_).
-                1. Set _k_ to _k_ + _skip_.
-            1. Set _R_ to the string-concatenation of _R_ and _c_.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _C_ be the code unit at index _k_ within _string_.
+            1. If _C_ is the code unit 0x0025 (PERCENT SIGN), then
+              1. Let _hexDigits_ be the empty String.
+              1. Let _optionalAdvance_ be 0.
+              1. If _k_ + 5 &lt; _len_ and the code unit at index _k_ + 1 within _string_ is the code unit 0x0075 (LATIN SMALL LETTER U), then
+                1. Set _hexDigits_ to the substring of _string_ from _k_ + 2 to _k_ + 6.
+                1. Set _optionalAdvance_ to 5.
+              1. Else if _k_ + 3 ≤ _len_, then
+                1. Set _hexDigits_ to the substring of _string_ from _k_ + 1 to _k_ + 3.
+                1. Set _optionalAdvance_ to 2.
+              1. Let _parseResult_ be ParseText(StringToCodePoints(_hexDigits_), |HexDigits[~Sep]|).
+              1. If _parseResult_ is a Parse Node, then
+                1. Let _n_ be the MV of _parseResult_.
+                1. Set _C_ to the code unit whose numeric value is _n_.
+                1. Set _k_ to _k_ + _optionalAdvance_.
+            1. Set _R_ to the string-concatenation of _R_ and _C_.
             1. Set _k_ to _k_ + 1.
           1. Return _R_.
         </emu-alg>
