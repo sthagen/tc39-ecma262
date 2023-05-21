@@ -4507,6 +4507,7 @@
         <dl class="header">
         </dl>
         <emu-alg>
+          1. If _size_ > 2<sup>53</sup> - 1, throw a *RangeError* exception.
           1. Let _db_ be a new Data Block value consisting of _size_ bytes. If it is impossible to create such a Data Block, throw a *RangeError* exception.
           1. Set all of the bytes of _db_ to 0.
           1. Return _db_.
@@ -6802,7 +6803,7 @@
               [[NextMethod]]
             </td>
             <td>
-              a function object
+              an ECMAScript language value
             </td>
             <td>
               The `next` method of the [[Iterator]] object.
@@ -11468,6 +11469,17 @@
         </tr>
         <tr>
           <td>
+            [[AgentSignifier]]
+          </td>
+          <td>
+            an agent signifier
+          </td>
+          <td>
+            The agent that owns this realm
+          </td>
+        </tr>
+        <tr>
+          <td>
             [[Intrinsics]]
           </td>
           <td>
@@ -11546,6 +11558,7 @@
       <emu-alg>
         1. Let _realmRec_ be a new Realm Record.
         1. Perform CreateIntrinsics(_realmRec_).
+        1. Set _realmRec_.[[AgentSignifier]] to AgentSignifier().
         1. Set _realmRec_.[[GlobalObject]] to *undefined*.
         1. Set _realmRec_.[[GlobalEnv]] to *undefined*.
         1. Set _realmRec_.[[TemplateMap]] to a new empty List.
@@ -12003,11 +12016,11 @@
     <h1>Agents</h1>
 
     <p>An <dfn id="agent" variants="agents">agent</dfn> comprises a set of ECMAScript execution contexts, an execution context stack, a running execution context, an <dfn id="agent-record" variants="Agent Records">Agent Record</dfn>, and an <dfn id="executing-thread" variants="executing threads">executing thread</dfn>. Except for the executing thread, the constituents of an agent belong exclusively to that agent.</p>
-    <p>An agent's executing thread executes a job on the agent's execution contexts independently of other agents, except that an executing thread may be used as the executing thread by multiple agents, provided none of the agents sharing the thread have an Agent Record whose [[CanBlock]] field is *true*.</p>
+    <p>An agent's executing thread executes algorithmic steps on the agent's execution contexts independently of other agents, except that an executing thread may be used as the executing thread by multiple agents, provided none of the agents sharing the thread have an Agent Record whose [[CanBlock]] field is *true*.</p>
     <emu-note>
       <p>Some web browsers share a single executing thread across multiple unrelated tabs of a browser window, for example.</p>
     </emu-note>
-    <p>While an agent's executing thread executes jobs, the agent is the <dfn id="surrounding-agent" variants="surrounding agents">surrounding agent</dfn> for the code in those jobs. The code uses the surrounding agent to access the specification-level execution objects held within the agent: the running execution context, the execution context stack, and the Agent Record's fields.</p>
+    <p>While an agent's executing thread is executing algorithmic steps, the agent is the <dfn id="surrounding-agent" variants="surrounding agents">surrounding agent</dfn> for those steps. The steps use the surrounding agent to access the specification-level execution objects held within the agent: the running execution context, the execution context stack, and the Agent Record's fields.</p>
     <p>An <dfn variants="agent signifiers">agent signifier</dfn> is a globally-unique opaque value used to identify an Agent.</p>
     <emu-table id="table-agent-record" caption="Agent Record Fields">
       <table>
@@ -34033,6 +34046,16 @@ THH:mm:ss.sss
         </emu-note>
       </emu-clause>
 
+      <emu-clause id="sec-string.prototype.iswellformed">
+        <h1>String.prototype.isWellFormed ( )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _S_ be ? ToString(_O_).
+          1. Return IsStringWellFormedUnicode(_S_).
+        </emu-alg>
+      </emu-clause>
+
       <emu-clause id="sec-string.prototype.lastindexof">
         <h1>String.prototype.lastIndexOf ( _searchString_ [ , _position_ ] )</h1>
         <emu-note>
@@ -34604,6 +34627,27 @@ THH:mm:ss.sss
         <emu-note>
           <p>This method is intentionally generic; it does not require that its *this* value be a String object. Therefore, it can be transferred to other kinds of objects for use as a method.</p>
         </emu-note>
+      </emu-clause>
+
+      <emu-clause id="sec-string.prototype.towellformed">
+        <h1>String.prototype.toWellFormed ( )</h1>
+        <p>This method returns a String representation of this object with all leading surrogates and trailing surrogates that are not part of a surrogate pair replaced with U+FFFD (REPLACEMENT CHARACTER).</p>
+        <p>It performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _S_ be ? ToString(_O_).
+          1. Let _strLen_ be the length of _S_.
+          1. Let _k_ be 0.
+          1. Let _result_ be the empty String.
+          1. Repeat, while _k_ &lt; _strLen_,
+            1. Let _cp_ be CodePointAt(_S_, _k_).
+            1. If _cp_.[[IsUnpairedSurrogate]] is *true*, then
+              1. Set _result_ to the string-concatenation of _result_ and 0xFFFD (REPLACEMENT CHARACTER).
+            1. Else,
+              1. Set _result_ to the string-concatenation of _result_ and UTF16EncodeCodePoint(_cp_.[[CodePoint]]).
+            1. Set _k_ to _k_ + _cp_.[[CodeUnitCount]].
+          1. Return _result_.
+        </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-string.prototype.trim">
