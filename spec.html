@@ -3110,7 +3110,7 @@
             If _P_ is described as a non-configurable, non-writable own data property, all future calls to [[GetOwnProperty]] ( _P_ ) must return Property Descriptor whose [[Value]] is SameValue as _P_'s [[Value]] attribute.
           </li>
           <li>
-            If _P_'s attributes other than [[Writable]] may change over time or if the property might be deleted, then _P_'s [[Configurable]] attribute must be *true*.
+            If _P_'s attributes other than [[Writable]] and [[Value]] may change over time, or if the property might be deleted, then _P_'s [[Configurable]] attribute must be *true*.
           </li>
           <li>
             If the [[Writable]] attribute may change from *false* to *true*, then the [[Configurable]] attribute must be *true*.
@@ -20911,7 +20911,7 @@
           1. Let _P_ be StringValue of |IdentifierReference|.
           1. Let _lref_ be ? ResolveBinding(_P_).
           1. Let _v_ be ? GetV(_value_, _P_).
-          1. If |Initializer?| is present and _v_ is *undefined*, then
+          1. If |Initializer| is present and _v_ is *undefined*, then
             1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
               1. Set _v_ to ? NamedEvaluation of |Initializer| with argument _P_.
             1. Else,
@@ -24785,7 +24785,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _name_ be ? Evaluation of |ClassElementName|.
-        1. If |Initializer?| is present, then
+        1. If |Initializer| is present, then
           1. Let _formalParameterList_ be an instance of the production <emu-grammar>FormalParameters : [empty]</emu-grammar>.
           1. Let _env_ be the LexicalEnvironment of the running execution context.
           1. Let _privateEnv_ be the running execution context's PrivateEnvironment.
@@ -24816,7 +24816,7 @@
         1. Let _privateEnv_ be the running execution context's PrivateEnvironment.
         1. Let _sourceText_ be the empty sequence of Unicode code points.
         1. Let _formalParameters_ be an instance of the production <emu-grammar>FormalParameters : [empty]</emu-grammar>.
-        1. Let _bodyFunction_ be OrdinaryFunctionCreate(%Function.prototype%, _sourceText_, _formalParameters_, |ClassStaticBlockBody|, ~non-lexical-this~, _lex_, _privateEnv_).
+        1. [id="step-synthetic-class-static-block-fn"] Let _bodyFunction_ be OrdinaryFunctionCreate(%Function.prototype%, _sourceText_, _formalParameters_, |ClassStaticBlockBody|, ~non-lexical-this~, _lex_, _privateEnv_).
         1. Perform MakeMethod(_bodyFunction_, _homeObject_).
         1. Return the ClassStaticBlockDefinition Record { [[BodyFunction]]: _bodyFunction_ }.
       </emu-alg>
@@ -24833,7 +24833,8 @@
       </dl>
       <emu-grammar>ClassStaticBlockBody : ClassStaticBlockStatementList</emu-grammar>
       <emu-alg>
-        1. Perform ? FunctionDeclarationInstantiation(_functionObject_, « »).
+        1. Assert: _functionObject_ is a synthetic function created by ClassStaticBlockDefinitionEvaluation step <emu-xref href="#step-synthetic-class-static-block-fn"></emu-xref>.
+        1. Perform ! FunctionDeclarationInstantiation(_functionObject_, « »).
         1. Return ? Evaluation of |ClassStaticBlockStatementList|.
       </emu-alg>
     </emu-clause>
@@ -24900,14 +24901,14 @@
           1. Perform ! _classEnv_.CreateImmutableBinding(_classBinding_, *true*).
         1. Let _outerPrivateEnvironment_ be the running execution context's PrivateEnvironment.
         1. Let _classPrivateEnvironment_ be NewPrivateEnvironment(_outerPrivateEnvironment_).
-        1. If |ClassBody?| is present, then
-          1. For each String _dn_ of the PrivateBoundIdentifiers of |ClassBody?|, do
+        1. If |ClassBody| is present, then
+          1. For each String _dn_ of the PrivateBoundIdentifiers of |ClassBody|, do
             1. If _classPrivateEnvironment_.[[Names]] contains a Private Name _pn_ such that _pn_.[[Description]] is _dn_, then
               1. Assert: This is only possible for getter/setter pairs.
             1. Else,
               1. Let _name_ be a new Private Name whose [[Description]] is _dn_.
               1. Append _name_ to _classPrivateEnvironment_.[[Names]].
-        1. If |ClassHeritage?| is not present, then
+        1. If |ClassHeritage| is not present, then
           1. Let _protoParent_ be %Object.prototype%.
           1. Let _constructorParent_ be %Function.prototype%.
         1. Else,
@@ -24926,7 +24927,7 @@
             1. If _protoParent_ is not an Object and _protoParent_ is not *null*, throw a *TypeError* exception.
             1. Let _constructorParent_ be _superclass_.
         1. Let _proto_ be OrdinaryObjectCreate(_protoParent_).
-        1. If |ClassBody?| is not present, let _constructor_ be ~empty~.
+        1. If |ClassBody| is not present, let _constructor_ be ~empty~.
         1. Else, let _constructor_ be ConstructorMethod of |ClassBody|.
         1. Set the running execution context's LexicalEnvironment to _classEnv_.
         1. Set the running execution context's PrivateEnvironment to _classPrivateEnvironment_.
@@ -24952,9 +24953,9 @@
           1. Perform MakeClassConstructor(_F_).
           1. Perform SetFunctionName(_F_, _className_).
         1. Perform MakeConstructor(_F_, *false*, _proto_).
-        1. If |ClassHeritage?| is present, set _F_.[[ConstructorKind]] to ~derived~.
+        1. If |ClassHeritage| is present, set _F_.[[ConstructorKind]] to ~derived~.
         1. Perform CreateMethodProperty(_proto_, *"constructor"*, _F_).
-        1. If |ClassBody?| is not present, let _elements_ be a new empty List.
+        1. If |ClassBody| is not present, let _elements_ be a new empty List.
         1. Else, let _elements_ be NonConstructorElements of |ClassBody|.
         1. Let _instancePrivateMethods_ be a new empty List.
         1. Let _staticPrivateMethods_ be a new empty List.
@@ -28936,7 +28937,7 @@
           1. If _x_ is not a String, return _x_.
           1. Let _evalRealm_ be the current Realm Record.
           1. NOTE: In the case of a direct eval, _evalRealm_ is the realm of both the caller of `eval` and of the `eval` function itself.
-          1. Perform ? HostEnsureCanCompileStrings(_evalRealm_).
+          1. Perform ? HostEnsureCanCompileStrings(_evalRealm_, « », _x_, _direct_).
           1. Let _inFunction_ be *false*.
           1. Let _inMethod_ be *false*.
           1. Let _inDerivedConstructor_ be *false*.
@@ -28999,12 +29000,19 @@
         <h1>
           HostEnsureCanCompileStrings (
             _calleeRealm_: a Realm Record,
+            _parameterStrings_: a List of Strings,
+            _bodyString_: a String,
+            _direct_: a Boolean,
           ): either a normal completion containing ~unused~ or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
           <dd>It allows host environments to block certain ECMAScript functions which allow developers to interpret and evaluate strings as ECMAScript code.</dd>
         </dl>
+        <p>
+          _parameterStrings_ represents the strings that, when using one of the function constructors, will be concatenated together to build the parameters list. _bodyString_ represents the function body or the string passed to an `eval` call.
+          _direct_ signifies whether the evaluation is a direct eval.
+        </p>
         <p>The default implementation of HostEnsureCanCompileStrings is to return NormalCompletion(~unused~).</p>
       </emu-clause>
 
@@ -30209,8 +30217,6 @@
             <dd>_constructor_ is the constructor function that is performing this action. _newTarget_ is the constructor that `new` was initially applied to. _parameterArgs_ and _bodyArg_ reflect the argument values that were passed to _constructor_.</dd>
           </dl>
           <emu-alg>
-            1. Let _currentRealm_ be the current Realm Record.
-            1. Perform ? HostEnsureCanCompileStrings(_currentRealm_).
             1. If _newTarget_ is *undefined*, set _newTarget_ to _constructor_.
             1. If _kind_ is ~normal~, then
               1. Let _prefix_ be *"function"*.
@@ -30238,22 +30244,26 @@
               1. Let _parameterSym_ be the grammar symbol |FormalParameters[+Yield, +Await]|.
               1. Let _fallbackProto_ be *"%AsyncGeneratorFunction.prototype%"*.
             1. Let _argCount_ be the number of elements in _parameterArgs_.
+            1. Let _bodyString_ be ? ToString(_bodyArg_).
+            1. Let _parameterStrings_ be a new empty List.
+            1. For each element _arg_ of _parameterArgs_, do
+              1. Append ? ToString(_arg_) to _parameterStrings_.
+            1. Let _currentRealm_ be the current Realm Record.
+            1. Perform ? HostEnsureCanCompileStrings(_currentRealm_, _parameterStrings_, _bodyString_, *false*).
             1. Let _P_ be the empty String.
             1. If _argCount_ > 0, then
-              1. Let _firstArg_ be _parameterArgs_[0].
-              1. Set _P_ to ? ToString(_firstArg_).
+              1. Set _P_ to _parameterStrings_[0].
               1. Let _k_ be 1.
               1. Repeat, while _k_ &lt; _argCount_,
-                1. Let _nextArg_ be _parameterArgs_[_k_].
-                1. Let _nextArgString_ be ? ToString(_nextArg_).
+                1. Let _nextArgString_ be _parameterStrings_[_k_].
                 1. Set _P_ to the string-concatenation of _P_, *","* (a comma), and _nextArgString_.
                 1. Set _k_ to _k_ + 1.
-            1. Let _bodyString_ be the string-concatenation of 0x000A (LINE FEED), ? ToString(_bodyArg_), and 0x000A (LINE FEED).
-            1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyString_, and *"}"*.
+            1. Let _bodyParseString_ be the string-concatenation of 0x000A (LINE FEED), _bodyString_, and 0x000A (LINE FEED).
+            1. Let _sourceString_ be the string-concatenation of _prefix_, *" anonymous("*, _P_, 0x000A (LINE FEED), *") {"*, _bodyParseString_, and *"}"*.
             1. Let _sourceText_ be StringToCodePoints(_sourceString_).
             1. Let _parameters_ be ParseText(StringToCodePoints(_P_), _parameterSym_).
             1. If _parameters_ is a List of errors, throw a *SyntaxError* exception.
-            1. Let _body_ be ParseText(StringToCodePoints(_bodyString_), _bodySym_).
+            1. Let _body_ be ParseText(StringToCodePoints(_bodyParseString_), _bodySym_).
             1. If _body_ is a List of errors, throw a *SyntaxError* exception.
             1. NOTE: The parameters and body are parsed separately to ensure that each is valid alone. For example, `new Function("/*", "*/ ) {")` does not evaluate to a function.
             1. NOTE: If this step is reached, _sourceText_ must have the syntax of _exprSym_ (although the reverse implication does not hold). The purpose of the next two steps is to enforce any Early Error rules which apply to _exprSym_ directly.
@@ -49699,6 +49709,15 @@ THH:mm:ss.sss
       <p>The syntax and semantics of <emu-xref href="#sec-comments"></emu-xref> is extended as follows except that this extension is not allowed when parsing source text using the goal symbol |Module|:</p>
       <h2>Syntax</h2>
       <emu-grammar type="definition">
+        InputElementHashbangOrRegExp ::
+          WhiteSpace
+          LineTerminator
+          Comment
+          CommonToken
+          HashbangComment
+          RegularExpressionLiteral
+          HTMLCloseComment
+
         Comment ::
           MultiLineComment
           SingleLineComment
