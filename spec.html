@@ -42,7 +42,7 @@
   }
 </style>
 <pre class="metadata">
-  title: ECMAScript&reg; 2024 Language&nbsp;Specification
+  title: ECMAScript&reg; 2025 Language&nbsp;Specification
   shortname: ECMA-262
   status: draft
   location: https://tc39.es/ecma262/
@@ -82,7 +82,7 @@
 
 <emu-intro id="sec-intro">
   <h1>Introduction</h1>
-  <p>This Ecma Standard defines the ECMAScript 2024 Language. It is the fifteenth edition of the ECMAScript Language Specification. Since publication of the first edition in 1997, ECMAScript has grown to be one of the world's most widely used general-purpose programming languages. It is best known as the language embedded in web browsers but has also been widely adopted for server and embedded applications.</p>
+  <p>This Ecma Standard defines the ECMAScript 2025 Language. It is the sixteenth edition of the ECMAScript Language Specification. Since publication of the first edition in 1997, ECMAScript has grown to be one of the world's most widely used general-purpose programming languages. It is best known as the language embedded in web browsers but has also been widely adopted for server and embedded applications.</p>
   <p>ECMAScript is based on several originating technologies, the most well-known being JavaScript (Netscape) and JScript (Microsoft). The language was invented by Brendan Eich at Netscape and first appeared in that company's Navigator 2.0 browser. It has appeared in all subsequent browsers from Netscape and in all browsers from Microsoft starting with Internet Explorer 3.0.</p>
   <p>The development of the ECMAScript Language Specification started in November 1996. The first edition of this Ecma Standard was adopted by the Ecma General Assembly of June 1997.</p>
   <p>That Ecma Standard was submitted to ISO/IEC JTC 1 for adoption under the fast-track procedure, and approved as international standard ISO/IEC 16262, in April 1998. The Ecma General Assembly of June 1998 approved the second edition of ECMA-262 to keep it fully aligned with ISO/IEC 16262. Changes between the first and the second edition are editorial in nature.</p>
@@ -99,6 +99,7 @@
   <p>ECMAScript 2021, the 12<sup>th</sup> edition, introduced the `replaceAll` method for Strings; `Promise.any`, a Promise combinator that short-circuits when an input value is fulfilled; `AggregateError`, a new Error type to represent multiple errors at once; logical assignment operators (`??=`, `&&=`, `||=`); `WeakRef`, for referring to a target object without preserving it from garbage collection, and `FinalizationRegistry`, to manage registration and unregistration of cleanup operations performed when target objects are garbage collected; separators for numeric literals (`1_000`); and `Array.prototype.sort` was made more precise, reducing the amount of cases that result in an implementation-defined sort order.</p>
   <p>ECMAScript 2022, the 13<sup>th</sup> edition, introduced top-level `await`, allowing the keyword to be used at the top level of modules; new class elements: public and private instance fields, public and private static fields, private instance methods and accessors, and private static methods and accessors; static blocks inside classes, to perform per-class evaluation initialization; the `#x in obj` syntax, to test for presence of private fields on objects; regular expression match indices via the `/d` flag, which provides start and end indices for matched substrings; the `cause` property on `Error` objects, which can be used to record a causation chain in errors; the `at` method for Strings, Arrays, and TypedArrays, which allows relative indexing; and `Object.hasOwn`, a convenient alternative to `Object.prototype.hasOwnProperty`.</p>
   <p>ECMAScript 2023, the 14<sup>th</sup> edition, introduced the `toSorted`, `toReversed`, `with`, `findLast`, and `findLastIndex` methods on `Array.prototype` and `TypedArray.prototype`, as well as the `toSpliced` method on `Array.prototype`; added support for `#!` comments at the beginning of files to better facilitate executable ECMAScript files; and allowed the use of most Symbols as keys in weak collections.</p>
+  <p>ECMAScript 2024, the 15<sup>th</sup> edition, added facilities for resizing and transferring ArrayBuffers and SharedArrayBuffers; added a new RegExp `/v` flag for creating RegExps with more advanced features for working with sets of strings; and introduced the `Promise.withResolvers` convenience method for constructing Promises, the `Object.groupBy` and `Map.groupBy` methods for aggregating data, the `Atomics.waitAsync` method for asynchronously waiting for a change to shared memory, and the `String.prototype.isWellFormed` and `String.prototype.toWellFormed` methods for checking and ensuring that strings contain only well-formed Unicode.</p>
   <p>Dozens of individuals representing many organizations have made very significant contributions within Ecma TC39 to the development of this edition and to the prior editions. In addition, a vibrant community has emerged supporting TC39's ECMAScript efforts. This community has reviewed numerous drafts, filed thousands of bug reports, performed implementation experiments, contributed test suites, and educated the world-wide developer community about ECMAScript. Unfortunately, it is impossible to identify and acknowledge every person and organization who has contributed to this effort.</p>
   <p>
     Allen Wirfs-Brock<br>
@@ -114,21 +115,21 @@
   </p>
   <p>
     Shu-yu Guo<br>
-    ECMA-262, Project Editor, 12<sup>th</sup> through 14<sup>th</sup> Editions
+    ECMA-262, Project Editor, 12<sup>th</sup> through 15<sup>th</sup> Editions
   </p>
   <p>
     Michael Ficarra<br>
-    ECMA-262, Project Editor, 12<sup>th</sup> through 14<sup>th</sup> Editions
+    ECMA-262, Project Editor, 12<sup>th</sup> through 15<sup>th</sup> Editions
   </p>
   <p>
     Kevin Gibbons<br>
-    ECMA-262, Project Editor, 12<sup>th</sup> through 14<sup>th</sup> Editions
+    ECMA-262, Project Editor, 12<sup>th</sup> through 15<sup>th</sup> Editions
   </p>
 </emu-intro>
 
 <emu-clause id="sec-scope">
   <h1>Scope</h1>
-  <p>This Standard defines the ECMAScript 2024 general-purpose programming language.</p>
+  <p>This Standard defines the ECMAScript 2025 general-purpose programming language.</p>
 </emu-clause>
 
 <emu-clause id="sec-conformance">
@@ -5934,8 +5935,8 @@
             1. If _nx_ is *undefined*, return *undefined*.
             1. Return BigInt::lessThan(_nx_, _py_).
           1. NOTE: Because _px_ and _py_ are primitive values, evaluation order is not important.
-          1. Let _nx_ be ? ToNumeric(_px_).
-          1. Let _ny_ be ? ToNumeric(_py_).
+          1. Let _nx_ be ? <emu-meta suppress-effects="user-code">ToNumeric(_px_)</emu-meta>.
+          1. Let _ny_ be ? <emu-meta suppress-effects="user-code">ToNumeric(_py_)</emu-meta>.
           1. If Type(_nx_) is Type(_ny_), then
             1. If _nx_ is a Number, then
               1. Return Number::lessThan(_nx_, _ny_).
@@ -6113,29 +6114,6 @@
       </emu-alg>
       <emu-note>
         <p>This abstract operation creates a property whose attributes are set to the same defaults used for properties created by the ECMAScript language assignment operator. Normally, the property will not already exist. If it does exist and is not configurable or if _O_ is not extensible, [[DefineOwnProperty]] will return *false*.</p>
-      </emu-note>
-    </emu-clause>
-
-    <emu-clause id="sec-createmethodproperty" type="abstract operation">
-      <h1>
-        CreateMethodProperty (
-          _O_: an Object,
-          _P_: a property key,
-          _V_: an ECMAScript language value,
-        ): ~unused~
-      </h1>
-      <dl class="header">
-        <dt>description</dt>
-        <dd>It is used to create a new own property of an ordinary object.</dd>
-      </dl>
-      <emu-alg>
-        1. Assert: _O_ is an ordinary, extensible object with no non-configurable properties.
-        1. Let _newDesc_ be the PropertyDescriptor { [[Value]]: _V_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.
-        1. Perform ! DefinePropertyOrThrow(_O_, _P_, _newDesc_).
-        1. Return ~unused~.
-      </emu-alg>
-      <emu-note>
-        <p>This abstract operation creates a property whose attributes are set to the same defaults used for built-in methods and methods defined using class declaration syntax. Normally, the property will not already exist. If it does exist, DefinePropertyOrThrow is guaranteed to complete normally.</p>
       </emu-note>
     </emu-clause>
 
@@ -24955,7 +24933,7 @@
           1. Perform SetFunctionName(_F_, _className_).
         1. Perform MakeConstructor(_F_, *false*, _proto_).
         1. If |ClassHeritage| is present, set _F_.[[ConstructorKind]] to ~derived~.
-        1. Perform CreateMethodProperty(_proto_, *"constructor"*, _F_).
+        1. Perform ! DefineMethodProperty(_proto_, *"constructor"*, _F_, *false*).
         1. If |ClassBody| is not present, let _elements_ be a new empty List.
         1. Else, let _elements_ be NonConstructorElements of |ClassBody|.
         1. Let _instancePrivateMethods_ be a new empty List.
