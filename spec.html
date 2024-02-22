@@ -1064,7 +1064,7 @@
       <ul>
         <li><dfn id="mathematical-value" variants="mathematical value,mathematical values">Mathematical values</dfn>: Arbitrary real numbers, used as the default numeric type.</li>
         <li><dfn id="extended-mathematical-value" variants="extended mathematical value,extended mathematical values">Extended mathematical values</dfn>: Mathematical values together with +∞ and -∞.</li>
-        <li><em>Numbers</em>: IEEE 754-2019 double-precision floating point values.</li>
+        <li><em>Numbers</em>: IEEE 754-2019 binary64 (double-precision floating point) values.</li>
         <li><em>BigInts</em>: ECMAScript language values representing arbitrary integers in a one-to-one correspondence.</li>
       </ul>
 
@@ -1820,7 +1820,7 @@
 
       <emu-clause id="sec-ecmascript-language-types-number-type">
         <h1>The Number Type</h1>
-        <p>The <dfn variants="is a Number,is not a Number">Number type</dfn> has exactly 18,437,736,874,454,810,627 (that is, <emu-eqn>2<sup>64</sup> - 2<sup>53</sup> + 3</emu-eqn>) values, representing the double-precision 64-bit format IEEE 754-2019 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic, except that the 9,007,199,254,740,990 (that is, <emu-eqn>2<sup>53</sup> - 2</emu-eqn>) distinct “Not-a-Number” values of the IEEE Standard are represented in ECMAScript as a single special *NaN* value. (Note that the *NaN* value is produced by the program expression `NaN`.) In some implementations, external code might be able to detect a difference between various Not-a-Number values, but such behaviour is implementation-defined; to ECMAScript code, all *NaN* values are indistinguishable from each other.</p>
+        <p>The <dfn variants="is a Number,is not a Number">Number type</dfn> has exactly 18,437,736,874,454,810,627 (that is, <emu-eqn>2<sup>64</sup> - 2<sup>53</sup> + 3</emu-eqn>) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic, except that the 9,007,199,254,740,990 (that is, <emu-eqn>2<sup>53</sup> - 2</emu-eqn>) distinct “Not-a-Number” values of the IEEE Standard are represented in ECMAScript as a single special *NaN* value. (Note that the *NaN* value is produced by the program expression `NaN`.) In some implementations, external code might be able to detect a difference between various Not-a-Number values, but such behaviour is implementation-defined; to ECMAScript code, all *NaN* values are indistinguishable from each other.</p>
         <emu-note>
           <p>The bit pattern that might be observed in an ArrayBuffer (see <emu-xref href="#sec-arraybuffer-objects"></emu-xref>) or a SharedArrayBuffer (see <emu-xref href="#sec-sharedarraybuffer-objects"></emu-xref>) after a Number value has been stored into it is not necessarily the same as the internal representation of that Number value used by the ECMAScript implementation.</p>
         </emu-note>
@@ -2355,7 +2355,7 @@
           <dl class="header">
           </dl>
           <emu-alg>
-            1. If _x_ is *0*<sub>ℤ</sub>, return *0*<sub>ℤ</sub>.
+            1. If _x_ = *0*<sub>ℤ</sub>, return *0*<sub>ℤ</sub>.
             1. Return -_x_.
           </emu-alg>
         </emu-clause>
@@ -2386,7 +2386,7 @@
           </dl>
           <emu-alg>
             1. If _exponent_ &lt; *0*<sub>ℤ</sub>, throw a *RangeError* exception.
-            1. If _base_ is *0*<sub>ℤ</sub> and _exponent_ is *0*<sub>ℤ</sub>, return *1*<sub>ℤ</sub>.
+            1. If _base_ = *0*<sub>ℤ</sub> and _exponent_ = *0*<sub>ℤ</sub>, return *1*<sub>ℤ</sub>.
             1. Return _base_ raised to the power _exponent_.
           </emu-alg>
         </emu-clause>
@@ -2416,7 +2416,7 @@
           <dl class="header">
           </dl>
           <emu-alg>
-            1. If _y_ is *0*<sub>ℤ</sub>, throw a *RangeError* exception.
+            1. If _y_ = *0*<sub>ℤ</sub>, throw a *RangeError* exception.
             1. Let _quotient_ be ℝ(_x_) / ℝ(_y_).
             1. Return ℤ(truncate(_quotient_)).
           </emu-alg>
@@ -2432,8 +2432,8 @@
           <dl class="header">
           </dl>
           <emu-alg>
-            1. If _d_ is *0*<sub>ℤ</sub>, throw a *RangeError* exception.
-            1. If _n_ is *0*<sub>ℤ</sub>, return *0*<sub>ℤ</sub>.
+            1. If _d_ = *0*<sub>ℤ</sub>, throw a *RangeError* exception.
+            1. If _n_ = *0*<sub>ℤ</sub>, return *0*<sub>ℤ</sub>.
             1. Let _quotient_ be ℝ(_n_) / ℝ(_d_).
             1. Let _q_ be ℤ(truncate(_quotient_)).
             1. Return _n_ - (_d_ × _q_).
@@ -3307,7 +3307,17 @@
               <td>
               </td>
               <td>
-                The constructor of async iterator objects (<emu-xref href="#sec-asyncgeneratorfunction-constructor"></emu-xref>)
+                The constructor of async generator function objects (<emu-xref href="#sec-asyncgeneratorfunction-constructor"></emu-xref>)
+              </td>
+            </tr>
+            <tr>
+              <td>
+                %AsyncGeneratorPrototype%
+              </td>
+              <td>
+              </td>
+              <td>
+                The prototype of async generator objects (<emu-xref href="#sec-asyncgenerator-objects"></emu-xref>)
               </td>
             </tr>
             <tr>
@@ -3535,7 +3545,17 @@
               <td>
               </td>
               <td>
-                The constructor of Generators (<emu-xref href="#sec-generatorfunction-constructor"></emu-xref>)
+                The constructor of generator function objects (<emu-xref href="#sec-generatorfunction-constructor"></emu-xref>)
+              </td>
+            </tr>
+            <tr>
+              <td>
+                %GeneratorPrototype%
+              </td>
+              <td>
+              </td>
+              <td>
+                The prototype of generator objects (<emu-xref href="#sec-generator-objects"></emu-xref>)
               </td>
             </tr>
             <tr>
@@ -13677,7 +13697,7 @@
           1. NOTE: A separate Environment Record is needed to ensure that bindings created by direct eval calls in the formal parameter list are outside the environment where parameters are declared.
           1. Let _calleeEnv_ be the LexicalEnvironment of _calleeContext_.
           1. Let _env_ be NewDeclarativeEnvironment(_calleeEnv_).
-          1. Assert: The VariableEnvironment of _calleeContext_ is _calleeEnv_.
+          1. Assert: The VariableEnvironment of _calleeContext_ and _calleeEnv_ are the same Environment Record.
           1. Set the LexicalEnvironment of _calleeContext_ to _env_.
         1. For each String _paramName_ of _parameterNames_, do
           1. Let _alreadyDeclared_ be ! _env_.HasBinding(_paramName_).
@@ -16237,69 +16257,7 @@
     <h1>Unicode Format-Control Characters</h1>
     <p>The Unicode format-control characters (i.e., the characters in category “Cf” in the Unicode Character Database such as LEFT-TO-RIGHT MARK or RIGHT-TO-LEFT MARK) are control codes used to control the formatting of a range of text in the absence of higher-level protocols for this (such as mark-up languages).</p>
     <p>It is useful to allow format-control characters in source text to facilitate editing and display. All format control characters may be used within comments, and within string literals, template literals, and regular expression literals.</p>
-    <p>U+200C (ZERO WIDTH NON-JOINER) and U+200D (ZERO WIDTH JOINER) are format-control characters that are used to make necessary distinctions when forming words or phrases in certain languages. In ECMAScript source text these code points may also be used in an |IdentifierName| after the first character.</p>
-    <p>U+FEFF (ZERO WIDTH NO-BREAK SPACE) is a format-control character used primarily at the start of a text to mark it as Unicode and to allow detection of the text's encoding and byte order. &lt;ZWNBSP> characters intended for this purpose can sometimes also appear after the start of a text, for example as a result of concatenating files. In ECMAScript source text &lt;ZWNBSP> code points are treated as white space characters (see <emu-xref href="#sec-white-space"></emu-xref>).</p>
-    <p>The special treatment of certain format-control characters outside of comments, string literals, and regular expression literals is summarized in <emu-xref href="#table-format-control-code-point-usage"></emu-xref>.</p>
-    <emu-table id="table-format-control-code-point-usage" caption="Format-Control Code Point Usage" oldids="table-31">
-      <table>
-        <tr>
-          <th>
-            Code Point
-          </th>
-          <th>
-            Name
-          </th>
-          <th>
-            Abbreviation
-          </th>
-          <th>
-            Usage
-          </th>
-        </tr>
-        <tr>
-          <td>
-            `U+200C`
-          </td>
-          <td>
-            ZERO WIDTH NON-JOINER
-          </td>
-          <td>
-            &lt;ZWNJ>
-          </td>
-          <td>
-            |IdentifierPart|
-          </td>
-        </tr>
-        <tr>
-          <td>
-            `U+200D`
-          </td>
-          <td>
-            ZERO WIDTH JOINER
-          </td>
-          <td>
-            &lt;ZWJ>
-          </td>
-          <td>
-            |IdentifierPart|
-          </td>
-        </tr>
-        <tr>
-          <td>
-            `U+FEFF`
-          </td>
-          <td>
-            ZERO WIDTH NO-BREAK SPACE
-          </td>
-          <td>
-            &lt;ZWNBSP>
-          </td>
-          <td>
-            |WhiteSpace|
-          </td>
-        </tr>
-      </table>
-    </emu-table>
+    <p>U+FEFF (ZERO WIDTH NO-BREAK SPACE) is a format-control character used primarily at the start of a text to mark it as Unicode and to allow detection of the text's encoding and byte order. &lt;ZWNBSP> characters intended for this purpose can sometimes also appear after the start of a text, for example as a result of concatenating files. In ECMAScript source text &lt;ZWNBSP> code points are treated as white space characters (see <emu-xref href="#sec-white-space"></emu-xref>) outside of comments, string literals, template literals, and regular expression literals.</p>
   </emu-clause>
 
   <emu-clause id="sec-white-space">
@@ -16548,7 +16506,7 @@
     <h1>Names and Keywords</h1>
     <p>|IdentifierName| and |ReservedWord| are tokens that are interpreted according to the Default Identifier Syntax given in Unicode Standard Annex #31, Identifier and Pattern Syntax, with some small modifications. |ReservedWord| is an enumerated subset of |IdentifierName|. The syntactic grammar defines |Identifier| as an |IdentifierName| that is not a |ReservedWord|. The Unicode identifier grammar is based on character properties specified by the Unicode Standard. The Unicode code points in the specified categories in the latest version of the Unicode Standard must be treated as in those categories by all conforming ECMAScript implementations. ECMAScript implementations may recognize identifier code points defined in later editions of the Unicode Standard.</p>
     <emu-note>
-      <p>This standard specifies specific code point additions: U+0024 (DOLLAR SIGN) and U+005F (LOW LINE) are permitted anywhere in an |IdentifierName|, and the code points U+200C (ZERO WIDTH NON-JOINER) and U+200D (ZERO WIDTH JOINER) are permitted anywhere after the first code point of an |IdentifierName|.</p>
+      <p>This standard specifies specific code point additions: U+0024 (DOLLAR SIGN) and U+005F (LOW LINE) are permitted anywhere in an |IdentifierName|.</p>
     </emu-note>
     <h2>Syntax</h2>
     <emu-grammar type="definition">
@@ -16575,8 +16533,6 @@
       IdentifierPartChar ::
         UnicodeIDContinue
         `$`
-        &lt;ZWNJ&gt;
-        &lt;ZWJ&gt;
 
       // emu-format ignore
       AsciiLetter :: one of
@@ -20496,16 +20452,12 @@
     <emu-clause id="sec-assignment-operators-static-semantics-early-errors">
       <h1>Static Semantics: Early Errors</h1>
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `=` AssignmentExpression</emu-grammar>
-      <p>If |LeftHandSideExpression| is either an |ObjectLiteral| or an |ArrayLiteral|, the following Early Error rules are applied:</p>
       <ul>
         <li>
-          |LeftHandSideExpression| must cover an |AssignmentPattern|.
+          If |LeftHandSideExpression| is either an |ObjectLiteral| or an |ArrayLiteral|, |LeftHandSideExpression| must cover an |AssignmentPattern|.
         </li>
-      </ul>
-      <p>If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, the following Early Error rule is applied:</p>
-      <ul>
         <li>
-          It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
+          If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, it is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
         </li>
       </ul>
       <emu-grammar>
@@ -20769,16 +20721,12 @@
           </li>
         </ul>
         <emu-grammar>DestructuringAssignmentTarget : LeftHandSideExpression</emu-grammar>
-        <p>If |LeftHandSideExpression| is either an |ObjectLiteral| or an |ArrayLiteral|, the following Early Error rules are applied:</p>
         <ul>
           <li>
-            |LeftHandSideExpression| must cover an |AssignmentPattern|.
+            If |LeftHandSideExpression| is either an |ObjectLiteral| or an |ArrayLiteral|, |LeftHandSideExpression| must cover an |AssignmentPattern|.
           </li>
-        </ul>
-        <p>If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, the following Early Error rule is applied:</p>
-        <ul>
           <li>
-            It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
+            If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, it is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
           </li>
         </ul>
       </emu-clause>
@@ -21965,16 +21913,12 @@
             `for` `(` LeftHandSideExpression `of` AssignmentExpression `)` Statement
             `for` `await` `(` LeftHandSideExpression `of` AssignmentExpression `)` Statement
         </emu-grammar>
-        <p>If |LeftHandSideExpression| is either an |ObjectLiteral| or an |ArrayLiteral|, the following Early Error rules are applied:</p>
         <ul>
           <li>
-            |LeftHandSideExpression| must cover an |AssignmentPattern|.
+            If |LeftHandSideExpression| is either an |ObjectLiteral| or an |ArrayLiteral|, |LeftHandSideExpression| must cover an |AssignmentPattern|.
           </li>
-        </ul>
-        <p>If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, the following Early Error rule is applied:</p>
-        <ul>
           <li>
-            It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
+            If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, it is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
           </li>
         </ul>
         <emu-grammar>
@@ -22371,7 +22315,7 @@
                 1. Repeat, while _O_.[[RemainingKeys]] is not empty,
                   1. Let _r_ be the first element of _O_.[[RemainingKeys]].
                   1. Remove the first element from _O_.[[RemainingKeys]].
-                  1. If there does not exist an element _v_ of _O_.[[VisitedKeys]] such that SameValue(_r_, _v_) is *true*, then
+                  1. If _O_.[[VisitedKeys]] does not contain _r_, then
                     1. Let _desc_ be ? <emu-meta effects="user-code">_object_.[[GetOwnProperty]]</emu-meta>(_r_).
                     1. If _desc_ is not *undefined*, then
                       1. Append _r_ to _O_.[[VisitedKeys]].
@@ -26728,7 +26672,7 @@
                 1. Set _m_.[[Status]] to ~evaluated~.
                 1. Set _m_.[[EvaluationError]] to _result_.
               1. Assert: _module_.[[Status]] is ~evaluated~.
-              1. Assert: _module_.[[EvaluationError]] is _result_.
+              1. Assert: _module_.[[EvaluationError]] and _result_ are the same Completion Record.
               1. Perform ! Call(_capability_.[[Reject]], *undefined*, « _result_.[[Value]] »).
             1. Else,
               1. Assert: _module_.[[Status]] is either ~evaluating-async~ or ~evaluated~.
@@ -26887,7 +26831,7 @@
               1. Set _module_.[[AsyncEvaluation]] to *false*.
               1. Set _module_.[[Status]] to ~evaluated~.
               1. If _module_.[[TopLevelCapability]] is not ~empty~, then
-                1. Assert: _module_.[[CycleRoot]] is _module_.
+                1. Assert: _module_.[[CycleRoot]] and _module_ are the same Module Record.
                 1. Perform ! Call(_module_.[[TopLevelCapability]].[[Resolve]], *undefined*, « *undefined* »).
               1. Let _execList_ be a new empty List.
               1. Perform GatherAvailableAncestors(_module_, _execList_).
@@ -26905,7 +26849,7 @@
                   1. Else,
                     1. Set _m_.[[Status]] to ~evaluated~.
                     1. If _m_.[[TopLevelCapability]] is not ~empty~, then
-                      1. Assert: _m_.[[CycleRoot]] is _m_.
+                      1. Assert: _m_.[[CycleRoot]] and _m_ are the same Module Record.
                       1. Perform ! Call(_m_.[[TopLevelCapability]].[[Resolve]], *undefined*, « *undefined* »).
               1. Return ~unused~.
             </emu-alg>
@@ -26932,7 +26876,7 @@
               1. For each Cyclic Module Record _m_ of _module_.[[AsyncParentModules]], do
                 1. Perform AsyncModuleExecutionRejected(_m_, _error_).
               1. If _module_.[[TopLevelCapability]] is not ~empty~, then
-                1. Assert: _module_.[[CycleRoot]] is _module_.
+                1. Assert: _module_.[[CycleRoot]] and _module_ are the same Module Record.
                 1. Perform ! Call(_module_.[[TopLevelCapability]].[[Reject]], *undefined*, « _error_ »).
               1. Return ~unused~.
             </emu-alg>
@@ -27913,7 +27857,7 @@
               1. Let _requestedModule_ be GetImportedModule(_module_, _e_.[[ModuleRequest]]).
               1. Let _starNames_ be _requestedModule_.GetExportedNames(_exportStarSet_).
               1. For each element _n_ of _starNames_, do
-                1. If SameValue(_n_, *"default"*) is *false*, then
+                1. If _n_ is not *"default"*, then
                   1. If _exportedNames_ does not contain _n_, then
                     1. Append _n_ to _exportedNames_.
             1. Return _exportedNames_.
@@ -27945,16 +27889,16 @@
             1. Assert: _module_.[[Status]] is not ~new~.
             1. If _resolveSet_ is not present, set _resolveSet_ to a new empty List.
             1. For each Record { [[Module]], [[ExportName]] } _r_ of _resolveSet_, do
-              1. If _module_ and _r_.[[Module]] are the same Module Record and SameValue(_exportName_, _r_.[[ExportName]]) is *true*, then
+              1. If _module_ and _r_.[[Module]] are the same Module Record and _exportName_ is _r_.[[ExportName]], then
                 1. Assert: This is a circular import request.
                 1. Return *null*.
             1. Append the Record { [[Module]]: _module_, [[ExportName]]: _exportName_ } to _resolveSet_.
             1. For each ExportEntry Record _e_ of _module_.[[LocalExportEntries]], do
-              1. If SameValue(_exportName_, _e_.[[ExportName]]) is *true*, then
+              1. If _e_.[[ExportName]] is _exportName_, then
                 1. Assert: _module_ provides the direct binding for this export.
                 1. Return ResolvedBinding Record { [[Module]]: _module_, [[BindingName]]: _e_.[[LocalName]] }.
             1. For each ExportEntry Record _e_ of _module_.[[IndirectExportEntries]], do
-              1. If SameValue(_exportName_, _e_.[[ExportName]]) is *true*, then
+              1. If _e_.[[ExportName]] is _exportName_, then
                 1. Assert: _e_.[[ModuleRequest]] is not *null*.
                 1. Let _importedModule_ be GetImportedModule(_module_, _e_.[[ModuleRequest]]).
                 1. If _e_.[[ImportName]] is ~all~, then
@@ -27963,7 +27907,7 @@
                 1. Else,
                   1. Assert: _module_ imports a specific binding for this export.
                   1. Return _importedModule_.ResolveExport(_e_.[[ImportName]], _resolveSet_).
-            1. If SameValue(_exportName_, *"default"*) is *true*, then
+            1. If _exportName_ is *"default"*, then
               1. Assert: A `default` export was not explicitly defined by this module.
               1. Return *null*.
               1. NOTE: A `default` export cannot be provided by an `export * from "mod"` declaration.
@@ -27981,7 +27925,7 @@
                   1. Assert: There is more than one `*` import that includes the requested name.
                   1. If _resolution_.[[Module]] and _starResolution_.[[Module]] are not the same Module Record, return ~ambiguous~.
                   1. If _resolution_.[[BindingName]] is not _starResolution_.[[BindingName]] and either _resolution_.[[BindingName]] or _starResolution_.[[BindingName]] is ~namespace~, return ~ambiguous~.
-                  1. If _resolution_.[[BindingName]] is a String, _starResolution_.[[BindingName]] is a String, and SameValue(_resolution_.[[BindingName]], _starResolution_.[[BindingName]]) is *false*, return ~ambiguous~.
+                  1. If _resolution_.[[BindingName]] is a String, _starResolution_.[[BindingName]] is a String, and _resolution_.[[BindingName]] is not _starResolution_.[[BindingName]], return ~ambiguous~.
             1. Return _starResolution_.
           </emu-alg>
         </emu-clause>
@@ -29023,7 +28967,7 @@
                 1. NOTE: `eval` will not create a global var declaration that would be shadowed by a global lexical declaration.
             1. Let _thisEnv_ be _lexEnv_.
             1. Assert: The following loop will terminate.
-            1. Repeat, while _thisEnv_ is not _varEnv_,
+            1. Repeat, while _thisEnv_ and _varEnv_ are not the same Environment Record,
               1. If _thisEnv_ is not an Object Environment Record, then
                 1. NOTE: The environment of with statements cannot contain any lexical declaration so it doesn't need to be checked for var/let hoisting conflicts.
                 1. For each element _name_ of _varNames_, do
@@ -30609,7 +30553,7 @@
 
       <emu-clause id="sec-symbol.asynciterator">
         <h1>Symbol.asyncIterator</h1>
-        <p>The initial value of `Symbol.asyncIterator` is the well known symbol @@asyncIterator (<emu-xref href="#table-well-known-symbols"></emu-xref>).</p>
+        <p>The initial value of `Symbol.asyncIterator` is the well-known symbol @@asyncIterator (<emu-xref href="#table-well-known-symbols"></emu-xref>).</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *false* }.</p>
       </emu-clause>
 
@@ -30619,7 +30563,7 @@
         <emu-alg>
           1. Let _stringKey_ be ? ToString(_key_).
           1. For each element _e_ of the GlobalSymbolRegistry List, do
-            1. If SameValue(_e_.[[Key]], _stringKey_) is *true*, return _e_.[[Symbol]].
+            1. If _e_.[[Key]] is _stringKey_, return _e_.[[Symbol]].
           1. Assert: GlobalSymbolRegistry does not currently contain an entry for _stringKey_.
           1. Let _newSymbol_ be a new Symbol whose [[Description]] is _stringKey_.
           1. Append the Record { [[Key]]: _stringKey_, [[Symbol]]: _newSymbol_ } to the GlobalSymbolRegistry List.
@@ -33991,7 +33935,8 @@ THH:mm:ss.sss
           1. Let _dateObject_ be the *this* value.
           1. Perform ? RequireInternalSlot(_dateObject_, [[DateValue]]).
           1. Let _tv_ be _dateObject_.[[DateValue]].
-          1. If _tv_ is not finite, throw a *RangeError* exception.
+          1. If _tv_ is *NaN*, throw a *RangeError* exception.
+          1. Assert: _tv_ is an integral Number.
           1. If _tv_ corresponds with a year that cannot be represented in the <emu-xref href="#sec-date-time-string-format">Date Time String Format</emu-xref>, throw a *RangeError* exception.
           1. Return a String representation of _tv_ in the <emu-xref href="#sec-date-time-string-format">Date Time String Format</emu-xref> on the UTC time scale, including all format elements and the UTC offset representation *"Z"*.
         </emu-alg>
@@ -38013,7 +37958,7 @@ THH:mm:ss.sss
           1. If _rx_ is not an Object, throw a *TypeError* exception.
           1. Let _S_ be ? ToString(_string_).
           1. Let _previousLastIndex_ be ? Get(_rx_, *"lastIndex"*).
-          1. If SameValue(_previousLastIndex_, *+0*<sub>𝔽</sub>) is *false*, then
+          1. If _previousLastIndex_ is not *+0*<sub>𝔽</sub>, then
             1. Perform ? Set(_rx_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*).
           1. Let _result_ be ? RegExpExec(_rx_, _S_).
           1. Let _currentLastIndex_ be ? Get(_rx_, *"lastIndex"*).
@@ -38822,8 +38767,8 @@ THH:mm:ss.sss
             1. Let _toKey_ be ! ToString(𝔽(_to_)).
             1. Let _fromPresent_ be ? HasProperty(_O_, _fromKey_).
             1. If _fromPresent_ is *true*, then
-              1. Let _fromVal_ be ? Get(_O_, _fromKey_).
-              1. Perform ? Set(_O_, _toKey_, _fromVal_, *true*).
+              1. Let _fromValue_ be ? Get(_O_, _fromKey_).
+              1. Perform ? Set(_O_, _toKey_, _fromValue_, *true*).
             1. Else,
               1. Assert: _fromPresent_ is *false*.
               1. Perform ? DeletePropertyOrThrow(_O_, _toKey_).
@@ -39205,9 +39150,10 @@ THH:mm:ss.sss
             1. Let _k_ be _len_ + _n_.
             1. If _k_ &lt; 0, set _k_ to 0.
           1. Repeat, while _k_ &lt; _len_,
-            1. Let _kPresent_ be ? HasProperty(_O_, ! ToString(𝔽(_k_))).
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
-              1. Let _elementK_ be ? Get(_O_, ! ToString(𝔽(_k_))).
+              1. Let _elementK_ be ? Get(_O_, _Pk_).
               1. If IsStrictlyEqual(_searchElement_, _elementK_) is *true*, return 𝔽(_k_).
             1. Set _k_ to _k_ + 1.
           1. Return *-1*<sub>𝔽</sub>.
@@ -39231,8 +39177,9 @@ THH:mm:ss.sss
           1. Repeat, while _k_ &lt; _len_,
             1. If _k_ > 0, set _R_ to the string-concatenation of _R_ and _sep_.
             1. Let _element_ be ? Get(_O_, ! ToString(𝔽(_k_))).
-            1. If _element_ is either *undefined* or *null*, let _next_ be the empty String; otherwise, let _next_ be ? ToString(_element_).
-            1. Set _R_ to the string-concatenation of _R_ and _next_.
+            1. If _element_ is neither *undefined* nor *null*, then
+              1. Let _S_ be ? ToString(_element_).
+              1. Set _R_ to the string-concatenation of _R_ and _S_.
             1. Set _k_ to _k_ + 1.
           1. Return _R_.
         </emu-alg>
@@ -39268,9 +39215,10 @@ THH:mm:ss.sss
           1. Else,
             1. Let _k_ be _len_ + _n_.
           1. Repeat, while _k_ ≥ 0,
-            1. Let _kPresent_ be ? HasProperty(_O_, ! ToString(𝔽(_k_))).
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kPresent_ be ? HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
-              1. Let _elementK_ be ? Get(_O_, ! ToString(𝔽(_k_))).
+              1. Let _elementK_ be ? Get(_O_, _Pk_).
               1. If IsStrictlyEqual(_searchElement_, _elementK_) is *true*, return 𝔽(_k_).
             1. Set _k_ to _k_ - 1.
           1. Return *-1*<sub>𝔽</sub>.
@@ -39500,8 +39448,8 @@ THH:mm:ss.sss
             1. Let _to_ be ! ToString(𝔽(_k_ - 1)).
             1. Let _fromPresent_ be ? HasProperty(_O_, _from_).
             1. If _fromPresent_ is *true*, then
-              1. Let _fromVal_ be ? Get(_O_, _from_).
-              1. Perform ? Set(_O_, _to_, _fromVal_, *true*).
+              1. Let _fromValue_ be ? Get(_O_, _from_).
+              1. Perform ? Set(_O_, _to_, _fromValue_, *true*).
             1. Else,
               1. Assert: _fromPresent_ is *false*.
               1. Perform ? DeletePropertyOrThrow(_O_, _to_).
@@ -39798,11 +39746,10 @@ THH:mm:ss.sss
           1. Let _R_ be the empty String.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_,
-            1. If _k_ > 0, then
-              1. Set _R_ to the string-concatenation of _R_ and _separator_.
-            1. Let _nextElement_ be ? Get(_array_, ! ToString(𝔽(_k_))).
-            1. If _nextElement_ is neither *undefined* nor *null*, then
-              1. Let _S_ be ? ToString(? Invoke(_nextElement_, *"toLocaleString"*)).
+            1. If _k_ > 0, set _R_ to the string-concatenation of _R_ and _separator_.
+            1. Let _element_ be ? Get(_array_, ! ToString(𝔽(_k_))).
+            1. If _element_ is neither *undefined* nor *null*, then
+              1. Let _S_ be ? ToString(? Invoke(_element_, *"toLocaleString"*)).
               1. Set _R_ to the string-concatenation of _R_ and _S_.
             1. Set _k_ to _k_ + 1.
           1. Return _R_.
@@ -39859,7 +39806,7 @@ THH:mm:ss.sss
           1. Let _O_ be ? ToObject(*this* value).
           1. Let _len_ be ? LengthOfArrayLike(_O_).
           1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
-          1. If _relativeStart_ is -∞, let _actualStart_ be 0.
+          1. If _relativeStart_ = -∞, let _actualStart_ be 0.
           1. Else if _relativeStart_ &lt; 0, let _actualStart_ be max(_len_ + _relativeStart_, 0).
           1. Else, let _actualStart_ be min(_relativeStart_, _len_).
           1. Let _insertCount_ be the number of elements in _items_.
@@ -39967,7 +39914,7 @@ THH:mm:ss.sss
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_,
             1. Let _Pk_ be ! ToString(𝔽(_k_)).
-            1. If _k_ is _actualIndex_, let _fromValue_ be _value_.
+            1. If _k_ = _actualIndex_, let _fromValue_ be _value_.
             1. Else, let _fromValue_ be ? Get(_O_, _Pk_).
             1. Perform ! CreateDataPropertyOrThrow(_A_, _Pk_, _fromValue_).
             1. Set _k_ to _k_ + 1.
@@ -40792,8 +40739,9 @@ THH:mm:ss.sss
           1. Repeat, while _k_ &lt; _len_,
             1. If _k_ > 0, set _R_ to the string-concatenation of _R_ and _sep_.
             1. Let _element_ be ! Get(_O_, ! ToString(𝔽(_k_))).
-            1. If _element_ is *undefined*, let _next_ be the empty String; otherwise, let _next_ be ! ToString(_element_).
-            1. Set _R_ to the string-concatenation of _R_ and _next_.
+            1. If _element_ is not *undefined*, then
+              1. Let _S_ be ! ToString(_element_).
+              1. Set _R_ to the string-concatenation of _R_ and _S_.
             1. Set _k_ to _k_ + 1.
           1. Return _R_.
         </emu-alg>
@@ -41274,7 +41222,7 @@ THH:mm:ss.sss
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_,
             1. Let _Pk_ be ! ToString(𝔽(_k_)).
-            1. If _k_ is _actualIndex_, let _fromValue_ be _numericValue_.
+            1. If _k_ = _actualIndex_, let _fromValue_ be _numericValue_.
             1. Else, let _fromValue_ be ! Get(_O_, _Pk_).
             1. Perform ! Set(_A_, _Pk_, _fromValue_, *true*).
             1. Set _k_ to _k_ + 1.
@@ -44586,7 +44534,7 @@ THH:mm:ss.sss
             1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"async"*, *false*).
             1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"value"*, *"not-equal"*).
             1. Return _resultObject_.
-          1. If _t_ is 0 and _mode_ is ~async~, then
+          1. If _t_ = 0 and _mode_ is ~async~, then
             1. NOTE: There is no special handling of synchronous immediate timeouts. Asynchronous immediate timeouts have special handling in order to fail fast and avoid unnecessary Promise jobs.
             1. Perform LeaveCriticalSection(_WL_).
             1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"async"*, *false*).
@@ -47332,7 +47280,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-generatorfunction.prototype.prototype">
         <h1>GeneratorFunction.prototype.prototype</h1>
-        <p>The initial value of `GeneratorFunction.prototype.prototype` is the Generator prototype object.</p>
+        <p>The initial value of `GeneratorFunction.prototype.prototype` is %GeneratorPrototype%.</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
       </emu-clause>
 
@@ -47434,7 +47382,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-asyncgeneratorfunction-prototype-prototype">
         <h1>AsyncGeneratorFunction.prototype.prototype</h1>
-        <p>The initial value of `AsyncGeneratorFunction.prototype.prototype` is the AsyncGenerator prototype object.</p>
+        <p>The initial value of `AsyncGeneratorFunction.prototype.prototype` is %AsyncGeneratorPrototype%.</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
       </emu-clause>
 
@@ -47474,12 +47422,12 @@ THH:mm:ss.sss
 
   <emu-clause id="sec-generator-objects">
     <h1>Generator Objects</h1>
-    <p>A Generator is an instance of a generator function and conforms to both the <i>Iterator</i> and <i>Iterable</i> interfaces.</p>
-    <p>Generator instances directly inherit properties from the object that is the initial value of the *"prototype"* property of the Generator function that created the instance. Generator instances indirectly inherit properties from the Generator Prototype intrinsic, %GeneratorFunction.prototype.prototype%.</p>
+    <p>A Generator is created by calling a generator function and conforms to both the <i>Iterator</i> and <i>Iterable</i> interfaces.</p>
+    <p>Generator instances directly inherit properties from the initial value of the *"prototype"* property of the generator function that created the instance. Generator instances indirectly inherit properties from %GeneratorPrototype%.</p>
 
     <emu-clause id="sec-properties-of-generator-prototype">
-      <h1>Properties of the Generator Prototype Object</h1>
-      <p>The <dfn>Generator prototype object</dfn>:</p>
+      <h1>The %GeneratorPrototype% Object</h1>
+      <p>The <dfn>%GeneratorPrototype%</dfn> object:</p>
       <ul>
         <li>is <dfn>%GeneratorFunction.prototype.prototype%</dfn>.</li>
         <li>is an ordinary object.</li>
@@ -47489,20 +47437,20 @@ THH:mm:ss.sss
       </ul>
 
       <emu-clause id="sec-generator.prototype.constructor">
-        <h1>Generator.prototype.constructor</h1>
-        <p>The initial value of `Generator.prototype.constructor` is %GeneratorFunction.prototype%.</p>
+        <h1>%GeneratorPrototype%.constructor</h1>
+        <p>The initial value of %GeneratorPrototype%`.constructor` is %GeneratorFunction.prototype%.</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
       </emu-clause>
 
       <emu-clause id="sec-generator.prototype.next">
-        <h1>Generator.prototype.next ( _value_ )</h1>
+        <h1>%GeneratorPrototype%.next ( _value_ )</h1>
         <emu-alg>
           1. Return ? GeneratorResume(*this* value, _value_, ~empty~).
         </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-generator.prototype.return">
-        <h1>Generator.prototype.return ( _value_ )</h1>
+        <h1>%GeneratorPrototype%.return ( _value_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
           1. Let _g_ be the *this* value.
@@ -47512,7 +47460,7 @@ THH:mm:ss.sss
       </emu-clause>
 
       <emu-clause id="sec-generator.prototype.throw">
-        <h1>Generator.prototype.throw ( _exception_ )</h1>
+        <h1>%GeneratorPrototype%.throw ( _exception_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
           1. Let _g_ be the *this* value.
@@ -47522,7 +47470,7 @@ THH:mm:ss.sss
       </emu-clause>
 
       <emu-clause id="sec-generator.prototype-@@tostringtag">
-        <h1>Generator.prototype [ @@toStringTag ]</h1>
+        <h1>%GeneratorPrototype% [ @@toStringTag ]</h1>
         <p>The initial value of the @@toStringTag property is the String value *"Generator"*.</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
       </emu-clause>
@@ -47784,13 +47732,13 @@ THH:mm:ss.sss
 
   <emu-clause id="sec-asyncgenerator-objects">
     <h1>AsyncGenerator Objects</h1>
-    <p>An AsyncGenerator is an instance of an async generator function and conforms to both the AsyncIterator and AsyncIterable interfaces.</p>
+    <p>An AsyncGenerator is created by calling an async generator function and conforms to both the AsyncIterator and AsyncIterable interfaces.</p>
 
-    <p>AsyncGenerator instances directly inherit properties from the object that is the initial value of the *"prototype"* property of the AsyncGenerator function that created the instance. AsyncGenerator instances indirectly inherit properties from the AsyncGenerator Prototype intrinsic, %AsyncGeneratorFunction.prototype.prototype%.</p>
+    <p>AsyncGenerator instances directly inherit properties from the initial value of the *"prototype"* property of the async generator function that created the instance. AsyncGenerator instances indirectly inherit properties from %AsyncGeneratorPrototype%.</p>
 
     <emu-clause id="sec-properties-of-asyncgenerator-prototype">
-      <h1>Properties of the AsyncGenerator Prototype Object</h1>
-      <p>The <dfn>AsyncGenerator prototype object</dfn>:</p>
+      <h1>The %AsyncGeneratorPrototype% Object</h1>
+      <p>The <dfn>%AsyncGeneratorPrototype%</dfn> object:</p>
       <ul>
         <li>is <dfn>%AsyncGeneratorFunction.prototype.prototype%</dfn>.</li>
         <li>is an ordinary object.</li>
@@ -47800,13 +47748,13 @@ THH:mm:ss.sss
       </ul>
 
       <emu-clause id="sec-asyncgenerator-prototype-constructor">
-        <h1>AsyncGenerator.prototype.constructor</h1>
-        <p>The initial value of `AsyncGenerator.prototype.constructor` is %AsyncGeneratorFunction.prototype%.</p>
+        <h1>%AsyncGeneratorPrototype%.constructor</h1>
+        <p>The initial value of %AsyncGeneratorPrototype%`.constructor` is %AsyncGeneratorFunction.prototype%.</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
       </emu-clause>
 
       <emu-clause id="sec-asyncgenerator-prototype-next">
-        <h1>AsyncGenerator.prototype.next ( _value_ )</h1>
+        <h1>%AsyncGeneratorPrototype%.next ( _value_ )</h1>
         <emu-alg>
           1. Let _generator_ be the *this* value.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
@@ -47828,7 +47776,7 @@ THH:mm:ss.sss
       </emu-clause>
 
       <emu-clause id="sec-asyncgenerator-prototype-return">
-        <h1>AsyncGenerator.prototype.return ( _value_ )</h1>
+        <h1>%AsyncGeneratorPrototype%.return ( _value_ )</h1>
         <emu-alg>
           1. Let _generator_ be the *this* value.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
@@ -47849,7 +47797,7 @@ THH:mm:ss.sss
       </emu-clause>
 
       <emu-clause id="sec-asyncgenerator-prototype-throw">
-        <h1>AsyncGenerator.prototype.throw ( _exception_ )</h1>
+        <h1>%AsyncGeneratorPrototype%.throw ( _exception_ )</h1>
         <emu-alg>
           1. Let _generator_ be the *this* value.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
@@ -47873,7 +47821,7 @@ THH:mm:ss.sss
       </emu-clause>
 
       <emu-clause id="sec-asyncgenerator-prototype-tostringtag">
-        <h1>AsyncGenerator.prototype [ @@toStringTag ]</h1>
+        <h1>%AsyncGeneratorPrototype% [ @@toStringTag ]</h1>
         <p>The initial value of the @@toStringTag property is the String value *"AsyncGenerator"*.</p>
         <p>This property has the attributes { [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.</p>
       </emu-clause>
@@ -49143,7 +49091,7 @@ THH:mm:ss.sss
           1. If _R_.[[NoTear]] is *true*, then
             1. Assert: The remainder of dividing _R_.[[ByteIndex]] by _R_.[[ElementSize]] is 0.
             1. For each event _W_ such that _execution_.[[ReadsFrom]] contains (_R_, _W_) and _W_.[[NoTear]] is *true*, do
-              1. If _R_ and _W_ have equal ranges and there exists an event _V_ such that _V_ and _W_ have equal ranges, _V_.[[NoTear]] is *true*, _W_ is not _V_, and _execution_.[[ReadsFrom]] contains (_R_, _V_), then
+              1. If _R_ and _W_ have equal ranges and there exists an event _V_ such that _V_ and _W_ have equal ranges, _V_.[[NoTear]] is *true*, _W_ and _V_ are not the same Shared Data Block event, and _execution_.[[ReadsFrom]] contains (_R_, _V_), then
                 1. Return *false*.
         1. Return *true*.
       </emu-alg>
@@ -49203,7 +49151,7 @@ THH:mm:ss.sss
     <h1>Races</h1>
     <p>For an execution _execution_, two events _E_ and _D_ in SharedDataBlockEventSet(_execution_) are in a race if the following algorithm returns *true*.</p>
     <emu-alg>
-      1. If _E_ is not _D_, then
+      1. If _E_ and _D_ are not the same Shared Data Block event, then
         1. If the pairs (_E_, _D_) and (_D_, _E_) are not in _execution_.[[HappensBefore]], then
           1. If _E_ and _D_ are both WriteSharedMemory or ReadModifyWriteSharedMemory events and _E_ and _D_ do not have disjoint ranges, then
             1. Return *true*.
