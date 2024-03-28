@@ -3,27 +3,11 @@
 <meta charset="utf-8">
 <link rel="icon" href="img/favicon.ico">
 <style>
-  /* custom styles */
-  @media print {
-    /* for the PDF */
-    body.oldtoc {
-      font-size: 80%;
-    }
-    .oldtoc var {
-      color: #197124;
-    }
-  }
   #metadata-block {
     margin: 4em 0;
     padding: 10px;
     border: 1px solid #ee8421;
-    page-break-after: always; /* so that the TOC, which appears next, is on a new page */
   }
-
-  #sec-intro {
-    page-break-before: always; /* so that the TOC, which appears previous, is on its own page */
-  }
-
   #metadata-block h1 {
     font-size: 1.5em;
     margin-top: 0;
@@ -32,9 +16,11 @@
     list-style-type: none;
     margin: 0; padding: 0;
   }
+
   #ecma-logo {
     width: 500px;
   }
+
   .unicode-property-table {
     table-layout: fixed;
     width: 100%;
@@ -71,7 +57,7 @@
     <li>
       Community:
       <ul>
-        <li>Discourse: <a href="https://es.discourse.group">https://es.discourse.group</a></li>
+        <li>Discourse: <a href="https://es.discourse.group">https://es.discourse.group/</a></li>
         <li>Chat: <a href="https://github.com/tc39/how-we-work/blob/HEAD/matrix-guide.md">Matrix</a></li>
         <li>Mailing <emu-not-ref>List</emu-not-ref> Archives: <a href="https://esdiscuss.org">https://esdiscuss.org/</a></li>
       </ul>
@@ -1166,7 +1152,7 @@
             _string_: a String,
             _searchValue_: a String,
             _fromIndex_: a non-negative integer,
-          ): a non-negative integer or -1
+          ): a non-negative integer or ~not-found~
         </h1>
         <dl class="header">
         </dl>
@@ -1177,13 +1163,13 @@
           1. For each integer _i_ such that _fromIndex_ ≤ _i_ ≤ _len_ - _searchLen_, in ascending order, do
             1. Let _candidate_ be the substring of _string_ from _i_ to _i_ + _searchLen_.
             1. If _candidate_ is _searchValue_, return _i_.
-          1. Return -1.
+          1. Return ~not-found~.
         </emu-alg>
         <emu-note>
           <p>If _searchValue_ is the empty String and _fromIndex_ ≤ the length of _string_, this algorithm returns _fromIndex_. The empty String is effectively found at every position within a string, including after the last code unit.</p>
         </emu-note>
         <emu-note>
-          <p>This algorithm always returns -1 if _fromIndex_ + the length of _searchValue_ > the length of _string_.</p>
+          <p>This algorithm always returns ~not-found~ if _fromIndex_ + the length of _searchValue_ > the length of _string_.</p>
         </emu-note>
       </emu-clause>
 
@@ -1193,7 +1179,7 @@
             _string_: a String,
             _searchValue_: a String,
             _fromIndex_: a non-negative integer,
-          ): a non-negative integer or -1
+          ): a non-negative integer or ~not-found~
         </h1>
         <dl class="header">
         </dl>
@@ -1204,7 +1190,7 @@
           1. For each integer _i_ such that 0 ≤ _i_ ≤ _fromIndex_, in descending order, do
             1. Let _candidate_ be the substring of _string_ from _i_ to _i_ + _searchLen_.
             1. If _candidate_ is _searchValue_, return _i_.
-          1. Return -1.
+          1. Return ~not-found~.
         </emu-alg>
         <emu-note>
           <p>If _searchValue_ is the empty String, this algorithm returns _fromIndex_. The empty String is effectively found at every position within a string, including after the last code unit.</p>
@@ -34619,8 +34605,8 @@ THH:mm:ss.sss
           1. Let _len_ be the length of _S_.
           1. Let _start_ be the result of clamping _pos_ between 0 and _len_.
           1. Let _index_ be StringIndexOf(_S_, _searchStr_, _start_).
-          1. If _index_ ≠ -1, return *true*.
-          1. Return *false*.
+          1. If _index_ is ~not-found~, return *false*.
+          1. Return *true*.
         </emu-alg>
         <emu-note>
           <p>If _searchString_ appears as a <emu-not-ref>substring</emu-not-ref> of the result of converting this object to a String, at one or more indices that are greater than or equal to _position_, this function returns *true*; otherwise, it returns *false*. If _position_ is *undefined*, 0 is assumed, so as to search all of the String.</p>
@@ -34647,7 +34633,9 @@ THH:mm:ss.sss
           1. Assert: If _position_ is *undefined*, then _pos_ is 0.
           1. Let _len_ be the length of _S_.
           1. Let _start_ be the result of clamping _pos_ between 0 and _len_.
-          1. Return 𝔽(StringIndexOf(_S_, _searchStr_, _start_)).
+          1. Let _result_ be StringIndexOf(_S_, _searchStr_, _start_).
+          1. If _result_ is ~not-found~, return *-1*<sub>𝔽</sub>.
+          1. Return 𝔽(_result_).
         </emu-alg>
         <emu-note>
           <p>This method is intentionally generic; it does not require that its *this* value be a String object. Therefore, it can be transferred to other kinds of objects for use as a method.</p>
@@ -34680,7 +34668,9 @@ THH:mm:ss.sss
           1. Let _len_ be the length of _S_.
           1. Let _searchLen_ be the length of _searchStr_.
           1. Let _start_ be the result of clamping _pos_ between 0 and _len_ - _searchLen_.
-          1. Return 𝔽(StringLastIndexOf(_S_, _searchStr_, _start_)).
+          1. Let _result_ be StringLastIndexOf(_S_, _searchStr_, _start_).
+          1. If _result_ is ~not-found~, return *-1*<sub>𝔽</sub>.
+          1. Return 𝔽(_result_).
         </emu-alg>
         <emu-note>
           <p>This method is intentionally generic; it does not require that its *this* value be a String object. Therefore, it can be transferred to other kinds of objects for use as a method.</p>
@@ -34910,7 +34900,7 @@ THH:mm:ss.sss
             1. Set _replaceValue_ to ? ToString(_replaceValue_).
           1. Let _searchLength_ be the length of _searchString_.
           1. Let _position_ be StringIndexOf(_string_, _searchString_, 0).
-          1. If _position_ = -1, return _string_.
+          1. If _position_ is ~not-found~, return _string_.
           1. Let _preceding_ be the substring of _string_ from 0 to _position_.
           1. Let _following_ be the substring of _string_ from _position_ + _searchLength_.
           1. If _functionalReplace_ is *true*, then
@@ -34984,7 +34974,7 @@ THH:mm:ss.sss
                   1. Let _refReplacement_ be _ref_.
               1. Else if _templateRemainder_ starts with *"$&lt;"*, then
                 1. Let _gtPos_ be StringIndexOf(_templateRemainder_, *">"*, 0).
-                1. If _gtPos_ = -1 or _namedCaptures_ is *undefined*, then
+                1. If _gtPos_ is ~not-found~ or _namedCaptures_ is *undefined*, then
                   1. Let _ref_ be *"$&lt;"*.
                   1. Let _refReplacement_ be _ref_.
                 1. Else,
@@ -35030,7 +35020,7 @@ THH:mm:ss.sss
           1. Let _advanceBy_ be max(1, _searchLength_).
           1. Let _matchPositions_ be a new empty List.
           1. Let _position_ be StringIndexOf(_string_, _searchString_, 0).
-          1. Repeat, while _position_ ≠ -1,
+          1. Repeat, while _position_ is not ~not-found~,
             1. Append _position_ to _matchPositions_.
             1. Set _position_ to StringIndexOf(_string_, _searchString_, _position_ + _advanceBy_).
           1. Let _endOfLastMatch_ be 0.
@@ -35119,7 +35109,7 @@ THH:mm:ss.sss
           1. Let _substrings_ be a new empty List.
           1. Let _i_ be 0.
           1. Let _j_ be StringIndexOf(_S_, _R_, 0).
-          1. Repeat, while _j_ ≠ -1,
+          1. Repeat, while _j_ is not ~not-found~,
             1. Let _T_ be the substring of _S_ from _i_ to _j_.
             1. Append _T_ to _substrings_.
             1. If the number of elements in _substrings_ is _lim_, return CreateArrayFromList(_substrings_).
