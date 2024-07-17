@@ -26,6 +26,29 @@
     width: 100%;
     font-size: 80%;
   }
+
+  .corner-cell {
+    position: relative;
+    height: 2lh;
+  }
+  .corner-cell .slash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom left, transparent calc(50% - 1px), gray, transparent calc(50% + 1px));
+  }
+  .corner-cell > .column {
+    position: absolute;
+    bottom: 0.4em;
+    left: 1em;
+  }
+  .corner-cell > .row {
+    position: absolute;
+    top: 0.4em;
+    right: 1em;
+  }
 </style>
 <pre class="metadata">
   title: ECMAScript&reg; 2025 Language&nbsp;Specification
@@ -26999,58 +27022,65 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
+                  <th class="corner-cell">
+                    <span class="column">Field</span>
+                    <div class="slash">
+                    </div>
+                    <span class="row">Module</span>
+                  </th>
+                  <th>_A_</th>
+                  <th>_B_</th>
+                  <th>_C_</th>
+                  <th>_D_</th>
+                  <th>_E_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« »</td>
-                <td>2 (_B_ and _C_)</td>
-              </tr>
-              <tr>
-                <th>_B_</th>
                 <td>1</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« _A_ »</td>
-                <td>1 (_D_)</td>
-              </tr>
-              <tr>
-                <th>_C_</th>
                 <td>3</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« _A_ »</td>
-                <td>2 (_D_ and _E_)</td>
-              </tr>
-              <tr>
-                <th>_D_</th>
                 <td>2</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« _B_, _C_ »</td>
-                <td>0</td>
+                <td>4</td>
               </tr>
               <tr>
-                <th>_E_</th>
+                <th>[[DFSAncestorIndex]]</th>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td>4</td>
-                <td>4</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
                 <td>~evaluating-async~</td>
+                <td>~evaluating-async~</td>
+                <td>~evaluating-async~</td>
+                <td>~evaluating-async~</td>
+                <td>~evaluating-async~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+                <td>*true*</td>
+                <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« »</td>
+                <td>« _A_ »</td>
+                <td>« _A_ »</td>
+                <td>« _B_, _C_ »</td>
                 <td>« _C_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
+                <td>2 (_B_ and _C_)</td>
+                <td>1 (_D_)</td>
+                <td>2 (_D_ and _E_)</td>
+                <td>0</td>
                 <td>0</td>
               </tr>
             </table>
@@ -27062,31 +27092,39 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_C_</th>
+                  <th>_E_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_C_</th>
+                <th>[[DFSIndex]]</th>
                 <td>3</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« _A_ »</td>
-                <td>1 (_D_)</td>
+                <td>4</td>
               </tr>
               <tr>
-                <th>_E_</th>
+                <th>[[DFSAncestorIndex]]</th>
+                <td>0</td>
                 <td>4</td>
-                <td>4</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
+                <td>~evaluating-async~</td>
                 <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« _A_ »</td>
                 <td>« _C_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
+                <td>1 (_D_)</td>
                 <td>0</td>
               </tr>
             </table>
@@ -27098,40 +27136,46 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
+                  <th>Fields / Module</th>
+                  <th>_B_</th>
+                  <th>_C_</th>
+                  <th>_D_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_B_</th>
+                <th>[[DFSIndex]]</th>
                 <td>1</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« _A_ »</td>
-                <td>0</td>
-              </tr>
-              <tr>
-                <th>_C_</th>
                 <td>3</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« _A_ »</td>
+                <td>0</td>
                 <td>0</td>
               </tr>
               <tr>
-                <th>_D_</th>
-                <td>2</td>
-                <td>0</td>
+                <th>[[Status]]</th>
+                <td>~evaluating-async~</td>
+                <td>~evaluating-async~</td>
                 <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« _A_ »</td>
+                <td>« _A_ »</td>
                 <td>« _B_, _C_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
               </tr>
             </table>
@@ -27143,31 +27187,39 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_A_</th>
+                  <th>_C_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
-                <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« »</td>
-                <td>1 (_B_)</td>
+                <td>3</td>
               </tr>
               <tr>
-                <th>_C_</th>
-                <td>3</td>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
+                <td>~evaluating-async~</td>
                 <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« »</td>
                 <td>« _A_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
+                <td>1 (_B_)</td>
                 <td>0</td>
               </tr>
             </table>
@@ -27179,31 +27231,39 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_A_</th>
+                  <th>_B_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
-                <td>~evaluating-async~</td>
-                <td>*true*</td>
-                <td>« »</td>
                 <td>0</td>
               </tr>
               <tr>
-                <th>_B_</th>
-                <td>1</td>
-                <td>0</td>
+                <th>[[Status]]</th>
+                <td>~evaluating-async~</td>
                 <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« »</td>
                 <td>« _A_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
+                <td>0</td>
                 <td>0</td>
               </tr>
             </table>
@@ -27215,22 +27275,32 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_A_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
+              </tr>
+              <tr>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
                 <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
                 <td>« »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
                 <td>0</td>
               </tr>
             </table>
@@ -27242,34 +27312,44 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
-                  <th>[[EvaluationError]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_A_</th>
+                  <th>_C_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
-                <td>0</td>
-                <td>~evaluated~</td>
-                <td>*true*</td>
-                <td>« »</td>
-                <td>1 (_B_)</td>
-                <td>~empty~</td>
+                <td>3</td>
               </tr>
               <tr>
-                <th>_C_</th>
-                <td>3</td>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
                 <td>~evaluated~</td>
+                <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« »</td>
                 <td>« _A_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
+                <td>1 (_B_)</td>
                 <th>0</th>
+              </tr>
+              <tr>
+                <th>[[EvaluationError]]</th>
+                <td>~empty~</td>
                 <td>_C_'s evaluation error</td>
               </tr>
             </table>
@@ -27281,24 +27361,37 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
-                  <th>[[EvaluationError]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_A_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
+              </tr>
+              <tr>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
                 <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
                 <td>« »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
                 <td>0</td>
+              </tr>
+              <tr>
+                <th>[[EvaluationError]]</th>
+
                 <td>_C_'s Evaluation Error</td>
               </tr>
             </table>
@@ -27310,34 +27403,44 @@
             <table>
               <thead>
                 <tr>
-                  <th>Module</th>
-                  <th>[[DFSIndex]]</th>
-                  <th>[[DFSAncestorIndex]]</th>
-                  <th>[[Status]]</th>
-                  <th>[[AsyncEvaluation]]</th>
-                  <th>[[AsyncParentModules]]</th>
-                  <th>[[PendingAsyncDependencies]]</th>
-                  <th>[[EvaluationError]]</th>
+                  <th>Fields / Modules</th>
+                  <th>_A_</th>
+                  <th>_B_</th>
                 </tr>
               </thead>
               <tr>
-                <th>_A_</th>
+                <th>[[DFSIndex]]</th>
                 <td>0</td>
-                <td>0</td>
-                <td>~evaluated~</td>
-                <td>*true*</td>
-                <td>« »</td>
-                <td>0</td>
-                <td>_C_'s Evaluation Error</td>
+                <td>1</td>
               </tr>
               <tr>
-                <th>_B_</th>
-                <td>1</td>
+                <th>[[DFSAncestorIndex]]</th>
                 <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>[[Status]]</th>
                 <td>~evaluated~</td>
+                <td>~evaluated~</td>
+              </tr>
+              <tr>
+                <th>[[AsyncEvaluation]]</th>
                 <td>*true*</td>
+                <td>*true*</td>
+              </tr>
+              <tr>
+                <th>[[AsyncParentModules]]</th>
+                <td>« »</td>
                 <td>« _A_ »</td>
+              </tr>
+              <tr>
+                <th>[[PendingAsyncDependencies]]</th>
                 <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <th>[[EvaluationError]]</th>
+                <td>_C_'s Evaluation Error</td>
                 <td>~empty~</td>
               </tr>
             </table>
@@ -33183,48 +33286,14 @@ THH:mm:ss.sss
         <p>
           ECMAScript defines a string interchange format for UTC offsets, derived from ISO 8601.
           The format is described by the following grammar.
-          The usage of Unicode code points in this grammar is listed in <emu-xref href="#table-time-zone-offset-string-code-points"></emu-xref>.
         </p>
-
-        <emu-table id="table-time-zone-offset-string-code-points" caption="Time Zone Offset String Code Points">
-          <table>
-            <thead>
-              <tr>
-                <th>
-                  Code Point
-                </th>
-                <th>
-                  Unicode Name
-                </th>
-                <th>
-                  Abbreviation
-                </th>
-              </tr>
-            </thead>
-            <tr>
-              <td>
-                `U+2212`
-              </td>
-              <td>
-                MINUS SIGN
-              </td>
-              <td>
-                &lt;MINUS>
-              </td>
-            </tr>
-          </table>
-        </emu-table>
 
         <h2>Syntax</h2>
         <emu-grammar type="definition">
           UTCOffset :::
-            TemporalSign Hour
-            TemporalSign Hour HourSubcomponents[+Extended]
-            TemporalSign Hour HourSubcomponents[~Extended]
-
-          TemporalSign :::
-            ASCIISign
-            &lt;MINUS&gt;
+            ASCIISign Hour
+            ASCIISign Hour HourSubcomponents[+Extended]
+            ASCIISign Hour HourSubcomponents[~Extended]
 
           ASCIISign ::: one of
             `+` `-`
@@ -33298,9 +33367,9 @@ THH:mm:ss.sss
           <emu-alg>
             1. Let _parseResult_ be ParseText(_offsetString_, |UTCOffset|).
             1. Assert: _parseResult_ is not a List of errors.
-            1. Assert: _parseResult_ contains a |TemporalSign| Parse Node.
-            1. Let _parsedSign_ be the source text matched by the |TemporalSign| Parse Node contained within _parseResult_.
-            1. If _parsedSign_ is the single code point U+002D (HYPHEN-MINUS) or U+2212 (MINUS SIGN), then
+            1. Assert: _parseResult_ contains a |ASCIISign| Parse Node.
+            1. Let _parsedSign_ be the source text matched by the |ASCIISign| Parse Node contained within _parseResult_.
+            1. If _parsedSign_ is the single code point U+002D (HYPHEN-MINUS), then
               1. Let _sign_ be -1.
             1. Else,
               1. Let _sign_ be 1.
@@ -50091,7 +50160,6 @@ THH:mm:ss.sss
   <emu-annex id="sec-time-zone-offset-string-format">
     <h1>Time Zone Offset String Format</h1>
     <emu-prodref name="UTCOffset"></emu-prodref>
-    <emu-prodref name="TemporalSign"></emu-prodref>
     <emu-prodref name="ASCIISign"></emu-prodref>
     <emu-prodref name="Hour"></emu-prodref>
     <emu-prodref name="HourSubcomponents"></emu-prodref>
@@ -50965,7 +51033,7 @@ THH:mm:ss.sss
         <p>During FunctionDeclarationInstantiation the following steps are performed in place of step <emu-xref href="#step-functiondeclarationinstantiation-web-compat-insertion-point"></emu-xref>:</p>
         <emu-alg replaces-step="step-functiondeclarationinstantiation-web-compat-insertion-point">
           1. If _strict_ is *false*, then
-            1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of a |Block|, |CaseClause|, or |DefaultClause|, do
+            1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of any |Block|, |CaseClause|, or |DefaultClause| _x_ such that _code_ Contains _x_ is *true*, do
               1. Let _F_ be the StringValue of the |BindingIdentifier| of _f_.
               1. If replacing the |FunctionDeclaration| _f_ with a |VariableStatement| that has _F_ as a |BindingIdentifier| would not produce any Early Errors for _func_ and _parameterNames_ does not contain _F_, then
                 1. NOTE: A var binding for _F_ is only instantiated here if it is neither a VarDeclaredName, the name of a formal parameter, or another |FunctionDeclaration|.
@@ -50990,7 +51058,7 @@ THH:mm:ss.sss
             1. Let _strict_ be ScriptIsStrict of _script_.
             1. If _strict_ is *false*, then
               1. Let _declaredFunctionOrVarNames_ be the list-concatenation of _declaredFunctionNames_ and _declaredVarNames_.
-              1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of a |Block|, |CaseClause|, or |DefaultClause| Contained within _script_, do
+              1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of any |Block|, |CaseClause|, or |DefaultClause| _x_ such that _script_ Contains _x_ is *true*, do
                 1. Let _F_ be the StringValue of the |BindingIdentifier| of _f_.
                 1. If replacing the |FunctionDeclaration| _f_ with a |VariableStatement| that has _F_ as a |BindingIdentifier| would not produce any Early Errors for _script_, then
                   1. If _env_.HasLexicalDeclaration(_F_) is *false*, then
@@ -51015,7 +51083,7 @@ THH:mm:ss.sss
         <emu-alg replaces-step="step-evaldeclarationinstantiation-web-compat-insertion-point">
           1. If _strict_ is *false*, then
             1. Let _declaredFunctionOrVarNames_ be the list-concatenation of _declaredFunctionNames_ and _declaredVarNames_.
-            1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of a |Block|, |CaseClause|, or |DefaultClause| Contained within _body_, do
+            1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of any |Block|, |CaseClause|, or |DefaultClause| _x_ such that _body_ Contains _x_ is *true*, do
               1. Let _F_ be the StringValue of the |BindingIdentifier| of _f_.
               1. If replacing the |FunctionDeclaration| _f_ with a |VariableStatement| that has _F_ as a |BindingIdentifier| would not produce any Early Errors for _body_, then
                 1. Let _bindingExists_ be *false*.
