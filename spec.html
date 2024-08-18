@@ -26922,6 +26922,7 @@
                   1. If _result_ is an abrupt completion, then
                     1. Perform AsyncModuleExecutionRejected(_m_, _result_.[[Value]]).
                   1. Else,
+                    1. Set _m_.[[AsyncEvaluation]] to *false*.
                     1. Set _m_.[[Status]] to ~evaluated~.
                     1. If _m_.[[TopLevelCapability]] is not ~empty~, then
                       1. Assert: _m_.[[CycleRoot]] and _m_ are the same Module Record.
@@ -26948,6 +26949,8 @@
               1. Assert: _module_.[[EvaluationError]] is ~empty~.
               1. Set _module_.[[EvaluationError]] to ThrowCompletion(_error_).
               1. Set _module_.[[Status]] to ~evaluated~.
+              1. Set _module_.[[AsyncEvaluation]] to *false*.
+              1. NOTE: _module_.[[AsyncEvaluation]] is set to *false* for symmetry with AsyncModuleExecutionFulfilled. In InnerModuleEvaluation, the value of a module's [[AsyncEvaluation]] internal slot is unused when its [[EvaluationError]] internal slot is not ~empty~.
               1. For each Cyclic Module Record _m_ of _module_.[[AsyncParentModules]], do
                 1. Perform AsyncModuleExecutionRejected(_m_, _error_).
               1. If _module_.[[TopLevelCapability]] is not ~empty~, then
@@ -31908,7 +31911,7 @@
     <emu-clause id="sec-function-properties-of-the-math-object">
       <h1>Function Properties of the Math Object</h1>
       <emu-note>
-        <p>The behaviour of the functions `acos`, `acosh`, `asin`, `asinh`, `atan`, `atanh`, `atan2`, `cbrt`, `cos`, `cosh`, `exp`, `expm1`, `hypot`, `log`, `log1p`, `log2`, `log10`, `pow`, `random`, `sin`, `sinh`, `sqrt`, `tan`, and `tanh` is not precisely specified here except to require specific results for certain argument values that represent boundary cases of interest. For other argument values, these functions are intended to compute approximations to the results of familiar mathematical functions, but some latitude is allowed in the choice of approximation algorithms. The general intent is that an implementer should be able to use the same mathematical library for ECMAScript on a given hardware platform that is available to C programmers on that platform.</p>
+        <p>The behaviour of the functions `acos`, `acosh`, `asin`, `asinh`, `atan`, `atanh`, `atan2`, `cbrt`, `cos`, `cosh`, `exp`, `expm1`, `hypot`, `log`, `log1p`, `log2`, `log10`, `pow`, `random`, `sin`, `sinh`, `tan`, and `tanh` is not precisely specified here except to require specific results for certain argument values that represent boundary cases of interest. For other argument values, these functions are intended to compute approximations to the results of familiar mathematical functions, but some latitude is allowed in the choice of approximation algorithms. The general intent is that an implementer should be able to use the same mathematical library for ECMAScript on a given hardware platform that is available to C programmers on that platform.</p>
         <p>Although the choice of algorithms is left to the implementation, it is recommended (but not specified by this standard) that implementations use the approximation algorithms for IEEE 754-2019 arithmetic contained in `fdlibm`, the freely distributable mathematical library from Sun Microsystems (<a href="http://www.netlib.org/fdlibm">http://www.netlib.org/fdlibm</a>).</p>
       </emu-note>
 
@@ -32381,7 +32384,7 @@
           1. Let _n_ be ? ToNumber(_x_).
           1. If _n_ is one of *NaN*, *+0*<sub>𝔽</sub>, *-0*<sub>𝔽</sub>, or *+∞*<sub>𝔽</sub>, return _n_.
           1. If _n_ &lt; *-0*<sub>𝔽</sub>, return *NaN*.
-          1. Return an implementation-approximated Number value representing the square root of ℝ(_n_).
+          1. Return 𝔽(the square root of ℝ(_n_)).
         </emu-alg>
       </emu-clause>
 
