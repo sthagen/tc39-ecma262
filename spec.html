@@ -4035,7 +4035,7 @@
 
   <emu-clause id="sec-ecmascript-specification-types">
     <h1>ECMAScript Specification Types</h1>
-    <p>A specification type corresponds to meta-values that are used within algorithms to describe the semantics of ECMAScript language constructs and ECMAScript language types. The specification types include Reference, List, Completion Record, Property Descriptor, Environment Record, Abstract Closure, and Data Block. Specification type values are specification artefacts that do not necessarily correspond to any specific entity within an ECMAScript implementation. Specification type values may be used to describe intermediate results of ECMAScript expression evaluation but such values cannot be stored as properties of objects or values of ECMAScript language variables.</p>
+    <p>A specification type corresponds to meta-values that are used within algorithms to describe the semantics of ECMAScript language constructs and ECMAScript language types. The specification types include Reference Record, List, Completion Record, Property Descriptor, Environment Record, Abstract Closure, and Data Block. Specification type values are specification artefacts that do not necessarily correspond to any specific entity within an ECMAScript implementation. Specification type values may be used to describe intermediate results of ECMAScript expression evaluation but such values cannot be stored as properties of objects or values of ECMAScript language variables.</p>
 
     <emu-clause id="sec-enum-specification-type">
       <h1>The Enum Specification Type</h1>
@@ -23286,7 +23286,7 @@
     </emu-clause>
 
     <emu-clause id="sec-static-semantics-expectedargumentcount" oldids="sec-function-definitions-static-semantics-expectedargumentcount,sec-arrow-function-definitions-static-semantics-expectedargumentcount,sec-method-definitions-static-semantics-expectedargumentcount,sec-async-arrow-function-definitions-static-semantics-ExpectedArgumentCount" type="sdo">
-      <h1>Static Semantics: ExpectedArgumentCount ( ): an integer</h1>
+      <h1>Static Semantics: ExpectedArgumentCount ( ): a non-negative integer</h1>
       <dl class="header">
       </dl>
       <emu-grammar>
@@ -30299,7 +30299,7 @@
           <h1>
             CreateDynamicFunction (
               _constructor_: a constructor,
-              _newTarget_: a constructor,
+              _newTarget_: a constructor or *undefined*,
               _kind_: ~normal~, ~generator~, ~async~, or ~async-generator~,
               _parameterArgs_: a List of ECMAScript language values,
               _bodyArg_: an ECMAScript language value,
@@ -47515,7 +47515,7 @@ THH:mm:ss.sss
         <emu-clause id="sec-promise-resolve" type="abstract operation">
           <h1>
             PromiseResolve (
-              _C_: a constructor,
+              _C_: an Object,
               _x_: an ECMAScript language value,
             ): either a normal completion containing an ECMAScript language value or a throw completion
           </h1>
