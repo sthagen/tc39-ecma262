@@ -3147,7 +3147,7 @@
             The normal return type is either Property Descriptor or Undefined.
           </li>
           <li>
-            If the Type of the return value is Property Descriptor, the return value must be a fully populated Property Descriptor.
+            If the return value is a Property Descriptor, it must be a fully populated Property Descriptor.
           </li>
           <li>
             If _P_ is described as a non-configurable, non-writable own data property, all future calls to [[GetOwnProperty]] ( _P_ ) must return Property Descriptor whose [[Value]] is SameValue as _P_'s [[Value]] attribute.
@@ -3236,7 +3236,7 @@
             The returned List must not contain any duplicate entries.
           </li>
           <li>
-            The Type of each element of the returned List is either String or Symbol.
+            Each element of the returned List must be a property key.
           </li>
           <li>
             The returned List must contain at least the keys of all non-configurable own properties that have previously been observed.
@@ -5871,6 +5871,30 @@
       </emu-alg>
     </emu-clause>
 
+    <emu-clause id="sec-sametype" type="abstract operation">
+      <h1>
+        SameType (
+          _x_: an ECMAScript language value,
+          _y_: an ECMAScript language value,
+        ): a Boolean
+      </h1>
+      <dl class="header">
+        <dt>description</dt>
+        <dd>It determines whether or not the two arguments are the same type.</dd>
+      </dl>
+      <emu-alg>
+        1. If _x_ is *undefined* and _y_ is *undefined*, return *true*.
+        1. If _x_ is *null* and _y_ is *null*, return *true*.
+        1. If _x_ is a Boolean and _y_ is a Boolean, return *true*.
+        1. If _x_ is a Number and _y_ is a Number, return *true*.
+        1. If _x_ is a BigInt and _y_ is a BigInt, return *true*.
+        1. If _x_ is a Symbol and _y_ is a Symbol, return *true*.
+        1. If _x_ is a String and _y_ is a String, return *true*.
+        1. If _x_ is an Object and _y_ is an Object, return *true*.
+        1. Return *false*.
+      </emu-alg>
+    </emu-clause>
+
     <emu-clause id="sec-samevalue" type="abstract operation">
       <h1>
         SameValue (
@@ -5883,7 +5907,7 @@
         <dd>It determines whether or not the two arguments are the same value.</dd>
       </dl>
       <emu-alg>
-        1. If Type(_x_) is not Type(_y_), return *false*.
+        1. If SameType(_x_, _y_) is *false*, return *false*.
         1. If _x_ is a Number, then
           1. Return Number::sameValue(_x_, _y_).
         1. Return SameValueNonNumber(_x_, _y_).
@@ -5905,7 +5929,7 @@
         <dd>It determines whether or not the two arguments are the same value (ignoring the difference between *+0*<sub>𝔽</sub> and *-0*<sub>𝔽</sub>).</dd>
       </dl>
       <emu-alg>
-        1. If Type(_x_) is not Type(_y_), return *false*.
+        1. If SameType(_x_, _y_) is *false*, return *false*.
         1. If _x_ is a Number, then
           1. Return Number::sameValueZero(_x_, _y_).
         1. Return SameValueNonNumber(_x_, _y_).
@@ -5925,7 +5949,7 @@
       <dl class="header">
       </dl>
       <emu-alg>
-        1. Assert: Type(_x_) is Type(_y_).
+        1. Assert: SameType(_x_, _y_) is *true*.
         1. If _x_ is either *null* or *undefined*, return *true*.
         1. If _x_ is a BigInt, then
           1. Return BigInt::equal(_x_, _y_).
@@ -5985,7 +6009,7 @@
           1. NOTE: Because _px_ and _py_ are primitive values, evaluation order is not important.
           1. Let _nx_ be ? <emu-meta suppress-effects="user-code">ToNumeric(_px_)</emu-meta>.
           1. Let _ny_ be ? <emu-meta suppress-effects="user-code">ToNumeric(_py_)</emu-meta>.
-          1. If Type(_nx_) is Type(_ny_), then
+          1. If SameType(_nx_, _ny_) is *true*, then
             1. If _nx_ is a Number, then
               1. Return Number::lessThan(_nx_, _ny_).
             1. Else,
@@ -6017,7 +6041,7 @@
         <dd>It provides the semantics for the `==` operator.</dd>
       </dl>
       <emu-alg>
-        1. If Type(_x_) is Type(_y_), then
+        1. If SameType(_x_, _y_) is *true*, then
           1. Return IsStrictlyEqual(_x_, _y_).
         1. If _x_ is *null* and _y_ is *undefined*, return *true*.
         1. If _x_ is *undefined* and _y_ is *null*, return *true*.
@@ -6052,7 +6076,7 @@
         <dd>It provides the semantics for the `===` operator.</dd>
       </dl>
       <emu-alg>
-        1. If Type(_x_) is not Type(_y_), return *false*.
+        1. If SameType(_x_, _y_) is *false*, return *false*.
         1. If _x_ is a Number, then
           1. Return Number::equal(_x_, _y_).
         1. Return SameValueNonNumber(_x_, _y_).
@@ -6447,7 +6471,7 @@
       <h1>
         CreateListFromArrayLike (
           _obj_: an ECMAScript language value,
-          optional _elementTypes_: a List of names of ECMAScript Language Types,
+          optional _requirePropertyKeys_: a boolean,
         ): either a normal completion containing a List of ECMAScript language values or a throw completion
       </h1>
       <dl class="header">
@@ -6455,7 +6479,6 @@
         <dd>It is used to create a List value whose elements are provided by the indexed properties of _obj_. _elementTypes_ contains the names of ECMAScript Language Types that are allowed for element values of the List that is created.</dd>
       </dl>
       <emu-alg>
-        1. If _elementTypes_ is not present, set _elementTypes_ to « Undefined, Null, Boolean, String, Symbol, Number, BigInt, Object ».
         1. If _obj_ is not an Object, throw a *TypeError* exception.
         1. Let _len_ be ? LengthOfArrayLike(_obj_).
         1. Let _list_ be a new empty List.
@@ -6463,7 +6486,7 @@
         1. Repeat, while _index_ &lt; _len_,
           1. Let _indexName_ be ! ToString(𝔽(_index_)).
           1. Let _next_ be ? Get(_obj_, _indexName_).
-          1. If _elementTypes_ does not contain Type(_next_), throw a *TypeError* exception.
+          1. If _requirePropertyKeys_ is *true* and _next_ is not a property key, throw a *TypeError* exception.
           1. Append _next_ to _list_.
           1. Set _index_ to _index_ + 1.
         1. Return _list_.
@@ -15861,7 +15884,7 @@
         1. If _trap_ is *undefined*, then
           1. Return ? <emu-meta effects="user-code">_target_.[[OwnPropertyKeys]]()</emu-meta>.
         1. Let _trapResultArray_ be ? Call(_trap_, _handler_, « _target_ »).
-        1. Let _trapResult_ be ? CreateListFromArrayLike(_trapResultArray_, « String, Symbol »).
+        1. Let _trapResult_ be ? CreateListFromArrayLike(_trapResultArray_, *true*).
         1. If _trapResult_ contains any duplicate entries, throw a *TypeError* exception.
         1. Let _extensibleTarget_ be ? IsExtensible(_target_).
         1. Let _targetKeys_ be ? <emu-meta effects="user-code">_target_.[[OwnPropertyKeys]]()</emu-meta>.
@@ -15898,7 +15921,7 @@
             The returned List contains no duplicate entries.
           </li>
           <li>
-            The Type of each result List element is either String or Symbol.
+            Each element of the returned List is a property key.
           </li>
           <li>
             The result List must contain the keys of all non-configurable own properties of the target object.
@@ -20659,7 +20682,7 @@
         1. NOTE: At this point, it must be a numeric operation.
         1. Let _lNum_ be ? ToNumeric(_lVal_).
         1. Let _rNum_ be ? ToNumeric(_rVal_).
-        1. If Type(_lNum_) is not Type(_rNum_), throw a *TypeError* exception.
+        1. If SameType(_lNum_, _rNum_) is *false*, throw a *TypeError* exception.
         1. If _lNum_ is a BigInt, then
           1. If _opText_ is `**`, return ? BigInt::exponentiate(_lNum_, _rNum_).
           1. If _opText_ is `/`, return ? BigInt::divide(_lNum_, _rNum_).
