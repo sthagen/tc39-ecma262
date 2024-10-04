@@ -24161,7 +24161,7 @@
               1. Else, set _received_ to Completion(GeneratorYield(_innerResult_)).
             1. Else,
               1. NOTE: If _iterator_ does not have a `throw` method, this throw is going to terminate the `yield*` loop. But first we need to give _iterator_ a chance to clean up.
-              1. Let _closeCompletion_ be Completion Record { [[Type]]: ~normal~, [[Value]]: ~empty~, [[Target]]: ~empty~ }.
+              1. Let _closeCompletion_ be NormalCompletion(~empty~).
               1. If _generatorKind_ is ~async~, perform ? AsyncIteratorClose(_iteratorRecord_, _closeCompletion_).
               1. Else, perform ? IteratorClose(_iteratorRecord_, _closeCompletion_).
               1. NOTE: The next step throws a *TypeError* to indicate that there was a `yield*` protocol violation: _iterator_ does not have a `throw` method.
@@ -34921,7 +34921,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-string.prototype.matchall">
         <h1>String.prototype.matchAll ( _regexp_ )</h1>
-        <p>This method performs a regular expression match of the String representing the *this* value against _regexp_ and returns an iterator. Each iteration result's value is an Array containing the results of the match, or *null* if the String did not match.</p>
+        <p>This method performs a regular expression match of the String representing the *this* value against _regexp_ and returns an iterator that yields match results. Each match result is an Array containing the matched portion of the String as the first element, followed by the portions matched by any capturing groups. If the regular expression never matches, the returned iterator does not yield any match results.</p>
         <p>It performs the following steps when called:</p>
 
         <emu-alg>
