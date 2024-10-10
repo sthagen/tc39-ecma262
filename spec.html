@@ -39738,7 +39738,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-array.prototype.sort" oldids="sec-sortcompare">
         <h1>Array.prototype.sort ( _comparator_ )</h1>
-        <p>This method sorts the elements of this array. The sort must be stable (that is, elements that compare equal must remain in their original order). If _comparator_ is not *undefined*, it should be a function that accepts two arguments _x_ and _y_ and returns a negative Number if _x_ &lt; _y_, a positive Number if _x_ > _y_, or a zero otherwise.</p>
+        <p>This method sorts the elements of this array. If _comparator_ is not *undefined*, it should be a function that accepts two arguments _x_ and _y_ and returns a negative Number if _x_ &lt; _y_, a positive Number if _x_ > _y_, or a zero otherwise.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
           1. [id="step-array-sort-comparefn"] If _comparator_ is not *undefined* and IsCallable(_comparator_) is *false*, throw a *TypeError* exception.
@@ -39796,7 +39796,7 @@ THH:mm:ss.sss
             1. [id="step-array-sort"] Sort _items_ using an implementation-defined sequence of <emu-meta effects="user-code">calls to _SortCompare_</emu-meta>. If any such call returns an abrupt completion, stop before performing any further calls to _SortCompare_ and return that Completion Record.
             1. Return _items_.
           </emu-alg>
-          <p>The <dfn id="sort-order">sort order</dfn> is the ordering of _items_ after completion of step <emu-xref href="#step-array-sort"></emu-xref> of the algorithm above. The sort order is implementation-defined if _SortCompare_ is not a consistent comparator for the elements of _items_. When SortIndexedProperties is invoked by <emu-xref href="#sec-array.prototype.sort">Array.prototype.sort</emu-xref>, the sort order is also implementation-defined if _comparator_ is *undefined*, and all applications of ToString, to any specific value passed as an argument to _SortCompare_, do not produce the same result.</p>
+          <p>The <dfn id="sort-order">sort order</dfn> is the ordering of _items_ after completion of step <emu-xref href="#step-array-sort"></emu-xref> of the algorithm above. The sort order is implementation-defined if _SortCompare_ is not a consistent comparator for the elements of _items_. When SortIndexedProperties is invoked by <emu-xref href="#sec-array.prototype.sort">Array.prototype.sort</emu-xref> or <emu-xref href="#sec-array.prototype.tosorted">Array.prototype.toSorted</emu-xref>, the sort order is also implementation-defined if _comparator_ is *undefined*, and all applications of ToString, to any specific value passed as an argument to _SortCompare_, do not produce the same result.</p>
           <p>Unless the sort order is specified to be implementation-defined, it must satisfy all of the following conditions:</p>
           <ul>
             <li>
@@ -39804,6 +39804,9 @@ THH:mm:ss.sss
             </li>
             <li>
               Then for all non-negative integers _j_ and _k_, each less than _itemCount_, if <emu-eqn>ℝ(_SortCompare_(old[_j_], old[_k_])) &lt; 0</emu-eqn>, then <emu-eqn>π(_j_) &lt; π(_k_)</emu-eqn>.
+            </li>
+            <li>
+              And for all non-negative integers _j_ and _k_ such that _j_ &lt; _k_ &lt; _itemCount_, if <emu-eqn>ℝ(_SortCompare_(old[_j_], old[_k_])) = 0</emu-eqn>, then <emu-eqn>π(_j_) &lt; π(_k_)</emu-eqn>; i.e., the sort is stable.
             </li>
           </ul>
           <p>Here the notation <emu-eqn>old[_j_]</emu-eqn> is used to refer to <emu-eqn>_items_[_j_]</emu-eqn> before step <emu-xref href="#step-array-sort"></emu-xref> is executed, and the notation <emu-eqn>new[_j_]</emu-eqn> to refer to <emu-eqn>_items_[_j_]</emu-eqn> after step <emu-xref href="#step-array-sort"></emu-xref> has been executed.</p>
