@@ -5655,11 +5655,11 @@
       <h1>
         ToLength (
           _argument_: an ECMAScript language value,
-        ): either a normal completion containing an integral Number or a throw completion
+        ): either a normal completion containing a non-negative integral Number or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
-        <dd>It clamps and truncates _argument_ to an integral Number suitable for use as the length of an array-like object.</dd>
+        <dd>It clamps and truncates _argument_ to a non-negative integral Number suitable for use as the length of an array-like object.</dd>
       </dl>
       <emu-alg>
         1. Let _len_ be ? ToIntegerOrInfinity(_argument_).
@@ -10796,7 +10796,7 @@
         </emu-clause>
 
         <emu-clause id="sec-getsuperbase" type="concrete method">
-          <h1>GetSuperBase ( ): either a normal completion containing either an Object, *null*, or *undefined*, or a throw completion</h1>
+          <h1>GetSuperBase ( ): an Object, *null*, or *undefined*</h1>
           <dl class="header">
             <dt>for</dt>
             <dd>a Function Environment Record _envRec_</dd>
@@ -10804,8 +10804,8 @@
           <emu-alg>
             1. Let _home_ be _envRec_.[[FunctionObject]].[[HomeObject]].
             1. If _home_ is *undefined*, return *undefined*.
-            1. Assert: _home_ is an Object.
-            1. Return ? <emu-meta effects="user-code">_home_.[[GetPrototypeOf]]</emu-meta>().
+            1. Assert: _home_ is an ordinary object.
+            1. Return ! _home_.[[GetPrototypeOf]]().
           </emu-alg>
         </emu-clause>
       </emu-clause>
@@ -13718,6 +13718,7 @@
         <dd>It configures _F_ as a method.</dd>
       </dl>
       <emu-alg>
+        1. Assert: _homeObject_ is an ordinary object.
         1. Set _F_.[[HomeObject]] to _homeObject_.
         1. Return ~unused~.
       </emu-alg>
@@ -19446,7 +19447,7 @@
           1. Let _propertyNameValue_ be ? GetValue(_propertyNameReference_).
           1. Let _strict_ be IsStrict(this |SuperProperty|).
           1. NOTE: In most cases, ToPropertyKey will be performed on _propertyNameValue_ immediately after this step. However, in the case of `super[b] = c`, it will not be performed until after evaluation of `c`.
-          1. Return ? MakeSuperPropertyReference(_actualThis_, _propertyNameValue_, _strict_).
+          1. Return MakeSuperPropertyReference(_actualThis_, _propertyNameValue_, _strict_).
         </emu-alg>
         <emu-grammar>SuperProperty : `super` `.` IdentifierName</emu-grammar>
         <emu-alg>
@@ -19454,7 +19455,7 @@
           1. Let _actualThis_ be ? _env_.GetThisBinding().
           1. Let _propertyKey_ be the StringValue of |IdentifierName|.
           1. Let _strict_ be IsStrict(this |SuperProperty|).
-          1. Return ? MakeSuperPropertyReference(_actualThis_, _propertyKey_, _strict_).
+          1. Return MakeSuperPropertyReference(_actualThis_, _propertyKey_, _strict_).
         </emu-alg>
         <emu-grammar>SuperCall : `super` Arguments</emu-grammar>
         <emu-alg>
@@ -19493,14 +19494,14 @@
             _actualThis_: an ECMAScript language value,
             _propertyKey_: an ECMAScript language value,
             _strict_: a Boolean,
-          ): either a normal completion containing a Super Reference Record or a throw completion
+          ): a Super Reference Record
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
           1. Let _env_ be GetThisEnvironment().
           1. Assert: _env_.HasSuperBinding() is *true*.
-          1. Let _baseValue_ be ? _env_.GetSuperBase().
+          1. Let _baseValue_ be _env_.GetSuperBase().
           1. Return the Reference Record { [[Base]]: _baseValue_, [[ReferencedName]]: _propertyKey_, [[Strict]]: _strict_, [[ThisValue]]: _actualThis_ }.
         </emu-alg>
       </emu-clause>
@@ -29697,6 +29698,11 @@
     <emu-clause id="sec-int32array">
       <h1>Int32Array ( . . . )</h1>
       <p>See <emu-xref href="#sec-typedarray-constructors"></emu-xref>.</p>
+    </emu-clause>
+
+    <emu-clause id="sec-constructor-properties-of-the-global-object-iterator">
+      <h1>Iterator ( . . . )</h1>
+      <p>See <emu-xref href="#sec-iterator-constructor"></emu-xref>.</p>
     </emu-clause>
 
     <emu-clause id="sec-map">
@@ -48863,7 +48869,7 @@ THH:mm:ss.sss
           1. Let _internalSlotsList_ be the list-concatenation of _extraSlots_ and « [[GeneratorState]], [[GeneratorContext]], [[GeneratorBrand]] ».
           1. Let _generator_ be OrdinaryObjectCreate(_generatorPrototype_, _internalSlotsList_).
           1. Set _generator_.[[GeneratorBrand]] to _generatorBrand_.
-          1. Set _generator_.[[GeneratorState]] to *undefined*.
+          1. Set _generator_.[[GeneratorState]] to ~suspended-start~.
           1. Let _callerContext_ be the running execution context.
           1. Let _calleeContext_ be a new execution context.
           1. Set the Function of _calleeContext_ to *null*.
