@@ -934,6 +934,8 @@
         <dl class="header">
           <dt>description</dt>
           <dd>It is used to emphasize that a Completion Record is being returned.</dd>
+          <dt>skip return checks</dt>
+          <dd>true</dd>
         </dl>
         <emu-alg>
           1. Assert: _completionRecord_ is a Completion Record.
@@ -4182,6 +4184,8 @@
           ): a normal completion
         </h1>
         <dl class="header">
+          <dt>skip return checks</dt>
+          <dd>true</dd>
         </dl>
         <emu-alg>
           1. Return Completion Record { [[Type]]: ~normal~, [[Value]]: _value_, [[Target]]: ~empty~ }.
@@ -45626,9 +45630,8 @@ THH:mm:ss.sss
         1. [id="step-json-parse-parse"] Let _script_ be ParseText(_scriptString_, |Script|).
         1. NOTE: The early error rules defined in <emu-xref href="#sec-object-initializer-static-semantics-early-errors"></emu-xref> have special handling for the above invocation of ParseText.
         1. Assert: _script_ is a Parse Node.
-        1. [id="step-json-parse-eval"] Let _completion_ be Completion(<emu-meta suppress-effects="user-code">Evaluation of _script_</emu-meta>).
+        1. [id="step-json-parse-eval"] Let _unfiltered_ be ! <emu-meta suppress-effects="user-code">Evaluation of _script_</emu-meta>.
         1. NOTE: The PropertyDefinitionEvaluation semantics defined in <emu-xref href="#sec-runtime-semantics-propertydefinitionevaluation"></emu-xref> have special handling for the above evaluation.
-        1. Let _unfiltered_ be _completion_.[[Value]].
         1. [id="step-json-parse-assert-type"] Assert: _unfiltered_ is either a String, a Number, a Boolean, an Object that is defined by either an |ArrayLiteral| or an |ObjectLiteral|, or *null*.
         1. If IsCallable(_reviver_) is *true*, then
           1. Let _root_ be OrdinaryObjectCreate(%Object.prototype%).
@@ -48851,6 +48854,8 @@ THH:mm:ss.sss
           ): either a normal completion containing an ECMAScript language value or an abrupt completion
         </h1>
         <dl class="header">
+          <dt>skip return checks</dt>
+          <dd>true</dd>
         </dl>
         <emu-alg>
           1. Let _genContext_ be the running execution context.
