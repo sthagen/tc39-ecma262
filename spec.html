@@ -11721,7 +11721,7 @@
             [[GlobalObject]]
           </td>
           <td>
-            an Object or *undefined*
+            an Object
           </td>
           <td>
             The global object for this realm
@@ -11786,7 +11786,6 @@
         1. Let _realm_ be a new Realm Record.
         1. Perform CreateIntrinsics(_realm_).
         1. Set _realm_.[[AgentSignifier]] to AgentSignifier().
-        1. Set _realm_.[[GlobalObject]] to *undefined*.
         1. Set _realm_.[[GlobalEnv]] to *undefined*.
         1. Set _realm_.[[TemplateMap]] to a new empty List.
         1. Let _newContext_ be a new execution context.
@@ -13980,7 +13979,9 @@
         <dd>a built-in function object _F_ (when the method is present)</dd>
       </dl>
       <emu-alg>
-        1. Return ? BuiltinCallOrConstruct(_F_, ~uninitialized~, _argumentsList_, _newTarget_).
+        1. Let _result_ be ? BuiltinCallOrConstruct(_F_, ~uninitialized~, _argumentsList_, _newTarget_).
+        1. Assert: _result_ is an Object.
+        1. Return _result_.
       </emu-alg>
     </emu-clause>
 
@@ -28467,7 +28468,7 @@
         <h1>
           GetModuleNamespace (
             _module_: an instance of a concrete subclass of Module Record,
-          ): a Module Namespace Object or ~empty~
+          ): a Module Namespace Object
         </h1>
         <dl class="header">
           <dt>description</dt>
@@ -49385,7 +49386,7 @@ THH:mm:ss.sss
           1. Let _internalSlotsList_ be « [[AsyncGeneratorState]], [[AsyncGeneratorContext]], [[AsyncGeneratorQueue]], [[GeneratorBrand]] ».
           1. Let _generator_ be OrdinaryObjectCreate(_generatorPrototype_, _internalSlotsList_).
           1. Set _generator_.[[GeneratorBrand]] to _generatorBrand_.
-          1. Set _generator_.[[AsyncGeneratorState]] to *undefined*.
+          1. Set _generator_.[[AsyncGeneratorState]] to ~suspended-start~.
           1. Let _callerContext_ be the running execution context.
           1. Let _calleeContext_ be a new execution context.
           1. Set the Function of _calleeContext_ to *null*.
