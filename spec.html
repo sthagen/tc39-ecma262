@@ -3331,7 +3331,7 @@
               <td>
               </td>
               <td>
-                The prototype of async-from-sync iterator objects (<emu-xref href="#sec-async-from-sync-iterator-objects"></emu-xref>)
+                The prototype of Async-from-Sync Iterator objects (<emu-xref href="#sec-async-from-sync-iterator-objects"></emu-xref>)
               </td>
             </tr>
             <tr>
@@ -3568,7 +3568,7 @@
               <td>
               </td>
               <td>
-                The prototype of For-In iterator objects (<emu-xref href="#sec-for-in-iterator-objects"></emu-xref>)
+                The prototype of For-In Iterator objects (<emu-xref href="#sec-for-in-iterator-objects"></emu-xref>)
               </td>
             </tr>
             <tr>
@@ -7506,11 +7506,11 @@
         1. Let _head_ be the |AsyncArrowHead| that is covered by |CoverCallExpressionAndAsyncArrowHead|.
         1. Return the BoundNames of _head_.
       </emu-alg>
-      <emu-grammar>ImportDeclaration : `import` ImportClause FromClause `;`</emu-grammar>
+      <emu-grammar>ImportDeclaration : `import` ImportClause FromClause WithClause? `;`</emu-grammar>
       <emu-alg>
         1. Return the BoundNames of |ImportClause|.
       </emu-alg>
-      <emu-grammar>ImportDeclaration : `import` ModuleSpecifier `;`</emu-grammar>
+      <emu-grammar>ImportDeclaration : `import` ModuleSpecifier WithClause? `;`</emu-grammar>
       <emu-alg>
         1. Return a new empty List.
       </emu-alg>
@@ -7542,7 +7542,7 @@
       </emu-alg>
       <emu-grammar>
         ExportDeclaration :
-          `export` ExportFromClause FromClause `;`
+          `export` ExportFromClause FromClause WithClause? `;`
           `export` NamedExports `;`
       </emu-grammar>
       <emu-alg>
@@ -7900,7 +7900,7 @@
       </emu-alg>
       <emu-grammar>
         ExportDeclaration :
-          `export` ExportFromClause FromClause `;`
+          `export` ExportFromClause FromClause WithClause? `;`
           `export` NamedExports `;`
           `export` VariableStatement
       </emu-grammar>
@@ -10003,11 +10003,19 @@
       <emu-alg>
         1. Return the PropName of |PropertyName|.
       </emu-alg>
-      <emu-grammar>LiteralPropertyName : IdentifierName</emu-grammar>
+      <emu-grammar>
+        LiteralPropertyName : IdentifierName
+
+        AttributeKey : IdentifierName
+      </emu-grammar>
       <emu-alg>
         1. Return the StringValue of |IdentifierName|.
       </emu-alg>
-      <emu-grammar>LiteralPropertyName : StringLiteral</emu-grammar>
+      <emu-grammar>
+        LiteralPropertyName : StringLiteral
+
+        AttributeKey : StringLiteral
+      </emu-grammar>
       <emu-alg>
         1. Return the SV of |StringLiteral|.
       </emu-alg>
@@ -10186,7 +10194,7 @@
               HasSuperBinding()
             </td>
             <td>
-              Determine if an Environment Record establishes a `super` method binding. Return *true* if it does and *false* if it does not.
+              Determine if an Environment Record establishes a `super` method binding. Return *true* if it does and *false* if it does not. If it returns *true* it implies that the Environment Record is a Function Environment Record, although the reverse implication does not hold.
             </td>
           </tr>
           <tr>
@@ -10203,7 +10211,6 @@
       <emu-clause id="sec-declarative-environment-records">
         <h1>Declarative Environment Records</h1>
         <p>Each <dfn variants="Declarative Environment Records">Declarative Environment Record</dfn> is associated with an ECMAScript program scope containing variable, constant, let, class, module, import, and/or function declarations. A Declarative Environment Record binds the set of identifiers defined by the declarations contained within its scope.</p>
-        <p>The behaviour of the concrete specification methods for Declarative Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-declarative-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -10451,7 +10458,6 @@
             </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the concrete specification methods for Object Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-object-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -10718,48 +10724,32 @@
             </thead>
             <tr>
               <td>
-                BindThisValue(V)
-              </td>
-              <td>
-                Set the [[ThisValue]] and record that it has been initialized.
-              </td>
-            </tr>
-            <tr>
-              <td>
                 GetThisBinding()
               </td>
               <td>
                 Return the value of this Environment Record's `this` binding. Throws a *ReferenceError* if the `this` binding has not been initialized.
               </td>
             </tr>
-            <tr>
-              <td>
-                GetSuperBase()
-              </td>
-              <td>
-                Return the object that is the base for `super` property accesses bound in this Environment Record. The value *undefined* indicates that such accesses will produce runtime errors.
-              </td>
-            </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the additional concrete specification methods for Function Environment Records is defined by the following algorithms:</p>
 
-        <emu-clause id="sec-bindthisvalue" type="concrete method">
+        <emu-clause id="sec-bindthisvalue" type="abstract operation">
           <h1>
             BindThisValue (
+              _envRec_: a Function Environment Record,
               _V_: an ECMAScript language value,
-            ): either a normal completion containing an ECMAScript language value or a throw completion
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Function Environment Record _envRec_</dd>
+            <dt>description</dt>
+            <dd>It sets the _envRec_.[[ThisValue]] and records that it has been initialized.</dd>
           </dl>
           <emu-alg>
             1. Assert: _envRec_.[[ThisBindingStatus]] is not ~lexical~.
             1. If _envRec_.[[ThisBindingStatus]] is ~initialized~, throw a *ReferenceError* exception.
             1. Set _envRec_.[[ThisValue]] to _V_.
             1. Set _envRec_.[[ThisBindingStatus]] to ~initialized~.
-            1. Return _V_.
+            1. Return ~unused~.
           </emu-alg>
         </emu-clause>
 
@@ -10799,11 +10789,15 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-getsuperbase" type="concrete method">
-          <h1>GetSuperBase ( ): an Object, *null*, or *undefined*</h1>
+        <emu-clause id="sec-getsuperbase" type="abstract operation">
+          <h1>
+            GetSuperBase (
+              _envRec_: a Function Environment Record,
+            ): an Object, *null*, or *undefined*
+          </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Function Environment Record _envRec_</dd>
+            <dt>description</dt>
+            <dd>It returns the object that is the base for `super` property accesses bound in _envRec_. The value *undefined* indicates that such accesses will produce runtime errors.</dd>
           </dl>
           <emu-alg>
             1. Let _home_ be _envRec_.[[FunctionObject]].[[HomeObject]].
@@ -10818,7 +10812,7 @@
         <h1>Global Environment Records</h1>
         <p>A <dfn variants="Global Environment Records">Global Environment Record</dfn> is used to represent the outer most scope that is shared by all of the ECMAScript |Script| elements that are processed in a common realm. A Global Environment Record provides the bindings for built-in globals (clause <emu-xref href="#sec-global-object"></emu-xref>), properties of the global object, and for all top-level declarations (<emu-xref href="#sec-static-semantics-toplevellexicallyscopeddeclarations"></emu-xref>, <emu-xref href="#sec-static-semantics-toplevelvarscopeddeclarations"></emu-xref>) that occur within a |Script|.</p>
         <p>A Global Environment Record is logically a single record but it is specified as a composite encapsulating an Object Environment Record and a Declarative Environment Record. The Object Environment Record has as its base object the global object of the associated Realm Record. This global object is the value returned by the Global Environment Record's GetThisBinding concrete method. The Object Environment Record component of a Global Environment Record contains the bindings for all built-in globals (clause <emu-xref href="#sec-global-object"></emu-xref>) and all bindings introduced by a |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableStatement| contained in global code. The bindings for all other ECMAScript declarations in global code are contained in the Declarative Environment Record component of the Global Environment Record.</p>
-        <p>Properties may be created directly on a global object. Hence, the Object Environment Record component of a Global Environment Record may contain both bindings created explicitly by |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableDeclaration| declarations and bindings created implicitly as properties of the global object. In order to identify which bindings were explicitly created using declarations, a Global Environment Record maintains a list of the names bound using its CreateGlobalVarBinding and CreateGlobalFunctionBinding concrete methods.</p>
+        <p>Properties may be created directly on a global object. Hence, the Object Environment Record component of a Global Environment Record may contain both bindings created explicitly by |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, or |VariableDeclaration| declarations and bindings created implicitly as properties of the global object. In order to identify which bindings were explicitly created using declarations, a Global Environment Record maintains a list of the names bound using the CreateGlobalVarBinding and CreateGlobalFunctionBinding abstract operations.</p>
         <p>Global Environment Records have the additional fields listed in <emu-xref href="#table-additional-fields-of-global-environment-records"></emu-xref> and the additional methods listed in <emu-xref href="#table-additional-methods-of-global-environment-records"></emu-xref>.</p>
         <emu-table id="table-additional-fields-of-global-environment-records" caption="Additional Fields of Global Environment Records" oldids="table-18">
           <table>
@@ -10901,65 +10895,8 @@
                 Return the value of this Environment Record's `this` binding.
               </td>
             </tr>
-            <tr>
-              <td>
-                HasVarDeclaration (N)
-              </td>
-              <td>
-                Determines if the argument identifier has a binding in this Environment Record that was created using a |VariableDeclaration|, |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, or |AsyncGeneratorDeclaration|.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                HasLexicalDeclaration (N)
-              </td>
-              <td>
-                Determines if the argument identifier has a binding in this Environment Record that was created using a lexical declaration such as a |LexicalDeclaration| or a |ClassDeclaration|.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                HasRestrictedGlobalProperty (N)
-              </td>
-              <td>
-                Determines if the argument is the name of a global object property that may not be shadowed by a global lexical binding.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                CanDeclareGlobalVar (N)
-              </td>
-              <td>
-                Determines if a corresponding CreateGlobalVarBinding call would succeed if called for the same argument _N_.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                CanDeclareGlobalFunction (N)
-              </td>
-              <td>
-                Determines if a corresponding CreateGlobalFunctionBinding call would succeed if called for the same argument _N_.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                CreateGlobalVarBinding(N, D)
-              </td>
-              <td>
-                Used to create and initialize to *undefined* a global `var` binding in the [[ObjectRecord]] component of a Global Environment Record. The binding will be a mutable binding. The corresponding global object property will have attribute values appropriate for a `var`. The String value _N_ is the bound name. If _D_ is *true*, the binding may be deleted. Logically equivalent to CreateMutableBinding followed by a SetMutableBinding but it allows var declarations to receive special treatment.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                CreateGlobalFunctionBinding(N, V, D)
-              </td>
-              <td>
-                Create and initialize a global `function` binding in the [[ObjectRecord]] component of a Global Environment Record. The binding will be a mutable binding. The corresponding global object property will have attribute values appropriate for a `function`. The String value _N_ is the bound name. _V_ is the initialization value. If the Boolean argument _D_ is *true*, the binding may be deleted. Logically equivalent to CreateMutableBinding followed by a SetMutableBinding but it allows function declarations to receive special treatment.
-              </td>
-            </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the concrete specification methods for Global Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-global-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -11174,18 +11111,16 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-hasvardeclaration" type="concrete method">
+        <emu-clause id="sec-hasvardeclaration" type="abstract operation">
           <h1>
             HasVarDeclaration (
+              _envRec_: a Global Environment Record,
               _N_: a String,
             ): a Boolean
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
-            <dd>It determines if the argument identifier has a binding in this record that was created using a |VariableStatement| or a |FunctionDeclaration|.</dd>
+            <dd>It determines if the argument identifier has a binding in _envRec_ that was created using a |VariableDeclaration|, |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, or |AsyncGeneratorDeclaration|.</dd>
           </dl>
           <emu-alg>
             1. Let _varDeclaredNames_ be _envRec_.[[VarNames]].
@@ -11194,18 +11129,16 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-haslexicaldeclaration" type="concrete method">
+        <emu-clause id="sec-haslexicaldeclaration" type="abstract operation">
           <h1>
             HasLexicalDeclaration (
+              _envRec_: a Global Environment Record,
               _N_: a String,
             ): a Boolean
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
-            <dd>It determines if the argument identifier has a binding in this record that was created using a lexical declaration such as a |LexicalDeclaration| or a |ClassDeclaration|.</dd>
+            <dd>It determines if the argument identifier has a binding in _envRec_ that was created using a lexical declaration such as a |LexicalDeclaration| or a |ClassDeclaration|.</dd>
           </dl>
           <emu-alg>
             1. Let _DclRec_ be _envRec_.[[DeclarativeRecord]].
@@ -11213,16 +11146,14 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-hasrestrictedglobalproperty" type="concrete method">
+        <emu-clause id="sec-hasrestrictedglobalproperty" type="abstract operation">
           <h1>
             HasRestrictedGlobalProperty (
+              _envRec_: a Global Environment Record,
               _N_: a String,
             ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
             <dd>It determines if the argument identifier is the name of a property of the global object that must not be shadowed by a global lexical binding.</dd>
           </dl>
@@ -11239,16 +11170,14 @@
           </emu-note>
         </emu-clause>
 
-        <emu-clause id="sec-candeclareglobalvar" type="concrete method">
+        <emu-clause id="sec-candeclareglobalvar" type="abstract operation">
           <h1>
             CanDeclareGlobalVar (
+              _envRec_: a Global Environment Record,
               _N_: a String,
             ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
             <dd>It determines if a corresponding CreateGlobalVarBinding call would succeed if called for the same argument _N_. Redundant var declarations and var declarations for pre-existing global object properties are allowed.</dd>
           </dl>
@@ -11261,16 +11190,14 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-candeclareglobalfunction" type="concrete method">
+        <emu-clause id="sec-candeclareglobalfunction" type="abstract operation">
           <h1>
             CanDeclareGlobalFunction (
+              _envRec_: a Global Environment Record,
               _N_: a String,
             ): either a normal completion containing a Boolean or a throw completion
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
             <dd>It determines if a corresponding CreateGlobalFunctionBinding call would succeed if called for the same argument _N_.</dd>
           </dl>
@@ -11285,17 +11212,15 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-createglobalvarbinding" type="concrete method">
+        <emu-clause id="sec-createglobalvarbinding" type="abstract operation">
           <h1>
             CreateGlobalVarBinding (
+              _envRec_: a Global Environment Record,
               _N_: a String,
               _D_: a Boolean,
             ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
             <dd>It creates and initializes a mutable binding in the associated Object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is reused and assumed to be initialized.</dd>
           </dl>
@@ -11313,18 +11238,16 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-createglobalfunctionbinding" type="concrete method">
+        <emu-clause id="sec-createglobalfunctionbinding" type="abstract operation">
           <h1>
             CreateGlobalFunctionBinding (
+              _envRec_: a Global Environment Record,
               _N_: a String,
               _V_: an ECMAScript language value,
               _D_: a Boolean,
             ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Global Environment Record _envRec_</dd>
-
             <dt>description</dt>
             <dd>It creates and initializes a mutable binding in the associated Object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is replaced.</dd>
           </dl>
@@ -11366,14 +11289,6 @@
             </thead>
             <tr>
               <td>
-                CreateImportBinding(N, M, N2)
-              </td>
-              <td>
-                Create an immutable indirect binding in a Module Environment Record. The String value _N_ is the text of the bound name. _M_ is a Module Record, and _N2_ is a binding that exists in _M_'s Module Environment Record.
-              </td>
-            </tr>
-            <tr>
-              <td>
                 GetThisBinding()
               </td>
               <td>
@@ -11382,7 +11297,6 @@
             </tr>
           </table>
         </emu-table>
-        <p>The behaviour of the additional concrete specification methods for Module Environment Records are defined by the following algorithms:</p>
 
         <emu-clause id="sec-module-environment-records-getbindingvalue-n-s" type="concrete method">
           <h1>
@@ -11447,20 +11361,18 @@
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-createimportbinding" type="concrete method">
+        <emu-clause id="sec-createimportbinding" type="abstract operation">
           <h1>
             CreateImportBinding (
+              _envRec_: a Module Environment Record,
               _N_: a String,
               _M_: a Module Record,
               _N2_: a String,
             ): ~unused~
           </h1>
           <dl class="header">
-            <dt>for</dt>
-            <dd>a Module Environment Record _envRec_</dd>
-
             <dt>description</dt>
-            <dd>It creates a new initialized immutable indirect binding for the name _N_. A binding must not already exist in this Environment Record for _N_. _N2_ is the name of a binding that exists in _M_'s Module Environment Record. Accesses to the value of the new binding will indirectly access the bound value of the target binding.</dd>
+            <dd>It creates a new initialized immutable indirect binding for the name _N_. A binding must not already exist in _envRec_ for _N_. _N2_ is the name of a binding that exists in _M_'s Module Environment Record. Accesses to the value of the new binding will indirectly access the bound value of the target binding.</dd>
           </dl>
           <emu-alg>
             1. Assert: _envRec_ does not already have a binding for _N_.
@@ -11755,10 +11667,10 @@
             [[LoadedModules]]
           </td>
           <td>
-            a List of Records with fields [[Specifier]] (a String) and [[Module]] (a Module Record)
+            a List of LoadedModuleRequest Records
           </td>
           <td>
-            <p>A map from the specifier strings imported by this realm to the resolved Module Record. The list does not contain two different Records with the same [[Specifier]].</p>
+            <p>A map from the specifier strings imported by this realm to the resolved Module Record. The list does not contain two different Records _r1_ and _r2_ such that ModuleRequestsEqual(_r1_, _r2_) is *true*.</p>
             <emu-note>
               As mentioned in HostLoadImportedModule (<emu-xref href="#note-HostLoadImportedModule-referrer-Realm-Record"></emu-xref>), [[LoadedModules]] in Realm Records is only used when running an `import()` expression in a context where there is no active script or module.
             </emu-note>
@@ -13466,7 +13378,7 @@
               1. NOTE: ToObject produces wrapper objects using _calleeRealm_.
           1. Assert: _localEnv_ is a Function Environment Record.
           1. Assert: The next step never returns an abrupt completion because _localEnv_.[[ThisBindingStatus]] is not ~initialized~.
-          1. Perform ! _localEnv_.BindThisValue(_thisValue_).
+          1. Perform ! BindThisValue(_localEnv_, _thisValue_).
           1. Return ~unused~.
         </emu-alg>
       </emu-clause>
@@ -19166,7 +19078,8 @@
         `super` Arguments[?Yield, ?Await]
 
       ImportCall[Yield, Await] :
-        `import` `(` AssignmentExpression[+In, ?Yield, ?Await] `)`
+        `import` `(` AssignmentExpression[+In, ?Yield, ?Await] `,`? `)`
+        `import` `(` AssignmentExpression[+In, ?Yield, ?Await] `,` AssignmentExpression[+In, ?Yield, ?Await] `,`? `)`
 
       Arguments[Yield, Await] :
         `(` `)`
@@ -19499,7 +19412,8 @@
           1. If IsConstructor(_func_) is *false*, throw a *TypeError* exception.
           1. Let _result_ be ? Construct(_func_, _argList_, _newTarget_).
           1. Let _thisER_ be GetThisEnvironment().
-          1. Perform ? _thisER_.BindThisValue(_result_).
+          1. Assert: _thisER_ is a Function Environment Record.
+          1. Perform ? BindThisValue(_thisER_, _result_).
           1. Let _F_ be _thisER_.[[FunctionObject]].
           1. Assert: _F_ is an ECMAScript function object.
           1. Perform ? InitializeInstanceElements(_result_, _F_).
@@ -19534,7 +19448,8 @@
         <emu-alg>
           1. Let _env_ be GetThisEnvironment().
           1. Assert: _env_.HasSuperBinding() is *true*.
-          1. Let _baseValue_ be _env_.GetSuperBase().
+          1. Assert: _env_ is a Function Environment Record.
+          1. Let _baseValue_ be GetSuperBase(_env_).
           1. Return the Reference Record { [[Base]]: _baseValue_, [[ReferencedName]]: _propertyKey_, [[Strict]]: _strict_, [[ThisValue]]: _actualThis_ }.
         </emu-alg>
       </emu-clause>
@@ -19725,58 +19640,108 @@
       <emu-clause id="sec-import-call-runtime-semantics-evaluation" type="sdo">
         <h1>Runtime Semantics: Evaluation</h1>
 
-        <emu-grammar>ImportCall : `import` `(` AssignmentExpression `)`</emu-grammar>
+        <emu-grammar>ImportCall : `import` `(` AssignmentExpression `,`? `)`</emu-grammar>
+        <emu-alg>
+          1. Return ? EvaluateImportCall(|AssignmentExpression|).
+        </emu-alg>
+
+        <emu-grammar>ImportCall : `import` `(` AssignmentExpression `,` AssignmentExpression `,`? `)`</emu-grammar>
+        <emu-alg>
+          1. Return ? EvaluateImportCall(the first |AssignmentExpression|, the second |AssignmentExpression|).
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-evaluate-import-call" type="abstract operation">
+        <h1>
+          EvaluateImportCall (
+            _specifierExpression_: a Parse Node,
+            optional _optionsExpression_: a Parse Node,
+          ): either a normal completion containing a Promise or an abrupt completion
+        </h1>
+        <dl class="header">
+        </dl>
         <emu-alg>
           1. Let _referrer_ be GetActiveScriptOrModule().
           1. If _referrer_ is *null*, set _referrer_ to the current Realm Record.
-          1. Let _argRef_ be ? Evaluation of |AssignmentExpression|.
-          1. Let _specifier_ be ? GetValue(_argRef_).
+          1. Let _specifierRef_ be ? Evaluation of _specifierExpression_.
+          1. Let _specifier_ be ? GetValue(_specifierRef_).
+          1. If _optionsExpression_ is present, then
+            1. Let _optionsRef_ be ? Evaluation of _optionsExpression_.
+            1. Let _options_ be ? GetValue(_optionsRef_).
+          1. Else,
+            1. Let _options_ be *undefined*.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
           1. Let _specifierString_ be Completion(ToString(_specifier_)).
           1. IfAbruptRejectPromise(_specifierString_, _promiseCapability_).
-          1. Perform HostLoadImportedModule(_referrer_, _specifierString_, ~empty~, _promiseCapability_).
+          1. Let _attributes_ be a new empty List.
+          1. If _options_ is not *undefined*, then
+            1. If _options_ is not an Object, then
+              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
+              1. Return _promiseCapability_.[[Promise]].
+            1. Let _attributesObj_ be Completion(Get(_options_, *"with"*)).
+            1. IfAbruptRejectPromise(_attributesObj_, _promiseCapability_).
+            1. If _attributesObj_ is not *undefined*, then
+              1. If _attributesObj_ is not an Object, then
+                1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
+                1. Return _promiseCapability_.[[Promise]].
+              1. Let _entries_ be Completion(EnumerableOwnProperties(_attributesObj_, ~key+value~)).
+              1. IfAbruptRejectPromise(_entries_, _promiseCapability_).
+              1. For each element _entry_ of _entries_, do
+                1. Let _key_ be ! Get(_entry_, *"0"*).
+                1. Let _value_ be ! Get(_entry_, *"1"*).
+                1. If _key_ is a String, then
+                  1. If _value_ is not a String, then
+                    1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
+                    1. Return _promiseCapability_.[[Promise]].
+                  1. Append the ImportAttribute Record { [[Key]]: _key_, [[Value]]: _value_ } to _attributes_.
+            1. If AllImportAttributesSupported(_attributes_) is *false*, then
+              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
+              1. Return _promiseCapability_.[[Promise]].
+            1. Sort _attributes_ according to the lexicographic order of their [[Key]] field, treating the value of each such field as a sequence of UTF-16 code unit values. NOTE: This sorting is observable only in that hosts are prohibited from changing behaviour based on the order in which attributes are enumerated.
+          1. Let _moduleRequest_ be a new ModuleRequest Record { [[Specifier]]: _specifierString_, [[Attributes]]: _attributes_ }.
+          1. Perform HostLoadImportedModule(_referrer_, _moduleRequest_, ~empty~, _promiseCapability_).
           1. Return _promiseCapability_.[[Promise]].
         </emu-alg>
+      </emu-clause>
 
-        <emu-clause id="sec-ContinueDynamicImport" type="abstract operation">
-          <h1>
-            ContinueDynamicImport (
-              _promiseCapability_: a PromiseCapability Record,
-              _moduleCompletion_: either a normal completion containing a Module Record or a throw completion,
-            ): ~unused~
-          </h1>
-          <dl class="header">
-            <dt>description</dt>
-            <dd>It completes the process of a dynamic import originally started by an <emu-xref href="#sec-import-calls">`import()`</emu-xref> call, resolving or rejecting the promise returned by that call as appropriate.</dd>
-          </dl>
-          <emu-alg>
-            1. If _moduleCompletion_ is an abrupt completion, then
-              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _moduleCompletion_.[[Value]] »).
-              1. Return ~unused~.
-            1. Let _module_ be _moduleCompletion_.[[Value]].
-            1. Let _loadPromise_ be _module_.LoadRequestedModules().
-            1. Let _rejectedClosure_ be a new Abstract Closure with parameters (_reason_) that captures _promiseCapability_ and performs the following steps when called:
-              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _reason_ »).
-              1. Return ~unused~.
-            1. Let _onRejected_ be CreateBuiltinFunction(_rejectedClosure_, 1, *""*, « »).
-            1. Let _linkAndEvaluateClosure_ be a new Abstract Closure with no parameters that captures _module_, _promiseCapability_, and _onRejected_ and performs the following steps when called:
-              1. Let _link_ be Completion(_module_.Link()).
-              1. If _link_ is an abrupt completion, then
-                1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _link_.[[Value]] »).
-                1. Return ~unused~.
-              1. Let _evaluatePromise_ be _module_.Evaluate().
-              1. Let _fulfilledClosure_ be a new Abstract Closure with no parameters that captures _module_ and _promiseCapability_ and performs the following steps when called:
-                1. Let _namespace_ be GetModuleNamespace(_module_).
-                1. Perform ! <emu-meta effects="user-code">Call</emu-meta>(_promiseCapability_.[[Resolve]], *undefined*, « _namespace_ »).
-                1. Return ~unused~.
-              1. Let _onFulfilled_ be CreateBuiltinFunction(_fulfilledClosure_, 0, *""*, « »).
-              1. Perform PerformPromiseThen(_evaluatePromise_, _onFulfilled_, _onRejected_).
-              1. Return ~unused~.
-            1. Let _linkAndEvaluate_ be CreateBuiltinFunction(_linkAndEvaluateClosure_, 0, *""*, « »).
-            1. Perform PerformPromiseThen(_loadPromise_, _linkAndEvaluate_, _onRejected_).
+      <emu-clause id="sec-ContinueDynamicImport" type="abstract operation">
+        <h1>
+          ContinueDynamicImport (
+            _promiseCapability_: a PromiseCapability Record,
+            _moduleCompletion_: either a normal completion containing a Module Record or a throw completion,
+          ): ~unused~
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It completes the process of a dynamic import originally started by an <emu-xref href="#sec-import-calls">`import()`</emu-xref> call, resolving or rejecting the promise returned by that call as appropriate.</dd>
+        </dl>
+        <emu-alg>
+          1. If _moduleCompletion_ is an abrupt completion, then
+            1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _moduleCompletion_.[[Value]] »).
             1. Return ~unused~.
-          </emu-alg>
-        </emu-clause>
+          1. Let _module_ be _moduleCompletion_.[[Value]].
+          1. Let _loadPromise_ be _module_.LoadRequestedModules().
+          1. Let _rejectedClosure_ be a new Abstract Closure with parameters (_reason_) that captures _promiseCapability_ and performs the following steps when called:
+            1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _reason_ »).
+            1. Return ~unused~.
+          1. Let _onRejected_ be CreateBuiltinFunction(_rejectedClosure_, 1, *""*, « »).
+          1. Let _linkAndEvaluateClosure_ be a new Abstract Closure with no parameters that captures _module_, _promiseCapability_, and _onRejected_ and performs the following steps when called:
+            1. Let _link_ be Completion(_module_.Link()).
+            1. If _link_ is an abrupt completion, then
+              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _link_.[[Value]] »).
+              1. Return ~unused~.
+            1. Let _evaluatePromise_ be _module_.Evaluate().
+            1. Let _fulfilledClosure_ be a new Abstract Closure with no parameters that captures _module_ and _promiseCapability_ and performs the following steps when called:
+              1. Let _namespace_ be GetModuleNamespace(_module_).
+              1. Perform ! <emu-meta effects="user-code">Call</emu-meta>(_promiseCapability_.[[Resolve]], *undefined*, « _namespace_ »).
+              1. Return ~unused~.
+            1. Let _onFulfilled_ be CreateBuiltinFunction(_fulfilledClosure_, 0, *""*, « »).
+            1. Perform PerformPromiseThen(_evaluatePromise_, _onFulfilled_, _onRejected_).
+            1. Return ~unused~.
+          1. Let _linkAndEvaluate_ be CreateBuiltinFunction(_linkAndEvaluateClosure_, 0, *""*, « »).
+          1. Perform PerformPromiseThen(_loadPromise_, _linkAndEvaluate_, _onRejected_).
+          1. Return ~unused~.
+        </emu-alg>
       </emu-clause>
     </emu-clause>
 
@@ -22539,7 +22504,7 @@
             <emu-alg>
               1. Let _O_ be the *this* value.
               1. Assert: _O_ is an Object.
-              1. Assert: _O_ has all of the internal slots of a For-In Iterator Instance (<emu-xref href="#sec-properties-of-for-in-iterator-instances"></emu-xref>).
+              1. Assert: _O_ has all of the internal slots of a For-In Iterator instance (<emu-xref href="#sec-properties-of-for-in-iterator-instances"></emu-xref>).
               1. Let _object_ be _O_.[[Object]].
               1. Repeat,
                 1. If _O_.[[ObjectWasVisited]] is *false*, then
@@ -26053,10 +26018,10 @@
               [[LoadedModules]]
             </td>
             <td>
-              a List of Records with fields [[Specifier]] (a String) and [[Module]] (a Module Record)
+              a List of LoadedModuleRequest Records
             </td>
             <td>
-              A map from the specifier strings imported by this script to the resolved Module Record. The list does not contain two different Records with the same [[Specifier]].
+              A map from the specifier strings imported by this script to the resolved Module Record. The list does not contain two different Records _r1_ and _r2_ such that ModuleRequestsEqual(_r1_, _r2_) is *true*.
             </td>
           </tr>
           <tr>
@@ -26154,12 +26119,12 @@
         1. Let _lexNames_ be the LexicallyDeclaredNames of _script_.
         1. Let _varNames_ be the VarDeclaredNames of _script_.
         1. For each element _name_ of _lexNames_, do
-          1. If _env_.HasVarDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
-          1. If _env_.HasLexicalDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
-          1. Let _hasRestrictedGlobal_ be ? _env_.HasRestrictedGlobalProperty(_name_).
+          1. If HasVarDeclaration(_env_, _name_) is *true*, throw a *SyntaxError* exception.
+          1. If HasLexicalDeclaration(_env_, _name_) is *true*, throw a *SyntaxError* exception.
+          1. Let _hasRestrictedGlobal_ be ? HasRestrictedGlobalProperty(_env_, _name_).
           1. If _hasRestrictedGlobal_ is *true*, throw a *SyntaxError* exception.
         1. For each element _name_ of _varNames_, do
-          1. If _env_.HasLexicalDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
+          1. If HasLexicalDeclaration(_env_, _name_) is *true*, throw a *SyntaxError* exception.
         1. Let _varDeclarations_ be the VarScopedDeclarations of _script_.
         1. Let _functionsToInitialize_ be a new empty List.
         1. Let _declaredFunctionNames_ be a new empty List.
@@ -26169,7 +26134,7 @@
             1. NOTE: If there are multiple function declarations for the same name, the last declaration is used.
             1. Let _fn_ be the sole element of the BoundNames of _d_.
             1. If _declaredFunctionNames_ does not contain _fn_, then
-              1. Let _fnDefinable_ be ? _env_.CanDeclareGlobalFunction(_fn_).
+              1. Let _fnDefinable_ be ? CanDeclareGlobalFunction(_env_, _fn_).
               1. If _fnDefinable_ is *false*, throw a *TypeError* exception.
               1. Append _fn_ to _declaredFunctionNames_.
               1. Insert _d_ as the first element of _functionsToInitialize_.
@@ -26178,7 +26143,7 @@
           1. If _d_ is either a |VariableDeclaration|, a |ForBinding|, or a |BindingIdentifier|, then
             1. For each String _vn_ of the BoundNames of _d_, do
               1. If _declaredFunctionNames_ does not contain _vn_, then
-                1. Let _vnDefinable_ be ? _env_.CanDeclareGlobalVar(_vn_).
+                1. Let _vnDefinable_ be ? CanDeclareGlobalVar(_env_, _vn_).
                 1. If _vnDefinable_ is *false*, throw a *TypeError* exception.
                 1. If _declaredVarNames_ does not contain _vn_, then
                   1. Append _vn_ to _declaredVarNames_.
@@ -26196,9 +26161,9 @@
         1. For each Parse Node _f_ of _functionsToInitialize_, do
           1. Let _fn_ be the sole element of the BoundNames of _f_.
           1. Let _fo_ be InstantiateFunctionObject of _f_ with arguments _env_ and _privateEnv_.
-          1. Perform ? <emu-meta effects="user-code">_env_.CreateGlobalFunctionBinding</emu-meta>(_fn_, _fo_, *false*).
+          1. Perform ? <emu-meta effects="user-code">CreateGlobalFunctionBinding</emu-meta>(_env_, _fn_, _fo_, *false*).
         1. For each String _vn_ of _declaredVarNames_, do
-          1. Perform ? <emu-meta effects="user-code">_env_.CreateGlobalVarBinding</emu-meta>(_vn_, *false*).
+          1. Perform ? <emu-meta effects="user-code">CreateGlobalVarBinding</emu-meta>(_env_, _vn_, *false*).
         1. Return ~unused~.
       </emu-alg>
       <emu-note>
@@ -26297,8 +26262,165 @@
         </emu-alg>
       </emu-clause>
 
+      <emu-clause id="sec-modulerequest-record">
+        <h1>ModuleRequest Records</h1>
+
+        <p>A <dfn id="modulerequest-record" variants="ModuleRequest Records">ModuleRequest Record</dfn> represents the request to import a module with given import attributes. It consists of the following fields:</p>
+        <emu-table id="table-modulerequest-fields" caption="ModuleRequest Record Fields">
+          <table>
+            <tr>
+              <th>
+                Field Name
+              </th>
+              <th>
+                Value Type
+              </th>
+              <th>
+                Meaning
+              </th>
+            </tr>
+            <tr>
+              <td>
+                [[Specifier]]
+              </td>
+              <td>
+                a String
+              </td>
+              <td>
+                The module specifier
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[Attributes]]
+              </td>
+              <td>
+                a List of ImportAttribute Records
+              </td>
+              <td>
+                The import attributes
+              </td>
+            </tr>
+          </table>
+        </emu-table>
+
+        <p>A <dfn id="loadedmodulerequest-record" variants="LoadedModuleRequest Records">LoadedModuleRequest Record</dfn> represents the request to import a module together with the resulting Module Record. It consists of the same fields defined in table <emu-xref href="#table-modulerequest-fields"></emu-xref>, with the addition of [[Module]]:</p>
+        <emu-table id="table-loadedmodulerequest-fields" caption="LoadedModuleRequest Record Fields">
+          <table>
+            <tr>
+              <th>
+                Field Name
+              </th>
+              <th>
+                Value Type
+              </th>
+              <th>
+                Meaning
+              </th>
+            </tr>
+            <tr>
+              <td>
+                [[Specifier]]
+              </td>
+              <td>
+                a String
+              </td>
+              <td>
+                The module specifier
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[Attributes]]
+              </td>
+              <td>
+                a List of ImportAttribute Records
+              </td>
+              <td>
+                The import attributes
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[Module]]
+              </td>
+              <td>
+                a Module Record
+              </td>
+              <td>
+                The loaded module corresponding to this module request
+              </td>
+            </tr>
+          </table>
+        </emu-table>
+
+        <p>An <dfn id="importattribute-record" variants="ImportAttribute Records">ImportAttribute Record</dfn> consists of the following fields:</p>
+        <emu-table id="table-importattribute-fields" caption="ImportAttribute Record Fields">
+          <table>
+            <tr>
+              <th>
+                Field Name
+              </th>
+              <th>
+                Value Type
+              </th>
+              <th>
+                Meaning
+              </th>
+            </tr>
+            <tr>
+              <td>
+                [[Key]]
+              </td>
+              <td>
+                a String
+              </td>
+              <td>
+                The attribute key
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[Value]]
+              </td>
+              <td>
+                a String
+              </td>
+              <td>
+                The attribute value
+              </td>
+            </tr>
+          </table>
+        </emu-table>
+
+        <emu-clause id="sec-ModuleRequestsEqual" type="abstract operation">
+          <h1>
+            ModuleRequestsEqual (
+              _left_: a ModuleRequest Record or a LoadedModuleRequest Record,
+              _right_: a ModuleRequest Record or a LoadedModuleRequest Record,
+            ): a Boolean
+          </h1>
+          <dl class="header">
+            <dt>description</dt>
+            <dd></dd>
+          </dl>
+
+          <emu-alg>
+            1. If _left_.[[Specifier]] is not _right_.[[Specifier]], return *false*.
+            1. Let _leftAttrs_ be _left_.[[Attributes]].
+            1. Let _rightAttrs_ be _right_.[[Attributes]].
+            1. Let _leftAttrsCount_ be the number of elements in _leftAttrs_.
+            1. Let _rightAttrsCount_ be the number of elements in _rightAttrs_.
+            1. If _leftAttrsCount_ ≠ _rightAttrsCount_, return *false*.
+            1. For each ImportAttribute Record _l_ of _leftAttrs_, do
+              1. If _rightAttrs_ does not contain an ImportAttribute Record _r_ such that _l_.[[Key]] is _r_.[[Key]] and _l_.[[Value]] is _r_.[[Value]], return *false*.
+            1. Return *true*.
+          </emu-alg>
+        </emu-clause>
+      </emu-clause>
+
       <emu-clause id="sec-static-semantics-modulerequests" oldids="sec-module-semantics-static-semantics-modulerequests,sec-imports-static-semantics-modulerequests,sec-exports-static-semantics-modulerequests" type="sdo">
-        <h1>Static Semantics: ModuleRequests ( ): a List of Strings</h1>
+        <h1>Static Semantics: ModuleRequests ( ): a List of ModuleRequest Records</h1>
         <dl class="header">
         </dl>
         <emu-grammar>Module : [empty]</emu-grammar>
@@ -26311,12 +26433,12 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _moduleNames_ be the ModuleRequests of |ModuleItemList|.
-          1. Let _additionalNames_ be the ModuleRequests of |ModuleItem|.
-          1. For each String _name_ of _additionalNames_, do
-            1. If _moduleNames_ does not contain _name_, then
-              1. Append _name_ to _moduleNames_.
-          1. Return _moduleNames_.
+          1. Let _requests_ be the ModuleRequests of |ModuleItemList|.
+          1. Let _additionalRequests_ be the ModuleRequests of |ModuleItem|.
+          1. For each ModuleRequest Record _mr_ of _additionalRequests_, do
+            1. If _requests_ does not contain a ModuleRequest Record _mr2_ such that ModuleRequestsEqual(_mr_, _mr2_) is *true*, then
+              1. Append _mr_ to _requests_.
+          1. Return _requests_.
         </emu-alg>
         <emu-grammar>ModuleItem : StatementListItem</emu-grammar>
         <emu-alg>
@@ -26324,17 +26446,40 @@
         </emu-alg>
         <emu-grammar>ImportDeclaration : `import` ImportClause FromClause `;`</emu-grammar>
         <emu-alg>
-          1. Return the ModuleRequests of |FromClause|.
+          1. Let _specifier_ be the SV of |FromClause|.
+          1. Return a List whose sole element is the ModuleRequest Record { [[Specifier]]: _specifier_, [[Attributes]]: « » }.
         </emu-alg>
-        <emu-grammar>ModuleSpecifier : StringLiteral</emu-grammar>
+        <emu-grammar>ImportDeclaration : `import` ImportClause FromClause WithClause `;`</emu-grammar>
         <emu-alg>
-          1. Return a List whose sole element is the SV of |StringLiteral|.
+          1. Let _specifier_ be the SV of |FromClause|.
+          1. Let _attributes_ be WithClauseToAttributes of |WithClause|.
+          1. Return a List whose sole element is the ModuleRequest Record { [[Specifier]]: _specifier_, [[Attributes]]: _attributes_ }.
+        </emu-alg>
+        <emu-grammar>ImportDeclaration : `import` ModuleSpecifier `;`</emu-grammar>
+        <emu-alg>
+          1. Let _specifier_ be the SV of |ModuleSpecifier|.
+          1. Return a List whose sole element is the ModuleRequest Record { [[Specifier]]: _specifier_, [[Attributes]]: « » }.
+        </emu-alg>
+        <emu-grammar>ImportDeclaration : `import` ModuleSpecifier WithClause `;`</emu-grammar>
+        <emu-alg>
+          1. Let _specifier_ be the SV of |ModuleSpecifier|.
+          1. Let _attributes_ be WithClauseToAttributes of |WithClause|.
+          1. Return a List whose sole element is the ModuleRequest Record { [[Specifier]]: _specifier_, [[Attributes]]: _attributes_ }.
         </emu-alg>
         <emu-grammar>
           ExportDeclaration : `export` ExportFromClause FromClause `;`
         </emu-grammar>
         <emu-alg>
-          1. Return the ModuleRequests of |FromClause|.
+          1. Let _specifier_ be the SV of |FromClause|.
+          1. Return a List whose sole element is the ModuleRequest Record { [[Specifier]]: _specifier_, [[Attributes]]: « » }.
+        </emu-alg>
+        <emu-grammar>
+          ExportDeclaration : `export` ExportFromClause FromClause WithClause `;`
+        </emu-grammar>
+        <emu-alg>
+          1. Let _specifier_ be the SV of |FromClause|.
+          1. Let _attributes_ be WithClauseToAttributes of |WithClause|.
+          1. Return a List whose sole element is the ModuleRequest Record { [[Specifier]]: _specifier_, [[Attributes]]: _attributes_ }.
         </emu-alg>
         <emu-grammar>
           ExportDeclaration :
@@ -26545,10 +26690,10 @@
                 [[RequestedModules]]
               </td>
               <td>
-                a List of Strings
+                a List of ModuleRequest Records
               </td>
               <td>
-                A List of all the |ModuleSpecifier| strings used by the module represented by this record to request the importation of a module. The List is in source text occurrence order.
+                A List of the ModuleRequest Records associated with the imports in this module. The List is in source text occurrence order of the imports.
               </td>
             </tr>
             <tr>
@@ -26556,10 +26701,10 @@
                 [[LoadedModules]]
               </td>
               <td>
-                a List of Records with fields [[Specifier]] (a String) and [[Module]] (a Module Record)
+                a List of LoadedModuleRequest Records
               </td>
               <td>
-                A map from the specifier strings used by the module represented by this record to request the importation of a module to the resolved Module Record. The list does not contain two different Records with the same [[Specifier]].
+                A map from the specifier strings used by the module represented by this record to request the importation of a module with the relative import attributes to the resolved Module Record. The list does not contain two different Records _r1_ and _r2_ such that ModuleRequestsEqual(_r1_, _r2_) is *true*.
               </td>
             </tr>
             <tr>
@@ -26781,12 +26926,14 @@
                 1. Append _module_ to _state_.[[Visited]].
                 1. Let _requestedModulesCount_ be the number of elements in _module_.[[RequestedModules]].
                 1. Set _state_.[[PendingModulesCount]] to _state_.[[PendingModulesCount]] + _requestedModulesCount_.
-                1. For each String _required_ of _module_.[[RequestedModules]], do
-                  1. If _module_.[[LoadedModules]] contains a Record whose [[Specifier]] is _required_, then
-                    1. Let _record_ be that Record.
+                1. For each ModuleRequest Record _request_ of _module_.[[RequestedModules]], do
+                  1. If AllImportAttributesSupported(_request_.[[Attributes]]) is *false*, then
+                    1. Let _error_ be ThrowCompletion(a newly created *SyntaxError* object).
+                    1. Perform ContinueModuleLoading(_state_, _error_).
+                  1. Else if _module_.[[LoadedModules]] contains a LoadedModuleRequest Record _record_ such that ModuleRequestsEqual(_record_, _request_) is *true*, then
                     1. Perform InnerModuleLoading(_state_, _record_.[[Module]]).
                   1. Else,
-                    1. Perform HostLoadImportedModule(_module_, _required_, _state_.[[HostDefined]], _state_).
+                    1. Perform HostLoadImportedModule(_module_, _request_, _state_.[[HostDefined]], _state_).
                     1. NOTE: HostLoadImportedModule will call FinishLoadingImportedModule, which re-enters the graph loading process through ContinueModuleLoading.
                   1. If _state_.[[IsLoading]] is *false*, return ~unused~.
               1. Assert: _state_.[[PendingModulesCount]] ≥ 1.
@@ -26874,8 +27021,8 @@
               1. Set _module_.[[DFSAncestorIndex]] to _index_.
               1. Set _index_ to _index_ + 1.
               1. Append _module_ to _stack_.
-              1. For each String _required_ of _module_.[[RequestedModules]], do
-                1. Let _requiredModule_ be GetImportedModule(_module_, _required_).
+              1. For each ModuleRequest Record _request_ of _module_.[[RequestedModules]], do
+                1. Let _requiredModule_ be GetImportedModule(_module_, _request_).
                 1. Set _index_ to ? InnerModuleLinking(_requiredModule_, _stack_, _index_).
                 1. If _requiredModule_ is a Cyclic Module Record, then
                   1. Assert: _requiredModule_.[[Status]] is one of ~linking~, ~linked~, ~evaluating-async~, or ~evaluated~.
@@ -26967,8 +27114,8 @@
               1. Set _module_.[[PendingAsyncDependencies]] to 0.
               1. Set _index_ to _index_ + 1.
               1. Append _module_ to _stack_.
-              1. For each String _required_ of _module_.[[RequestedModules]], do
-                1. Let _requiredModule_ be GetImportedModule(_module_, _required_).
+              1. For each ModuleRequest Record _request_ of _module_.[[RequestedModules]], do
+                1. Let _requiredModule_ be GetImportedModule(_module_, _request_).
                 1. Set _index_ to ? InnerModuleEvaluation(_requiredModule_, _stack_, _index_).
                 1. If _requiredModule_ is a Cyclic Module Record, then
                   1. Assert: _requiredModule_.[[Status]] is one of ~evaluating~, ~evaluating-async~, or ~evaluated~.
@@ -27747,10 +27894,10 @@
                 [[ModuleRequest]]
               </td>
               <td>
-                a String
+                a ModuleRequest Record
               </td>
               <td>
-                String value of the |ModuleSpecifier| of the |ImportDeclaration|.
+                ModuleRequest Record representing the |ModuleSpecifier| and import attributes of the |ImportDeclaration|.
               </td>
             </tr>
             <tr>
@@ -27896,10 +28043,10 @@
                 [[ModuleRequest]]
               </td>
               <td>
-                a String or *null*
+                a ModuleRequest Record or *null*
               </td>
               <td>
-                The String value of the |ModuleSpecifier| of the |ExportDeclaration|. *null* if the |ExportDeclaration| does not have a |ModuleSpecifier|.
+                The ModuleRequest Record representing the |ModuleSpecifier| and import attributes of the |ExportDeclaration|. *null* if the |ExportDeclaration| does not have a |ModuleSpecifier|.
               </td>
             </tr>
             <tr>
@@ -28308,7 +28455,7 @@
                   1. Perform ! _env_.CreateImmutableBinding(_in_.[[LocalName]], *true*).
                   1. Perform ! _env_.InitializeBinding(_in_.[[LocalName]], _namespace_).
                 1. Else,
-                  1. Perform _env_.CreateImportBinding(_in_.[[LocalName]], _resolution_.[[Module]], _resolution_.[[BindingName]]).
+                  1. Perform CreateImportBinding(_env_, _in_.[[LocalName]], _resolution_.[[Module]], _resolution_.[[BindingName]]).
             1. Let _moduleContext_ be a new ECMAScript code execution context.
             1. Set the Function of _moduleContext_ to *null*.
             1. Assert: _module_.[[Realm]] is not *undefined*.
@@ -28384,7 +28531,7 @@
         <h1>
           GetImportedModule (
             _referrer_: a Cyclic Module Record,
-            _specifier_: a String,
+            _request_: a ModuleRequest Record,
           ): a Module Record
         </h1>
         <dl class="header">
@@ -28393,8 +28540,9 @@
         </dl>
 
         <emu-alg>
-          1. Assert: Exactly one element of _referrer_.[[LoadedModules]] is a Record whose [[Specifier]] is _specifier_, since LoadRequestedModules has completed successfully on _referrer_ prior to invoking this abstract operation.
-          1. Let _record_ be the Record in _referrer_.[[LoadedModules]] whose [[Specifier]] is _specifier_.
+          1. [declared="r"] Let _records_ be a List consisting of each LoadedModuleRequest Record _r_ of _referrer_.[[LoadedModules]] such that ModuleRequestsEqual(_r_, _request_) is *true*.
+          1. Assert: _records_ has exactly one element, since LoadRequestedModules has completed successfully on _referrer_ prior to invoking this abstract operation.
+          1. Let _record_ be the sole element of _records_.
           1. Return _record_.[[Module]].
         </emu-alg>
       </emu-clause>
@@ -28403,7 +28551,7 @@
         <h1>
           HostLoadImportedModule (
             _referrer_: a Script Record, a Cyclic Module Record, or a Realm Record,
-            _specifier_: a String,
+            _moduleRequest_: a ModuleRequest Record,
             _hostDefined_: anything,
             _payload_: a GraphLoadingState Record or a PromiseCapability Record,
           ): ~unused~
@@ -28424,24 +28572,29 @@
         <p>An implementation of HostLoadImportedModule must conform to the following requirements:</p>
         <ul>
           <li>
-            The host environment must perform FinishLoadingImportedModule(_referrer_, _specifier_, _payload_, _result_), where _result_ is either a normal completion containing the loaded Module Record or a throw completion, either synchronously or asynchronously.
+            The host environment must perform FinishLoadingImportedModule(_referrer_, _moduleRequest_, _payload_, _result_), where _result_ is either a normal completion containing the loaded Module Record or a throw completion, either synchronously or asynchronously.
           </li>
           <li>
-            If this operation is called multiple times with the same (_referrer_, _specifier_) pair and it performs FinishLoadingImportedModule(_referrer_, _specifier_, _payload_, _result_) where _result_ is a normal completion, then it must perform FinishLoadingImportedModule(_referrer_, _specifier_, _payload_, _result_) with the same _result_ each time.
+            <p>If this operation is called multiple times with two (_referrer_, _moduleRequest_) pairs such that:</p>
+            <ul>
+              <li>the first _referrer_ is the same as the second _referrer_;</li>
+              <li>ModuleRequestsEqual(the first _moduleRequest_, the second _moduleRequest_) is *true*;</li>
+            </ul>
+            <p>and it performs FinishLoadingImportedModule(_referrer_, _moduleRequest_, _payload_, _result_) where _result_ is a normal completion, then it must perform FinishLoadingImportedModule(_referrer_, _moduleRequest_, _payload_, _result_) with the same _result_ each time.</p>
           </li>
           <li>
             The operation must treat _payload_ as an opaque value to be passed through to FinishLoadingImportedModule.
           </li>
         </ul>
 
-        <p>The actual process performed is host-defined, but typically consists of performing whatever I/O operations are necessary to load the appropriate Module Record. Multiple different (_referrer_, _specifier_) pairs may map to the same Module Record instance. The actual mapping semantics is host-defined but typically a normalization process is applied to _specifier_ as part of the mapping process. A typical normalization process would include actions such as expansion of relative and abbreviated path specifiers.</p>
+        <p>The actual process performed is host-defined, but typically consists of performing whatever I/O operations are necessary to load the appropriate Module Record. Multiple different (_referrer_, _moduleRequest_.[[Specifier]], _moduleRequest_.[[Attributes]]) triples may map to the same Module Record instance. The actual mapping semantics is host-defined but typically a normalization process is applied to _specifier_ as part of the mapping process. A typical normalization process would include actions such as expansion of relative and abbreviated path specifiers.</p>
       </emu-clause>
 
       <emu-clause id="sec-FinishLoadingImportedModule" type="abstract operation" oldids="sec-finishdynamicimport">
         <h1>
           FinishLoadingImportedModule (
             _referrer_: a Script Record, a Cyclic Module Record, or a Realm Record,
-            _specifier_: a String,
+            _moduleRequest_: a ModuleRequest Record,
             _payload_: a GraphLoadingState Record or a PromiseCapability Record,
             _result_: either a normal completion containing a Module Record or a throw completion,
           ): ~unused~
@@ -28452,16 +28605,54 @@
         </dl>
         <emu-alg>
           1. If _result_ is a normal completion, then
-            1. If _referrer_.[[LoadedModules]] contains a Record whose [[Specifier]] is _specifier_, then
-              1. Assert: That Record's [[Module]] is _result_.[[Value]].
+            1. If _referrer_.[[LoadedModules]] contains a LoadedModuleRequest Record _record_ such that ModuleRequestsEqual(_record_, _moduleRequest_) is *true*, then
+              1. Assert: _record_.[[Module]] and _result_.[[Value]] are the same Module Record.
             1. Else,
-              1. Append the Record { [[Specifier]]: _specifier_, [[Module]]: _result_.[[Value]] } to _referrer_.[[LoadedModules]].
+              1. Append the LoadedModuleRequest Record { [[Specifier]]: _moduleRequest_.[[Specifier]], [[Attributes]]: _moduleRequest_.[[Attributes]], [[Module]]: _result_.[[Value]] } to _referrer_.[[LoadedModules]].
           1. If _payload_ is a GraphLoadingState Record, then
             1. Perform ContinueModuleLoading(_payload_, _result_).
           1. Else,
             1. Perform ContinueDynamicImport(_payload_, _result_).
           1. Return ~unused~.
         </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-AllImportAttributesSupported" type="abstract operation">
+        <h1>
+          AllImportAttributesSupported (
+            _attributes_: a List of ImportAttribute Records,
+          ): a Boolean
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd></dd>
+        </dl>
+        <emu-alg>
+          1. Let _supported_ be HostGetSupportedImportAttributes().
+          1. For each ImportAttribute Record _attribute_ of _attributes_, do
+            1. If _supported_ does not contain _attribute_.[[Key]], return *false*.
+          1. Return *true*.
+        </emu-alg>
+
+        <emu-clause id="sec-hostgetsupportedimportattributes" type="host-defined abstract operation">
+          <h1>HostGetSupportedImportAttributes ( ): a List of Strings</h1>
+          <dl class="header">
+            <dt>description</dt>
+            <dd>It allows host environments to specify which import attributes they support. Only attributes with supported keys will be provided to the host.</dd>
+          </dl>
+
+          <p>An implementation of HostGetSupportedImportAttributes must conform to the following requrements:</p>
+
+          <ul>
+            <li>It must return a List of Strings, each indicating a supported attribute.</li>
+
+            <li>Each time this operation is called, it must return the same List with the same contents in the same order.</li>
+          </ul>
+
+          <p>The default implementation of HostGetSupportedImportAttributes is to return a new empty List.</p>
+
+          <emu-note>The purpose of requiring the host to specify its supported import attributes, rather than passing all attributes to the host and letting it then choose which ones it wants to handle, is to ensure that unsupported attributes are handled in a consistent way across different hosts.</emu-note>
+        </emu-clause>
       </emu-clause>
 
       <emu-clause id="sec-getmodulenamespace" type="abstract operation">
@@ -28526,8 +28717,8 @@
       <h2>Syntax</h2>
       <emu-grammar type="definition">
         ImportDeclaration :
-          `import` ImportClause FromClause `;`
-          `import` ModuleSpecifier `;`
+          `import` ImportClause FromClause WithClause? `;`
+          `import` ModuleSpecifier WithClause? `;`
 
         ImportClause :
           ImportedDefaultBinding
@@ -28563,6 +28754,18 @@
 
         ImportedBinding :
           BindingIdentifier[~Yield, +Await]
+
+        WithClause :
+          `with` `{` `}`
+          `with` `{` WithEntries `,`? `}`
+
+        WithEntries :
+          AttributeKey `:` StringLiteral
+          AttributeKey `:` StringLiteral `,` WithEntries
+
+        AttributeKey :
+          IdentifierName
+          StringLiteral
       </emu-grammar>
 
       <emu-clause id="sec-imports-static-semantics-early-errors">
@@ -28571,6 +28774,13 @@
         <ul>
           <li>
             It is a Syntax Error if the BoundNames of |ImportDeclaration| contains any duplicate entries.
+          </li>
+        </ul>
+
+        <emu-grammar>WithClause : `with` `{` WithEntries `,`? `}`</emu-grammar>
+        <ul>
+          <li>
+            It is a Syntax Error if WithClauseToAttributes of |WithClause| has two different entries _a_ and _b_ such that _a_.[[Key]] is _b_.[[Key]].
           </li>
         </ul>
       </emu-clause>
@@ -28597,12 +28807,12 @@
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>ImportDeclaration : `import` ImportClause FromClause `;`</emu-grammar>
+        <emu-grammar>ImportDeclaration : `import` ImportClause FromClause WithClause? `;`</emu-grammar>
         <emu-alg>
-          1. Let _module_ be the sole element of the ModuleRequests of |FromClause|.
+          1. Let _module_ be the sole element of the ModuleRequests of |ImportDeclaration|.
           1. Return the ImportEntriesForModule of |ImportClause| with argument _module_.
         </emu-alg>
-        <emu-grammar>ImportDeclaration : `import` ModuleSpecifier `;`</emu-grammar>
+        <emu-grammar>ImportDeclaration : `import` ModuleSpecifier WithClause? `;`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
@@ -28611,7 +28821,7 @@
       <emu-clause id="sec-static-semantics-importentriesformodule" type="sdo">
         <h1>
           Static Semantics: ImportEntriesForModule (
-            _module_: a String,
+            _module_: a ModuleRequest Record,
           ): a List of ImportEntry Records
         </h1>
         <dl class="header">
@@ -28664,6 +28874,43 @@
           1. Return « _entry_ ».
         </emu-alg>
       </emu-clause>
+
+      <emu-clause id="sec-withclausetoattributes" type="sdo">
+        <h1>Static Semantics: WithClauseToAttributes ( ): a List of ImportAttribute Records</h1>
+        <dl class="header">
+        </dl>
+
+        <emu-grammar>
+          WithClause : `with` `{` `}`
+        </emu-grammar>
+        <emu-alg>
+          1. Return a new empty List.
+        </emu-alg>
+
+        <emu-grammar>
+          WithClause : `with` `{` WithEntries `,`? `}`
+        </emu-grammar>
+        <emu-alg>
+          1. Let _attributes_ be WithClauseToAttributes of |WithEntries|.
+          1. Sort _attributes_ according to the lexicographic order of their [[Key]] field, treating the value of each such field as a sequence of UTF-16 code unit values. NOTE: This sorting is observable only in that hosts are prohibited from changing behaviour based on the order in which attributes are enumerated.
+          1. Return _attributes_.
+        </emu-alg>
+
+        <emu-grammar>WithEntries : AttributeKey `:` StringLiteral</emu-grammar>
+        <emu-alg>
+          1. Let _key_ be the PropName of |AttributeKey|.
+          1. Let _entry_ be the ImportAttribute Record { [[Key]]: _key_, [[Value]]: the SV of |StringLiteral| }.
+          1. Return « _entry_ ».
+        </emu-alg>
+
+        <emu-grammar>WithEntries : AttributeKey `:` StringLiteral `,` WithEntries</emu-grammar>
+        <emu-alg>
+          1. Let _key_ be the PropName of |AttributeKey|.
+          1. Let _entry_ be the ImportAttribute Record { [[Key]]: _key_, [[Value]]: the SV of |StringLiteral| }.
+          1. Let _rest_ be WithClauseToAttributes of |WithEntries|.
+          1. Return the list-concatenation of « _entry_ » and _rest_.
+        </emu-alg>
+      </emu-clause>
     </emu-clause>
 
     <emu-clause id="sec-exports">
@@ -28671,7 +28918,7 @@
       <h2>Syntax</h2>
       <emu-grammar type="definition">
         ExportDeclaration :
-          `export` ExportFromClause FromClause `;`
+          `export` ExportFromClause FromClause WithClause? `;`
           `export` NamedExports `;`
           `export` VariableStatement[~Yield, +Await]
           `export` Declaration[~Yield, +Await]
@@ -28735,10 +28982,7 @@
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>
-          ExportDeclaration :
-            `export` ExportFromClause FromClause `;`
-        </emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause WithClause? `;`</emu-grammar>
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
@@ -28808,7 +29052,7 @@
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause WithClause? `;`</emu-grammar>
         <emu-alg>
           1. Return the ExportedNames of |ExportFromClause|.
         </emu-alg>
@@ -28883,9 +29127,9 @@
         <emu-alg>
           1. Return a new empty List.
         </emu-alg>
-        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause `;`</emu-grammar>
+        <emu-grammar>ExportDeclaration : `export` ExportFromClause FromClause WithClause? `;`</emu-grammar>
         <emu-alg>
-          1. Let _module_ be the sole element of the ModuleRequests of |FromClause|.
+          1. Let _module_ be the sole element of the ModuleRequests of |ExportDeclaration|.
           1. Return the ExportEntriesForModule of |ExportFromClause| with argument _module_.
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` NamedExports `;`</emu-grammar>
@@ -28933,7 +29177,7 @@
       <emu-clause id="sec-static-semantics-exportentriesformodule" type="sdo">
         <h1>
           Static Semantics: ExportEntriesForModule (
-            _module_: a String or *null*,
+            _module_: a ModuleRequest Record or *null*,
           ): a List of ExportEntry Records
         </h1>
         <dl class="header">
@@ -29016,7 +29260,7 @@
         <h1>Runtime Semantics: Evaluation</h1>
         <emu-grammar>
           ExportDeclaration :
-            `export` ExportFromClause FromClause `;`
+            `export` ExportFromClause FromClause WithClause? `;`
             `export` NamedExports `;`
         </emu-grammar>
         <emu-alg>
@@ -29309,7 +29553,7 @@
           1. If _strict_ is *false*, then
             1. If _varEnv_ is a Global Environment Record, then
               1. For each element _name_ of _varNames_, do
-                1. If _varEnv_.HasLexicalDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
+                1. If HasLexicalDeclaration(_varEnv_, _name_) is *true*, throw a *SyntaxError* exception.
                 1. NOTE: `eval` will not create a global var declaration that would be shadowed by a global lexical declaration.
             1. Let _thisEnv_ be _lexEnv_.
             1. Assert: The following loop will terminate.
@@ -29338,7 +29582,7 @@
               1. Let _fn_ be the sole element of the BoundNames of _d_.
               1. If _declaredFunctionNames_ does not contain _fn_, then
                 1. If _varEnv_ is a Global Environment Record, then
-                  1. Let _fnDefinable_ be ? _varEnv_.CanDeclareGlobalFunction(_fn_).
+                  1. Let _fnDefinable_ be ? CanDeclareGlobalFunction(_varEnv_, _fn_).
                   1. If _fnDefinable_ is *false*, throw a *TypeError* exception.
                 1. Append _fn_ to _declaredFunctionNames_.
                 1. Insert _d_ as the first element of _functionsToInitialize_.
@@ -29348,7 +29592,7 @@
               1. For each String _vn_ of the BoundNames of _d_, do
                 1. If _declaredFunctionNames_ does not contain _vn_, then
                   1. If _varEnv_ is a Global Environment Record, then
-                    1. Let _vnDefinable_ be ? _varEnv_.CanDeclareGlobalVar(_vn_).
+                    1. Let _vnDefinable_ be ? CanDeclareGlobalVar(_varEnv_, _vn_).
                     1. If _vnDefinable_ is *false*, throw a *TypeError* exception.
                   1. If _declaredVarNames_ does not contain _vn_, then
                     1. Append _vn_ to _declaredVarNames_.
@@ -29366,7 +29610,7 @@
             1. Let _fn_ be the sole element of the BoundNames of _f_.
             1. Let _fo_ be InstantiateFunctionObject of _f_ with arguments _lexEnv_ and _privateEnv_.
             1. If _varEnv_ is a Global Environment Record, then
-              1. Perform ? _varEnv_.CreateGlobalFunctionBinding(_fn_, _fo_, *true*).
+              1. Perform ? CreateGlobalFunctionBinding(_varEnv_, _fn_, _fo_, *true*).
             1. Else,
               1. Let _bindingExists_ be ! _varEnv_.HasBinding(_fn_).
               1. If _bindingExists_ is *false*, then
@@ -29377,7 +29621,7 @@
                 1. Perform ! _varEnv_.SetMutableBinding(_fn_, _fo_, *false*).
           1. For each String _vn_ of _declaredVarNames_, do
             1. If _varEnv_ is a Global Environment Record, then
-              1. Perform ? _varEnv_.CreateGlobalVarBinding(_vn_, *true*).
+              1. Perform ? CreateGlobalVarBinding(_varEnv_, _vn_, *true*).
             1. Else,
               1. Let _bindingExists_ be ! _varEnv_.HasBinding(_vn_).
               1. If _bindingExists_ is *false*, then
@@ -41149,9 +41393,10 @@ THH:mm:ss.sss
             1. Let _k_ be _len_ + _n_.
             1. If _k_ &lt; 0, set _k_ to 0.
           1. Repeat, while _k_ &lt; _len_,
-            1. Let _kPresent_ be ! HasProperty(_O_, ! ToString(𝔽(_k_))).
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kPresent_ be ! HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
-              1. Let _elementK_ be ! Get(_O_, ! ToString(𝔽(_k_))).
+              1. Let _elementK_ be ! Get(_O_, _Pk_).
               1. If IsStrictlyEqual(_searchElement_, _elementK_) is *true*, return 𝔽(_k_).
             1. Set _k_ to _k_ + 1.
           1. Return *-1*<sub>𝔽</sub>.
@@ -41209,9 +41454,10 @@ THH:mm:ss.sss
           1. Else,
             1. Let _k_ be _len_ + _n_.
           1. Repeat, while _k_ ≥ 0,
-            1. Let _kPresent_ be ! HasProperty(_O_, ! ToString(𝔽(_k_))).
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kPresent_ be ! HasProperty(_O_, _Pk_).
             1. If _kPresent_ is *true*, then
-              1. Let _elementK_ be ! Get(_O_, ! ToString(𝔽(_k_))).
+              1. Let _elementK_ be ! Get(_O_, _Pk_).
               1. If IsStrictlyEqual(_searchElement_, _elementK_) is *true*, return 𝔽(_k_).
             1. Set _k_ to _k_ - 1.
           1. Return *-1*<sub>𝔽</sub>.
@@ -42402,7 +42648,7 @@ THH:mm:ss.sss
 
     <emu-clause id="sec-map-iterator-objects">
       <h1>Map Iterator Objects</h1>
-      <p>A <dfn variants="Map Iterators,Map Iterator object,Map Iterator objects">Map Iterator</dfn> is an object that represents a specific iteration over some specific Map instance object. There is not a named constructor for Map Iterator objects. Instead, map iterator objects are created by calling certain methods of Map instance objects.</p>
+      <p>A <dfn variants="Map Iterators,Map Iterator object,Map Iterator objects">Map Iterator</dfn> is an object that represents a specific iteration over some specific Map instance object. There is not a named constructor for Map Iterator objects. Instead, Map Iterator objects are created by calling certain methods of Map instance objects.</p>
 
       <emu-clause id="sec-createmapiterator" type="abstract operation" oldids="sec-properties-of-map-iterator-instances,table-50,table-internal-slots-of-map-iterator-instances">
         <h1>
@@ -43034,7 +43280,7 @@ THH:mm:ss.sss
 
     <emu-clause id="sec-set-iterator-objects">
       <h1>Set Iterator Objects</h1>
-      <p>A <dfn variants="Set Iterators,Set Iterator object,Set Iterator objects">Set Iterator</dfn> is an ordinary object, with the structure defined below, that represents a specific iteration over some specific Set instance object. There is not a named constructor for Set Iterator objects. Instead, set iterator objects are created by calling certain methods of Set instance objects.</p>
+      <p>A <dfn variants="Set Iterators,Set Iterator object,Set Iterator objects">Set Iterator</dfn> is an ordinary object, with the structure defined below, that represents a specific iteration over some specific Set instance object. There is not a named constructor for Set Iterator objects. Instead, Set Iterator objects are created by calling certain methods of Set instance objects.</p>
 
       <emu-clause id="sec-createsetiterator" type="abstract operation" oldids="sec-properties-of-set-iterator-instances,table-51,table-internal-slots-of-set-iterator-instances">
         <h1>
@@ -46546,7 +46792,7 @@ THH:mm:ss.sss
           </table>
         </emu-table>
         <emu-note>
-          <p>Arguments may be passed to the `next` function but their interpretation and validity is dependent upon the target iterator. The for-of statement and other common users of <em>Iterators</em> do not pass any arguments, so iterator objects that expect to be used in such a manner must be prepared to deal with being called with no arguments.</p>
+          <p>Arguments may be passed to the `next` function but their interpretation and validity is dependent upon the target iterator. The for-of statement and other common users of iterators do not pass any arguments, so iterator objects that expect to be used in such a manner must be prepared to deal with being called with no arguments.</p>
         </emu-note>
         <emu-table id="table-iterator-interface-optional-properties" caption="Iterator Interface Optional Properties" oldids="table-54">
           <table>
@@ -46637,7 +46883,7 @@ THH:mm:ss.sss
           </table>
         </emu-table>
         <emu-note>
-          <p>Arguments may be passed to the `next` function but their interpretation and validity is dependent upon the target async iterator. The `for`-`await`-`of` statement and other common users of <em>AsyncIterators</em> do not pass any arguments, so async iterator objects that expect to be used in such a manner must be prepared to deal with being called with no arguments.</p>
+          <p>Arguments may be passed to the `next` function but their interpretation and validity is dependent upon the target async iterator. The `for`-`await`-`of` statement and other common users of async iterators do not pass any arguments, so async iterator objects that expect to be used in such a manner must be prepared to deal with being called with no arguments.</p>
         </emu-note>
         <emu-table id="table-async-iterator-optional" caption="Async Iterator Interface Optional Properties">
           <table>
@@ -46699,7 +46945,7 @@ THH:mm:ss.sss
                 a Boolean
               </td>
               <td>
-                This is the result status of an <em>iterator</em> `next` method call. If the end of the iterator was reached *"done"* is *true*. If the end was not reached *"done"* is *false* and a value is available. If a *"done"* property (either own or inherited) does not exist, it is considered to have the value *false*.
+                This is the result status of an iterator `next` method call. If the end of the iterator was reached *"done"* is *true*. If the end was not reached *"done"* is *false* and a value is available. If a *"done"* property (either own or inherited) does not exist, it is considered to have the value *false*.
               </td>
             </tr>
             <tr>
@@ -46855,7 +47101,7 @@ THH:mm:ss.sss
         <li>is an ordinary object.</li>
       </ul>
       <emu-note>
-        <p>All objects defined in this specification that implement the Iterator interface also inherit from %Iterator.prototype%. ECMAScript code may also define objects that inherit from %Iterator.prototype%. The %Iterator.prototype% object provides a place where additional methods that are applicable to all iterator objects may be added.</p>
+        <p>All objects defined in this specification that implement the iterator interface also inherit from %Iterator.prototype%. ECMAScript code may also define objects that inherit from %Iterator.prototype%. The %Iterator.prototype% object provides a place where additional methods that are applicable to all iterator objects may be added.</p>
         <p>The following expression is one way that ECMAScript code can access the %Iterator.prototype% object:</p>
         <pre><code class="javascript">Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()))</code></pre>
       </emu-note>
@@ -49416,23 +49662,17 @@ THH:mm:ss.sss
         <emu-alg>
           1. Assert: _generator_.[[AsyncGeneratorState]] is ~draining-queue~.
           1. Let _queue_ be _generator_.[[AsyncGeneratorQueue]].
-          1. If _queue_ is empty, then
-            1. Set _generator_.[[AsyncGeneratorState]] to ~completed~.
-            1. Return ~unused~.
-          1. Let _done_ be *false*.
-          1. Repeat, while _done_ is *false*,
+          1. Repeat, while _queue_ is not empty,
             1. Let _next_ be the first element of _queue_.
             1. Let _completion_ be Completion(_next_.[[Completion]]).
             1. If _completion_ is a return completion, then
               1. Perform AsyncGeneratorAwaitReturn(_generator_).
-              1. Set _done_ to *true*.
+              1. Return ~unused~.
             1. Else,
               1. If _completion_ is a normal completion, then
                 1. Set _completion_ to NormalCompletion(*undefined*).
               1. Perform AsyncGeneratorCompleteStep(_generator_, _completion_, *true*).
-              1. If _queue_ is empty, then
-                1. Set _generator_.[[AsyncGeneratorState]] to ~completed~.
-                1. Set _done_ to *true*.
+          1. Set _generator_.[[AsyncGeneratorState]] to ~completed~.
           1. Return ~unused~.
         </emu-alg>
       </emu-clause>
@@ -50885,6 +51125,9 @@ THH:mm:ss.sss
     <emu-prodref name="ImportSpecifier"></emu-prodref>
     <emu-prodref name="ModuleSpecifier"></emu-prodref>
     <emu-prodref name="ImportedBinding"></emu-prodref>
+    <emu-prodref name="WithClause"></emu-prodref>
+    <emu-prodref name="WithEntries"></emu-prodref>
+    <emu-prodref name="AttributeKey"></emu-prodref>
     <emu-prodref name="ExportDeclaration"></emu-prodref>
     <emu-prodref name="ExportFromClause"></emu-prodref>
     <emu-prodref name="NamedExports"></emu-prodref>
@@ -51812,12 +52055,12 @@ THH:mm:ss.sss
               1. For each |FunctionDeclaration| _f_ that is directly contained in the |StatementList| of any |Block|, |CaseClause|, or |DefaultClause| _x_ such that _script_ Contains _x_ is *true*, do
                 1. Let _F_ be the StringValue of the |BindingIdentifier| of _f_.
                 1. If replacing the |FunctionDeclaration| _f_ with a |VariableStatement| that has _F_ as a |BindingIdentifier| would not produce any Early Errors for _script_, then
-                  1. If _env_.HasLexicalDeclaration(_F_) is *false*, then
-                    1. Let _fnDefinable_ be ? _env_.CanDeclareGlobalVar(_F_).
+                  1. If HasLexicalDeclaration(_env_, _F_) is *false*, then
+                    1. Let _fnDefinable_ be ? CanDeclareGlobalVar(_env_, _F_).
                     1. If _fnDefinable_ is *true*, then
                       1. NOTE: A var binding for _F_ is only instantiated here if it is neither a VarDeclaredName nor the name of another |FunctionDeclaration|.
                       1. If _declaredFunctionOrVarNames_ does not contain _F_, then
-                        1. Perform ? _env_.CreateGlobalVarBinding(_F_, *false*).
+                        1. Perform ? CreateGlobalVarBinding(_env_, _F_, *false*).
                         1. Append _F_ to _declaredFunctionOrVarNames_.
                       1. When the |FunctionDeclaration| _f_ is evaluated, perform the following steps in place of the |FunctionDeclaration| Evaluation algorithm provided in <emu-xref href="#sec-function-definitions-runtime-semantics-evaluation"></emu-xref>:
                         1. Let _gEnv_ be the running execution context's VariableEnvironment.
@@ -51846,8 +52089,8 @@ THH:mm:ss.sss
                       1. [id="step-evaldeclarationinstantiation-web-compat-bindingexists"] Let _bindingExists_ be *true*.
                   1. Set _thisEnv_ to _thisEnv_.[[OuterEnv]].
                 1. If _bindingExists_ is *false* and _varEnv_ is a Global Environment Record, then
-                  1. If _varEnv_.HasLexicalDeclaration(_F_) is *false*, then
-                    1. Let _fnDefinable_ be ? _varEnv_.CanDeclareGlobalVar(_F_).
+                  1. If HasLexicalDeclaration(_varEnv_, _F_) is *false*, then
+                    1. Let _fnDefinable_ be ? CanDeclareGlobalVar(_varEnv_, _F_).
                   1. Else,
                     1. Let _fnDefinable_ be *false*.
                 1. Else,
@@ -51855,7 +52098,7 @@ THH:mm:ss.sss
                 1. If _bindingExists_ is *false* and _fnDefinable_ is *true*, then
                   1. If _declaredFunctionOrVarNames_ does not contain _F_, then
                     1. If _varEnv_ is a Global Environment Record, then
-                      1. Perform ? _varEnv_.CreateGlobalVarBinding(_F_, *true*).
+                      1. Perform ? CreateGlobalVarBinding(_varEnv_, _F_, *true*).
                     1. Else,
                       1. Let _bindingExists_ be ! _varEnv_.HasBinding(_F_).
                       1. If _bindingExists_ is *false*, then
@@ -52144,6 +52387,7 @@ THH:mm:ss.sss
     <p><b>HostGrowSharedArrayBuffer(...)</b></p>
     <p><b>HostHasSourceTextAvailable(...)</b></p>
     <p><b>HostLoadImportedModule(...)</b></p>
+    <p><b>HostGetSupportedImportAttributes(...)</b></p>
     <p><b>HostMakeJobCallback(...)</b></p>
     <p><b>HostPromiseRejectionTracker(...)</b></p>
     <p><b>HostResizeArrayBuffer(...)</b></p>
