@@ -10862,17 +10862,6 @@
                 <emu-not-ref>Contains</emu-not-ref> bindings for all declarations in global code for the associated realm code except for |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, and |VariableDeclaration| bindings.
               </td>
             </tr>
-            <tr>
-              <td>
-                [[VarNames]]
-              </td>
-              <td>
-                a List of Strings
-              </td>
-              <td>
-                The string names bound by |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, |AsyncGeneratorDeclaration|, and |VariableDeclaration| declarations in global code for the associated realm.
-              </td>
-            </tr>
           </table>
         </emu-table>
         <emu-table id="table-additional-methods-of-global-environment-records" caption="Additional Methods of Global Environment Records" oldids="table-19">
@@ -11053,10 +11042,7 @@
             1. Let _globalObject_ be _ObjRec_.[[BindingObject]].
             1. Let _existingProp_ be ? HasOwnProperty(_globalObject_, _N_).
             1. If _existingProp_ is *true*, then
-              1. Let _status_ be ? <emu-meta effects="user-code">_ObjRec_.DeleteBinding</emu-meta>(_N_).
-              1. If _status_ is *true* and _envRec_.[[VarNames]] contains _N_, then
-                1. Remove _N_ from _envRec_.[[VarNames]].
-              1. Return _status_.
+              1. Return ? <emu-meta effects="user-code">_ObjRec_.DeleteBinding</emu-meta>(_N_).
             1. Return *true*.
           </emu-alg>
         </emu-clause>
@@ -11108,24 +11094,6 @@
           </dl>
           <emu-alg>
             1. Return _envRec_.[[GlobalThisValue]].
-          </emu-alg>
-        </emu-clause>
-
-        <emu-clause id="sec-hasvardeclaration" type="abstract operation">
-          <h1>
-            HasVarDeclaration (
-              _envRec_: a Global Environment Record,
-              _N_: a String,
-            ): a Boolean
-          </h1>
-          <dl class="header">
-            <dt>description</dt>
-            <dd>It determines if the argument identifier has a binding in _envRec_ that was created using a |VariableDeclaration|, |FunctionDeclaration|, |GeneratorDeclaration|, |AsyncFunctionDeclaration|, or |AsyncGeneratorDeclaration|.</dd>
-          </dl>
-          <emu-alg>
-            1. Let _varDeclaredNames_ be _envRec_.[[VarNames]].
-            1. If _varDeclaredNames_ contains _N_, return *true*.
-            1. Return *false*.
           </emu-alg>
         </emu-clause>
 
@@ -11222,7 +11190,7 @@
           </h1>
           <dl class="header">
             <dt>description</dt>
-            <dd>It creates and initializes a mutable binding in the associated Object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is reused and assumed to be initialized.</dd>
+            <dd>It creates and initializes a mutable binding in the associated Object Environment Record. If a binding already exists, it is reused and assumed to be initialized.</dd>
           </dl>
           <emu-alg>
             1. Let _ObjRec_ be _envRec_.[[ObjectRecord]].
@@ -11232,8 +11200,6 @@
             1. If _hasProperty_ is *false* and _extensible_ is *true*, then
               1. Perform ? <emu-meta effects="user-code">_ObjRec_.CreateMutableBinding</emu-meta>(_N_, _D_).
               1. Perform ? <emu-meta effects="user-code">_ObjRec_.InitializeBinding</emu-meta>(_N_, *undefined*).
-            1. If _envRec_.[[VarNames]] does not contain _N_, then
-              1. Append _N_ to _envRec_.[[VarNames]].
             1. Return ~unused~.
           </emu-alg>
         </emu-clause>
@@ -11249,7 +11215,7 @@
           </h1>
           <dl class="header">
             <dt>description</dt>
-            <dd>It creates and initializes a mutable binding in the associated Object Environment Record and records the bound name in the associated [[VarNames]] List. If a binding already exists, it is replaced.</dd>
+            <dd>It creates and initializes a mutable binding in the associated Object Environment Record. If a binding already exists, it is replaced.</dd>
           </dl>
           <emu-alg>
             1. Let _ObjRec_ be _envRec_.[[ObjectRecord]].
@@ -11261,8 +11227,6 @@
               1. Let _desc_ be the PropertyDescriptor { [[Value]]: _V_ }.
             1. Perform ? DefinePropertyOrThrow(_globalObject_, _N_, _desc_).
             1. [id="step-createglobalfunctionbinding-set"] Perform ? Set(_globalObject_, _N_, _V_, *false*).
-            1. If _envRec_.[[VarNames]] does not contain _N_, then
-              1. Append _N_ to _envRec_.[[VarNames]].
             1. Return ~unused~.
           </emu-alg>
           <emu-note>
@@ -11480,7 +11444,6 @@
           1. Set _env_.[[ObjectRecord]] to _objRec_.
           1. Set _env_.[[GlobalThisValue]] to _thisValue_.
           1. Set _env_.[[DeclarativeRecord]] to _dclRec_.
-          1. Set _env_.[[VarNames]] to a new empty List.
           1. Set _env_.[[OuterEnv]] to *null*.
           1. Return _env_.
         </emu-alg>
@@ -26119,9 +26082,9 @@
         1. Let _lexNames_ be the LexicallyDeclaredNames of _script_.
         1. Let _varNames_ be the VarDeclaredNames of _script_.
         1. For each element _name_ of _lexNames_, do
-          1. If HasVarDeclaration(_env_, _name_) is *true*, throw a *SyntaxError* exception.
           1. If HasLexicalDeclaration(_env_, _name_) is *true*, throw a *SyntaxError* exception.
           1. Let _hasRestrictedGlobal_ be ? HasRestrictedGlobalProperty(_env_, _name_).
+          1. NOTE: Global `var` and `function` bindings (except those that are introduced by non-strict direct eval) are non-configurable and are therefore restricted global properties.
           1. If _hasRestrictedGlobal_ is *true*, throw a *SyntaxError* exception.
         1. For each element _name_ of _varNames_, do
           1. If HasLexicalDeclaration(_env_, _name_) is *true*, throw a *SyntaxError* exception.
@@ -38532,6 +38495,64 @@ THH:mm:ss.sss
         <li>has the following properties:</li>
       </ul>
 
+      <emu-clause id="sec-regexp.escape">
+        <h1>RegExp.escape ( _S_ )</h1>
+        <p>This function returns a copy of _S_ in which characters that are potentially special in a regular expression |Pattern| have been replaced by equivalent escape sequences.</p>
+        <p>It performs the following steps when called:</p>
+
+        <emu-alg>
+          1. If _S_ is not a String, throw a *TypeError* exception.
+          1. Let _escaped_ be the empty String.
+          1. Let _cpList_ be StringToCodePoints(_S_).
+          1. For each code point _cp_ of _cpList_, do
+            1. If _escaped_ is the empty String and _cp_ is matched by either |DecimalDigit| or |AsciiLetter|, then
+              1. NOTE: Escaping a leading digit ensures that output corresponds with pattern text which may be used after a `\0` character escape or a |DecimalEscape| such as `\1` and still match _S_ rather than be interpreted as an extension of the preceding escape sequence. Escaping a leading ASCII letter does the same for the context after `\c`.
+              1. Let _numericValue_ be the numeric value of _cp_.
+              1. Let _hex_ be Number::toString(𝔽(_numericValue_), 16).
+              1. Assert: The length of _hex_ is 2.
+              1. Set _escaped_ to the string-concatenation of the code unit 0x005C (REVERSE SOLIDUS), *"x"*, and _hex_.
+            1. Else,
+              1. Set _escaped_ to the string-concatenation of _escaped_ and EncodeForRegExpEscape(_cp_).
+          1. Return _escaped_.
+        </emu-alg>
+
+        <emu-note>
+          <p>Despite having similar names, EscapeRegExpPattern and `RegExp.escape` do not perform similar actions. The former escapes a pattern for representation as a string, while this function escapes a string for representation inside a pattern.</p>
+        </emu-note>
+
+        <emu-clause id="sec-encodeforregexpescape" type="abstract operation">
+          <h1>
+            EncodeForRegExpEscape (
+              _cp_: a code point,
+            ): a String
+          </h1>
+          <dl class="header">
+            <dt>description</dt>
+            <dd>It returns a String representing a |Pattern| for matching _c_. If _c_ is white space or an ASCII punctuator, the returned value is an escape sequence. Otherwise, the returned value is a String representation of _c_ itself.</dd>
+          </dl>
+
+          <emu-alg>
+            1. If _cp_ is matched by |SyntaxCharacter| or _cp_ is U+002F (SOLIDUS), then
+              1. Return the string-concatenation of 0x005C (REVERSE SOLIDUS) and UTF16EncodeCodePoint(_cp_).
+            1. Else if _cp_ is a code point listed in the “Code Point” column of <emu-xref href="#table-controlescape-code-point-values"></emu-xref>, then
+              1. Return the string-concatenation of 0x005C (REVERSE SOLIDUS) and the string in the “ControlEscape” column of the row whose “Code Point” column contains _c_.
+            1. Let _otherPunctuators_ be the string-concatenation of *",-=&lt;>#&amp;!%:;@~'`"* and the code unit 0x0022 (QUOTATION MARK).
+            1. Let _toEscape_ be StringToCodePoints(_otherPunctuators_).
+            1. If _toEscape_ contains _cp_, _cp_ is matched by either |WhiteSpace| or |LineTerminator|, or _cp_ has the same numeric value as a leading surrogate or trailing surrogate, then
+              1. Let _cpNum_ be the numeric value of _cp_.
+              1. If _cpNum_ ≤ 0xFF, then
+                1. Let _hex_ be Number::toString(𝔽(_cpNum_), 16).
+                1. Return the string-concatenation of the code unit 0x005C (REVERSE SOLIDUS), *"x"*, and StringPad(_hex_, 2, *"0"*, ~start~).
+              1. Let _escaped_ be the empty String.
+              1. Let _codeUnits_ be UTF16EncodeCodePoint(_cp_).
+              1. For each code unit _cu_ of _codeUnits_, do
+                1. Set _escaped_ to the string-concatenation of _escaped_ and UnicodeEscape(_cu_).
+              1. Return _escaped_.
+            1. Return UTF16EncodeCodePoint(_cp_).
+          </emu-alg>
+        </emu-clause>
+      </emu-clause>
+
       <emu-clause id="sec-regexp.prototype">
         <h1>RegExp.prototype</h1>
         <p>The initial value of `RegExp.prototype` is the RegExp prototype object.</p>
@@ -38863,6 +38884,10 @@ THH:mm:ss.sss
             1. The code points `/` or any |LineTerminator| occurring in the pattern shall be escaped in _S_ as necessary to ensure that the string-concatenation of *"/"*, _S_, *"/"*, and _F_ can be parsed (in an appropriate lexical context) as a |RegularExpressionLiteral| that behaves identically to the constructed regular expression. For example, if _P_ is *"/"*, then _S_ could be *"\\/"* or *"\\u002F"*, among other possibilities, but not *"/"*, because `///` followed by _F_ would be parsed as a |SingleLineComment| rather than a |RegularExpressionLiteral|. If _P_ is the empty String, this specification can be met by letting _S_ be *"(?:)"*.
             1. Return _S_.
           </emu-alg>
+
+          <emu-note>
+            <p>Despite having similar names, `RegExp.escape` and EscapeRegExpPattern do not perform similar actions. The former escapes a string for representation inside a pattern, while this function escapes a pattern for representation as a string.</p>
+          </emu-note>
         </emu-clause>
       </emu-clause>
 
@@ -47331,11 +47356,17 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. Let _numLimit_ be ? ToNumber(_limit_).
-          1. If _numLimit_ is *NaN*, throw a *RangeError* exception.
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. Let _numLimit_ be Completion(ToNumber(_limit_)).
+          1. IfAbruptCloseIterator(_numLimit_, _iterated_).
+          1. If _numLimit_ is *NaN*, then
+            1. Let _error_ be ThrowCompletion(a newly created *RangeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
           1. Let _integerLimit_ be ! ToIntegerOrInfinity(_numLimit_).
-          1. If _integerLimit_ &lt; 0, throw a *RangeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. If _integerLimit_ &lt; 0, then
+            1. Let _error_ be ThrowCompletion(a newly created *RangeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _integerLimit_ and performs the following steps when called:
             1. Let _remaining_ be _integerLimit_.
             1. Repeat, while _remaining_ > 0,
@@ -47360,8 +47391,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_predicate_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_predicate_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _counter_ be 0.
           1. Repeat,
             1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -47379,8 +47413,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_predicate_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_predicate_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _predicate_ and performs the following steps when called:
             1. Let _counter_ be 0.
             1. Repeat,
@@ -47404,8 +47441,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_predicate_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_predicate_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _counter_ be 0.
           1. Repeat,
             1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -47423,8 +47463,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_mapper_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_mapper_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _mapper_ and performs the following steps when called:
             1. Let _counter_ be 0.
             1. Repeat,
@@ -47459,8 +47502,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_procedure_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_procedure_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _counter_ be 0.
           1. Repeat,
             1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -47477,8 +47523,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_mapper_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_mapper_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _mapper_ and performs the following steps when called:
             1. Let _counter_ be 0.
             1. Repeat,
@@ -47501,8 +47550,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_reducer_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_reducer_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. If _initialValue_ is not present, then
             1. Let _accumulator_ be ? IteratorStepValue(_iterated_).
             1. If _accumulator_ is ~done~, throw a *TypeError* exception.
@@ -47526,8 +47578,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. If IsCallable(_predicate_) is *false*, throw a *TypeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. If IsCallable(_predicate_) is *false*, then
+            1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _counter_ be 0.
           1. Repeat,
             1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -47545,11 +47600,17 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. If _O_ is not an Object, throw a *TypeError* exception.
-          1. Let _numLimit_ be ? ToNumber(_limit_).
-          1. If _numLimit_ is *NaN*, throw a *RangeError* exception.
+          1. Let _iterated_ be the Iterator Record { [[Iterator]]: _O_, [[NextMethod]]: *undefined*, [[Done]]: *false* }.
+          1. Let _numLimit_ be Completion(ToNumber(_limit_)).
+          1. IfAbruptCloseIterator(_numLimit_, _iterated_).
+          1. If _numLimit_ is *NaN*, then
+            1. Let _error_ be ThrowCompletion(a newly created *RangeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
           1. Let _integerLimit_ be ! ToIntegerOrInfinity(_numLimit_).
-          1. If _integerLimit_ &lt; 0, throw a *RangeError* exception.
-          1. Let _iterated_ be ? GetIteratorDirect(_O_).
+          1. If _integerLimit_ &lt; 0, then
+            1. Let _error_ be ThrowCompletion(a newly created *RangeError* object).
+            1. Return ? IteratorClose(_iterated_, _error_).
+          1. Set _iterated_ to ? GetIteratorDirect(_O_).
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _integerLimit_ and performs the following steps when called:
             1. Let _remaining_ be _integerLimit_.
             1. Repeat,
@@ -47685,7 +47746,7 @@ THH:mm:ss.sss
             1. Else,
               1. Let _result_ be Completion(IteratorNext(_syncIteratorRecord_)).
             1. IfAbruptRejectPromise(_result_, _promiseCapability_).
-            1. Return AsyncFromSyncIteratorContinuation(_result_, _promiseCapability_).
+            1. Return AsyncFromSyncIteratorContinuation(_result_, _promiseCapability_, _syncIteratorRecord_, *true*).
           </emu-alg>
         </emu-clause>
 
@@ -47696,7 +47757,8 @@ THH:mm:ss.sss
             1. Let _O_ be the *this* value.
             1. Assert: _O_ is an Object that has a [[SyncIteratorRecord]] internal slot.
             1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
-            1. Let _syncIterator_ be _O_.[[SyncIteratorRecord]].[[Iterator]].
+            1. Let _syncIteratorRecord_ be _O_.[[SyncIteratorRecord]].
+            1. Let _syncIterator_ be _syncIteratorRecord_.[[Iterator]].
             1. Let _return_ be Completion(GetMethod(_syncIterator_, *"return"*)).
             1. IfAbruptRejectPromise(_return_, _promiseCapability_).
             1. If _return_ is *undefined*, then
@@ -47711,7 +47773,7 @@ THH:mm:ss.sss
             1. If _result_ is not an Object, then
               1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
               1. Return _promiseCapability_.[[Promise]].
-            1. Return AsyncFromSyncIteratorContinuation(_result_, _promiseCapability_).
+            1. Return AsyncFromSyncIteratorContinuation(_result_, _promiseCapability_, _syncIteratorRecord_, *false*).
           </emu-alg>
         </emu-clause>
 
@@ -47723,11 +47785,18 @@ THH:mm:ss.sss
             1. Let _O_ be the *this* value.
             1. Assert: _O_ is an Object that has a [[SyncIteratorRecord]] internal slot.
             1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
-            1. Let _syncIterator_ be _O_.[[SyncIteratorRecord]].[[Iterator]].
+            1. Let _syncIteratorRecord_ be _O_.[[SyncIteratorRecord]].
+            1. Let _syncIterator_ be _syncIteratorRecord_.[[Iterator]].
             1. Let _throw_ be Completion(GetMethod(_syncIterator_, *"throw"*)).
             1. IfAbruptRejectPromise(_throw_, _promiseCapability_).
             1. If _throw_ is *undefined*, then
-              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « _value_ »).
+              1. NOTE: If _syncIterator_ does not have a `throw` method, close it to give it a chance to clean up before we reject the capability.
+              1. Let _closeCompletion_ be NormalCompletion(~empty~).
+              1. Let _result_ be Completion(IteratorClose(_syncIteratorRecord_, _closeCompletion_)).
+              1. IfAbruptRejectPromise(_result_, _promiseCapability_).
+              1. NOTE: The next step throws a *TypeError* to indicate that there was a protocol violation: _syncIterator_ does not have a `throw` method.
+              1. NOTE: If closing _syncIterator_ does not throw then the result of that operation is ignored, even if it yields a rejected promise.
+              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
               1. Return _promiseCapability_.[[Promise]].
             1. If _value_ is present, then
               1. Let _result_ be Completion(Call(_throw_, _syncIterator_, « _value_ »)).
@@ -47737,7 +47806,7 @@ THH:mm:ss.sss
             1. If _result_ is not an Object, then
               1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, « a newly created *TypeError* object »).
               1. Return _promiseCapability_.[[Promise]].
-            1. Return AsyncFromSyncIteratorContinuation(_result_, _promiseCapability_).
+            1. Return AsyncFromSyncIteratorContinuation(_result_, _promiseCapability_, _syncIteratorRecord_, *true*).
           </emu-alg>
         </emu-clause>
       </emu-clause>
@@ -47780,6 +47849,8 @@ THH:mm:ss.sss
           AsyncFromSyncIteratorContinuation (
             _result_: an Object,
             _promiseCapability_: a PromiseCapability Record for an intrinsic %Promise%,
+            _syncIteratorRecord_: an Iterator Record,
+            _closeOnRejection_: a Boolean,
           ): a Promise
         </h1>
         <dl class="header">
@@ -47792,12 +47863,21 @@ THH:mm:ss.sss
           1. Let _value_ be Completion(IteratorValue(_result_)).
           1. IfAbruptRejectPromise(_value_, _promiseCapability_).
           1. Let _valueWrapper_ be Completion(PromiseResolve(%Promise%, _value_)).
+          1. If _valueWrapper_ is an abrupt completion, _done_ is *false*, and _closeOnRejection_ is *true*, then
+            1. Set _valueWrapper_ to Completion(IteratorClose(_syncIteratorRecord_, _valueWrapper_)).
           1. IfAbruptRejectPromise(_valueWrapper_, _promiseCapability_).
           1. Let _unwrap_ be a new Abstract Closure with parameters (_v_) that captures _done_ and performs the following steps when called:
             1. Return CreateIteratorResultObject(_v_, _done_).
           1. Let _onFulfilled_ be CreateBuiltinFunction(_unwrap_, 1, *""*, « »).
           1. NOTE: _onFulfilled_ is used when processing the *"value"* property of an IteratorResult object in order to wait for its value if it is a promise and re-package the result in a new "unwrapped" IteratorResult object.
-          1. Perform PerformPromiseThen(_valueWrapper_, _onFulfilled_, *undefined*, _promiseCapability_).
+          1. If _done_ is *true*, or if _closeOnRejection_ is *false*, then
+            1. Let _onRejected_ be *undefined*.
+          1. Else,
+            1. Let _closeIterator_ be a new Abstract Closure with parameters (_error_) that captures _syncIteratorRecord_ and performs the following steps when called:
+              1. Return ? IteratorClose(_syncIteratorRecord_, ThrowCompletion(_error_)).
+            1. Let _onRejected_ be CreateBuiltinFunction(_closeIterator_, 1, *""*, « »).
+            1. NOTE: _onRejected_ is used to close the Iterator when the *"value"* property of an IteratorResult object it yields is a rejected promise.
+          1. Perform PerformPromiseThen(_valueWrapper_, _onFulfilled_, _onRejected_, _promiseCapability_).
           1. Return _promiseCapability_.[[Promise]].
         </emu-alg>
       </emu-clause>
