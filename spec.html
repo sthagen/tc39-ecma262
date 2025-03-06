@@ -3,6 +3,12 @@
 <meta charset="utf-8">
 <link rel="icon" href="img/favicon.ico">
 <style>
+  .unicode-property-table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 80%;
+  }
+
   #metadata-block {
     margin: 4em 0;
     padding: 10px;
@@ -19,12 +25,6 @@
 
   #ecma-logo {
     width: 500px;
-  }
-
-  .unicode-property-table {
-    table-layout: fixed;
-    width: 100%;
-    font-size: 80%;
   }
 
   .corner-cell {
@@ -50,8 +50,120 @@
     right: 1em;
   }
 </style>
+<style media="print">
+  /**
+  * ECMA-262-specific hacks. Shouldn't require a ton of maintenance; audit if
+  * visual inspection results in unexpected page breaks.
+  */
+  /* 2.2 Examples of legacy/normative-optional are small enough to be aggressive against breaks */
+  #sec-conformance [example],
+
+  /* 8.3.3 avoid breaking in small alg lists */
+  #sec-static-semantics-containsundefinedcontinuetarget li,
+
+  /* 16.2.1.5.4 many tables */
+  #table-module-graph-cycle-async-fields-1 table,
+  #table-module-graph-cycle-async-fields-9 table {
+    break-inside: avoid-page;
+  }
+
+  /* 12.10.1 long note can break wherever it wants */
+  #sec-rules-of-automatic-semicolon-insertion > emu-note {
+    break-before: initial;
+    break-inside: initial;
+  }
+
+  /* 12.10.2, 12.10.3, 12.10.3.2 Sections start with an <em> not inside a <p> */
+  #sec-examples-of-automatic-semicolon-insertion > em,
+  #sec-interesting-cases-of-automatic-semicolon-insertion > em,
+  #sec-asi-cases-with-no-lineterminator-here > em {
+    display: block;
+    margin-top: 1.25ex;
+  }
+
+  /* 15.1.2 bad spacing between intro and first emu-grammar */
+  #sec-static-semantics-containsexpression > emu-grammar:first-of-type {
+    margin-top: 2ex;
+  }
+
+  /* 15.3 A very long term combined with inline-block, nowrap, and justified text resulting in weird punctuation */
+  #sec-arrow-function-definitions > p > emu-grammar {
+    text-align: left;
+  }
+
+  /* 16.2.1.5.4 squish margins on graphics so table 46 fits on one page */
+  #sec-example-cyclic-module-record-graphs figure:has(> img),
+  #sec-example-cyclic-module-record-graphs figure > img {
+    margin: 0;
+  }
+  #sec-example-cyclic-module-record-graphs figure:has(> img) > figcaption {
+    margin-bottom: 1ex;
+  }
+  #sec-example-cyclic-module-record-graphs emu-figure:has(> figure > img) + p {
+    margin-top: 1ex;
+  }
+
+  /* 16.2.1.5.4 table 51 & 54 are too narrow for caption */
+  #table-module-graph-cycle-async-fields-6 table {
+    width: 110mm;
+  }
+  #table-module-graph-cycle-async-fields-9 table {
+    width: 135mm;
+  }
+
+  /* 20.1.3.7 legacy title */
+  #sec-object\.prototype\.__proto__ > .attributes-tag {
+    break-before: avoid-page;
+    break-after: avoid-page;
+  }
+
+  /* 21.4.1.22 Table 61 middle column is too narrow */
+  #table-time-zone-identifier-record-fields > figure > table th:nth-of-type(2) {
+    width: 15%;
+  }
+
+  /* 21.4.4.41.2 These tables are way too narrow for their captions */
+  #sec-todatestring-day-names table,
+  #sec-todatestring-month-names table {
+    width: 100mm;
+  }
+
+  /* 27.2.6 squeeze to make more room for figure-2.svg */
+  #table-internal-slots-of-promise-instances > figure {
+    margin-bottom: 0;
+  }
+
+  /* 27.3 fit generator objects relationships diagram */
+  #sec-generatorfunction-objects,
+  #sec-generatorfunction-objects h1 {
+    margin-top: 1.5ex;
+  }
+
+  /* 27.3 `figure-2.svg` is just a tiny bit too big to fit on the page, results in weird white space */
+  #figure-2 figure {
+    margin: 1ex 0;
+  }
+  #figure-2 > figure > img {
+    width: 97%;
+  }
+
+  /* 29.11 extremely long note */
+  #sec-shared-memory-guidelines > emu-note {
+    break-inside: auto;
+  }
+
+  .unicode-property-table {
+    table-layout: initial;
+    width: auto;
+    font-size: 90%;
+  }
+
+  .unicode-property-table th:first-of-type {
+    width: 33%;
+  }
+</style>
 <pre class="metadata">
-  title: ECMAScript&reg; 2025 Language&nbsp;Specification
+  title: ECMAScript<sup>&reg;</sup> 2025 Language&nbsp;Specification
   shortname: ECMA-262
   status: draft
   location: https://tc39.es/ecma262/
@@ -409,7 +521,7 @@
 
     <emu-clause id="sec-terms-and-definitions-number-type">
       <h1>Number type</h1>
-      <p>set of all possible Number values including the special “Not-a-Number” (NaN) value, positive infinity, and negative infinity</p>
+      <p>set of all possible Number values including *NaN* (“not a number”), *+∞*<sub>𝔽</sub> (positive infinity), and *-∞*<sub>𝔽</sub> (negative infinity)</p>
     </emu-clause>
 
     <emu-clause id="sec-number-object">
@@ -427,7 +539,7 @@
 
     <emu-clause id="sec-terms-and-definitions-nan">
       <h1>NaN</h1>
-      <p>Number value that is an IEEE 754-2019 “Not-a-Number” value</p>
+      <p>Number value that is an IEEE 754-2019 NaN (“not a number”) value</p>
     </emu-clause>
 
     <emu-clause id="sec-terms-and-definitions-bigint-value">
@@ -1856,7 +1968,7 @@
 
       <emu-clause id="sec-ecmascript-language-types-number-type">
         <h1>The Number Type</h1>
-        <p>The <dfn variants="is a Number,is not a Number">Number type</dfn> has exactly 18,437,736,874,454,810,627 (that is, <emu-eqn>2<sup>64</sup> - 2<sup>53</sup> + 3</emu-eqn>) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic, except that the 9,007,199,254,740,990 (that is, <emu-eqn>2<sup>53</sup> - 2</emu-eqn>) distinct “Not-a-Number” values of the IEEE Standard are represented in ECMAScript as a single special *NaN* value. (Note that the *NaN* value is produced by the program expression `NaN`.) In some implementations, external code might be able to detect a difference between various Not-a-Number values, but such behaviour is implementation-defined; to ECMAScript code, all *NaN* values are indistinguishable from each other.</p>
+        <p>The <dfn variants="is a Number,is not a Number">Number type</dfn> has exactly 18,437,736,874,454,810,627 (that is, <emu-eqn>2<sup>64</sup> - 2<sup>53</sup> + 3</emu-eqn>) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic, except that the 9,007,199,254,740,990 (that is, <emu-eqn>2<sup>53</sup> - 2</emu-eqn>) distinct NaN values of the IEEE Standard are represented in ECMAScript as a single special *NaN* value. (Note that the *NaN* value is produced by the program expression `NaN`.) In some implementations, external code might be able to detect a difference between various NaN values, but such behaviour is implementation-defined; to ECMAScript code, all *NaN* values are indistinguishable from each other.</p>
         <emu-note>
           <p>The bit pattern that might be observed in an ArrayBuffer (see <emu-xref href="#sec-arraybuffer-objects"></emu-xref>) or a SharedArrayBuffer (see <emu-xref href="#sec-sharedarraybuffer-objects"></emu-xref>) after a Number value has been stored into it is not necessarily the same as the internal representation of that Number value used by the ECMAScript implementation.</p>
         </emu-note>
@@ -12193,6 +12305,11 @@
           <td>a List of either Objects or Symbols</td>
           <td>Initially a new empty List, representing the list of objects and/or symbols to be kept alive until the end of the current Job</td>
         </tr>
+        <tr>
+          <td>[[ModuleAsyncEvaluationCount]]</td>
+          <td>an integer</td>
+          <td>Initially 0, used to assign unique incrementing values to the [[AsyncEvaluationOrder]] field of modules that are asynchronous or have asynchronous dependencies.</td>
+        </tr>
       </table>
     </emu-table>
 
@@ -12232,6 +12349,21 @@
       </emu-alg>
       <emu-note>
         <p>In some environments it may not be reasonable for a given agent to suspend. For example, in a web browser environment, it may be reasonable to disallow suspending a document's main event handling thread, while still allowing workers' event handling threads to suspend.</p>
+      </emu-note>
+    </emu-clause>
+
+    <emu-clause id="sec-IncrementModuleAsyncEvaluationCount" type="abstract operation">
+      <h1>IncrementModuleAsyncEvaluationCount ( ): an integer</h1>
+      <dl class="header">
+      </dl>
+      <emu-alg>
+        1. Let _AR_ be the Agent Record of the surrounding agent.
+        1. Let _count_ be _AR_.[[ModuleAsyncEvaluationCount]].
+        1. Set _AR_.[[ModuleAsyncEvaluationCount]] to _count_ + 1.
+        1. Return _count_.
+      </emu-alg>
+      <emu-note>
+        <p>This value is only used to keep track of the relative evaluation order between pending modules. An implementation may unobservably reset [[ModuleAsyncEvaluationCount]] to 0 whenever there are no pending modules.</p>
       </emu-note>
     </emu-clause>
   </emu-clause>
@@ -26706,13 +26838,13 @@
             </tr>
             <tr>
               <td>
-                [[AsyncEvaluation]]
+                [[AsyncEvaluationOrder]]
               </td>
               <td>
-                a Boolean
+                ~unset~, an integer, or ~done~
               </td>
               <td>
-                Whether this module is either itself asynchronous or has an asynchronous dependency. Note: The order in which this field is set is used to order queued executions, see <emu-xref href="#sec-async-module-execution-fulfilled"></emu-xref>.
+                This field is initially set to ~unset~, and remains ~unset~ for fully synchronous modules. For modules that are either themselves asynchronous or have an asynchronous dependency, it is set to an integer that determines the order in which execution of pending modules is queued by <emu-xref href="#sec-async-module-execution-fulfilled"></emu-xref>. Once the pending module is executed, the field is set to ~done~.
               </td>
             </tr>
             <tr>
@@ -27043,6 +27175,7 @@
             1. If _result_ is an abrupt completion, then
               1. For each Cyclic Module Record _m_ of _stack_, do
                 1. Assert: _m_.[[Status]] is ~evaluating~.
+                1. Assert: _m_.[[AsyncEvaluationOrder]] is ~unset~.
                 1. Set _m_.[[Status]] to ~evaluated~.
                 1. Set _m_.[[EvaluationError]] to _result_.
               1. Assert: _module_.[[Status]] is ~evaluated~.
@@ -27051,8 +27184,9 @@
             1. Else,
               1. Assert: _module_.[[Status]] is either ~evaluating-async~ or ~evaluated~.
               1. Assert: _module_.[[EvaluationError]] is ~empty~.
-              1. If _module_.[[AsyncEvaluation]] is *false*, then
-                1. Assert: _module_.[[Status]] is ~evaluated~.
+              1. If _module_.[[Status]] is ~evaluated~, then
+                1. NOTE: This implies that evaluation of _module_ completed synchronously.
+                1. Assert: _module_.[[AsyncEvaluationOrder]] is ~unset~.
                 1. Perform ! Call(_capability_.[[Resolve]], *undefined*, « *undefined* »).
               1. Assert: _stack_ is empty.
             1. Return _capability_.[[Promise]].
@@ -27101,13 +27235,12 @@
                     1. Set _requiredModule_ to _requiredModule_.[[CycleRoot]].
                     1. Assert: _requiredModule_.[[Status]] is either ~evaluating-async~ or ~evaluated~.
                     1. If _requiredModule_.[[EvaluationError]] is not ~empty~, return ? _requiredModule_.[[EvaluationError]].
-                  1. If _requiredModule_.[[AsyncEvaluation]] is *true*, then
+                  1. If _requiredModule_.[[AsyncEvaluationOrder]] is an integer, then
                     1. Set _module_.[[PendingAsyncDependencies]] to _module_.[[PendingAsyncDependencies]] + 1.
                     1. Append _module_ to _requiredModule_.[[AsyncParentModules]].
               1. If _module_.[[PendingAsyncDependencies]] > 0 or _module_.[[HasTLA]] is *true*, then
-                1. Assert: _module_.[[AsyncEvaluation]] is *false* and was never previously set to *true*.
-                1. Set _module_.[[AsyncEvaluation]] to *true*.
-                1. NOTE: The order in which module records have their [[AsyncEvaluation]] fields transition to *true* is significant. (See <emu-xref href="#sec-async-module-execution-fulfilled"></emu-xref>.)
+                1. Assert: _module_.[[AsyncEvaluationOrder]] is ~unset~.
+                1. Set _module_.[[AsyncEvaluationOrder]] to IncrementModuleAsyncEvaluationCount().
                 1. If _module_.[[PendingAsyncDependencies]] = 0, perform ExecuteAsyncModule(_module_).
               1. Else,
                 1. Perform ? <emu-meta effects="user-code">_module_.ExecuteModule()</emu-meta>.
@@ -27119,7 +27252,8 @@
                   1. Let _requiredModule_ be the last element of _stack_.
                   1. Remove the last element of _stack_.
                   1. Assert: _requiredModule_ is a Cyclic Module Record.
-                  1. If _requiredModule_.[[AsyncEvaluation]] is *false*, set _requiredModule_.[[Status]] to ~evaluated~.
+                  1. Assert: _requiredModule_.[[AsyncEvaluationOrder]] is either an integer or ~unset~.
+                  1. If _requiredModule_.[[AsyncEvaluationOrder]] is ~unset~, set _requiredModule_.[[Status]] to ~evaluated~.
                   1. Otherwise, set _requiredModule_.[[Status]] to ~evaluating-async~.
                   1. If _requiredModule_ and _module_ are the same Module Record, set _done_ to *true*.
                   1. Set _requiredModule_.[[CycleRoot]] to _module_.
@@ -27174,7 +27308,7 @@
                 1. If _execList_ does not contain _m_ and _m_.[[CycleRoot]].[[EvaluationError]] is ~empty~, then
                   1. Assert: _m_.[[Status]] is ~evaluating-async~.
                   1. Assert: _m_.[[EvaluationError]] is ~empty~.
-                  1. Assert: _m_.[[AsyncEvaluation]] is *true*.
+                  1. Assert: _m_.[[AsyncEvaluationOrder]] is an integer.
                   1. Assert: _m_.[[PendingAsyncDependencies]] > 0.
                   1. Set _m_.[[PendingAsyncDependencies]] to _m_.[[PendingAsyncDependencies]] - 1.
                   1. If _m_.[[PendingAsyncDependencies]] = 0, then
@@ -27200,17 +27334,17 @@
                 1. Assert: _module_.[[EvaluationError]] is not ~empty~.
                 1. Return ~unused~.
               1. Assert: _module_.[[Status]] is ~evaluating-async~.
-              1. Assert: _module_.[[AsyncEvaluation]] is *true*.
+              1. Assert: _module_.[[AsyncEvaluationOrder]] is an integer.
               1. Assert: _module_.[[EvaluationError]] is ~empty~.
-              1. Set _module_.[[AsyncEvaluation]] to *false*.
+              1. Set _module_.[[AsyncEvaluationOrder]] to ~done~.
               1. Set _module_.[[Status]] to ~evaluated~.
               1. If _module_.[[TopLevelCapability]] is not ~empty~, then
                 1. Assert: _module_.[[CycleRoot]] and _module_ are the same Module Record.
                 1. Perform ! Call(_module_.[[TopLevelCapability]].[[Resolve]], *undefined*, « *undefined* »).
               1. Let _execList_ be a new empty List.
               1. Perform GatherAvailableAncestors(_module_, _execList_).
-              1. Let _sortedExecList_ be a List whose elements are the elements of _execList_, in the order in which they had their [[AsyncEvaluation]] fields set to *true* in InnerModuleEvaluation.
-              1. Assert: All elements of _sortedExecList_ have their [[AsyncEvaluation]] field set to *true*, [[PendingAsyncDependencies]] field set to 0, and [[EvaluationError]] field set to ~empty~.
+              1. Assert: All elements of _execList_ have their [[AsyncEvaluationOrder]] field set to an integer, [[PendingAsyncDependencies]] field set to 0, and [[EvaluationError]] field set to ~empty~.
+              1. Let _sortedExecList_ be a List whose elements are the elements of _execList_, sorted by their [[AsyncEvaluationOrder]] field in ascending order.
               1. For each Cyclic Module Record _m_ of _sortedExecList_, do
                 1. If _m_.[[Status]] is ~evaluated~, then
                   1. Assert: _m_.[[EvaluationError]] is not ~empty~.
@@ -27221,7 +27355,7 @@
                   1. If _result_ is an abrupt completion, then
                     1. Perform AsyncModuleExecutionRejected(_m_, _result_.[[Value]]).
                   1. Else,
-                    1. Set _m_.[[AsyncEvaluation]] to *false*.
+                    1. Set _m_.[[AsyncEvaluationOrder]] to ~done~.
                     1. Set _m_.[[Status]] to ~evaluated~.
                     1. If _m_.[[TopLevelCapability]] is not ~empty~, then
                       1. Assert: _m_.[[CycleRoot]] and _m_ are the same Module Record.
@@ -27244,12 +27378,12 @@
                 1. Assert: _module_.[[EvaluationError]] is not ~empty~.
                 1. Return ~unused~.
               1. Assert: _module_.[[Status]] is ~evaluating-async~.
-              1. Assert: _module_.[[AsyncEvaluation]] is *true*.
+              1. Assert: _module_.[[AsyncEvaluationOrder]] is an integer.
               1. Assert: _module_.[[EvaluationError]] is ~empty~.
               1. Set _module_.[[EvaluationError]] to ThrowCompletion(_error_).
               1. Set _module_.[[Status]] to ~evaluated~.
-              1. Set _module_.[[AsyncEvaluation]] to *false*.
-              1. NOTE: _module_.[[AsyncEvaluation]] is set to *false* for symmetry with AsyncModuleExecutionFulfilled. In InnerModuleEvaluation, the value of a module's [[AsyncEvaluation]] internal slot is unused when its [[EvaluationError]] internal slot is not ~empty~.
+              1. Set _module_.[[AsyncEvaluationOrder]] to ~done~.
+              1. NOTE: _module_.[[AsyncEvaluationOrder]] is set to ~done~ for symmetry with AsyncModuleExecutionFulfilled. In InnerModuleEvaluation, the value of a module's [[AsyncEvaluationOrder]] internal slot is unused when its [[EvaluationError]] internal slot is not ~empty~.
               1. For each Cyclic Module Record _m_ of _module_.[[AsyncParentModules]], do
                 1. Perform AsyncModuleExecutionRejected(_m_, _error_).
               1. If _module_.[[TopLevelCapability]] is not ~empty~, then
@@ -27268,7 +27402,7 @@
           <p>First consider the following simple module graph:</p>
 
           <emu-figure id="figure-module-graph-simple" caption="A simple module graph">
-            <img alt="A module graph in which module A depends on module B, and module B depends on module C" width="121" height="211" src="img/module-graph-simple.svg">
+            <img alt="A module graph in which module A depends on module B, and module B depends on module C" width="60" height="198" src="img/module-graph-simple.svg">
           </emu-figure>
 
           <p>Let's first assume that there are no error conditions. When a host first calls _A_.LoadRequestedModules(), this will complete successfully by assumption, and recursively load the dependencies of _B_ and _C_ as well (respectively, _C_ and none), and then set _A_.[[Status]] = _B_.[[Status]] = _C_.[[Status]] = ~unlinked~. Then, when the host calls _A_.Link(), it will complete successfully (again by assumption) such that _A_.[[Status]] = _B_.[[Status]] = _C_.[[Status]] = linked. These preparatory steps can be performed at any time. Later, when the host is ready to incur any possible side effects of the modules, it can call _A_.Evaluate(), which will complete successfully, returning a Promise resolving to *undefined* (again by assumption), recursively having evaluated first _C_ and then _B_. Each module's [[Status]] at this point will be ~evaluated~.</p>
@@ -27280,7 +27414,7 @@
           <p>Now consider a different type of error condition:</p>
 
           <emu-figure id="figure-module-graph-missing" caption="A module graph with an unresolvable module">
-            <img alt="A module graph in which module A depends on a missing (unresolvable) module, represented by ???" width="121" height="121" src="img/module-graph-missing.svg">
+            <img alt="A module graph in which module A depends on a missing (unresolvable) module, represented by ???" width="60" height="121" src="img/module-graph-missing.svg">
           </emu-figure>
 
           <p>In this scenario, module _A_ declares a dependency on some other module, but no Module Record exists for that module, i.e. HostLoadImportedModule calls FinishLoadingImportedModule with an exception when asked for it. This could occur for a variety of reasons, such as the corresponding resource not existing, or the resource existing but ParseModule returning some errors when trying to parse the resulting source text. Hosts can choose to expose the cause of failure via the completion they pass to FinishLoadingImportedModule. In any case, this exception causes a loading failure, which results in _A_'s [[Status]] remaining ~new~.</p>
@@ -27314,7 +27448,7 @@
           </emu-figure>
           <p>Loading and linking happen as before, and all modules end up with [[Status]] set to ~linked~.</p>
 
-          <p>Calling _A_.Evaluate() calls InnerModuleEvaluation on _A_, _B_, and _D_, which all transition to ~evaluating~. Then InnerModuleEvaluation is called on _A_ again, which is a no-op because it is already ~evaluating~. At this point, _D_.[[PendingAsyncDependencies]] is 0, so ExecuteAsyncModule(_D_) is called and we call _D_.ExecuteModule with a new PromiseCapability tracking the asynchronous execution of _D_. We unwind back to the InnerModuleEvaluation on _B_, setting _B_.[[PendingAsyncDependencies]] to 1 and _B_.[[AsyncEvaluation]] to *true*. We unwind back to the original InnerModuleEvaluation on _A_, setting _A_.[[PendingAsyncDependencies]] to 1. In the next iteration of the loop over _A_'s dependencies, we call InnerModuleEvaluation on _C_ and thus on _D_ (again a no-op) and _E_. As _E_ has no dependencies and is not part of a cycle, we call ExecuteAsyncModule(_E_) in the same manner as _D_ and _E_ is immediately removed from the stack. We unwind once more to the original InnerModuleEvaluation on _A_, setting _C_.[[AsyncEvaluation]] to *true*. Now we finish the loop over _A_'s dependencies, set _A_.[[AsyncEvaluation]] to *true*, and remove the entire strongly connected component from the stack, transitioning all of the modules to ~evaluating-async~ at once. At this point, the fields of the modules are as given in <emu-xref href="#table-module-graph-cycle-async-fields-1"></emu-xref>.</p>
+          <p>Calling _A_.Evaluate() calls InnerModuleEvaluation on _A_, _B_, and _D_, which all transition to ~evaluating~. Then InnerModuleEvaluation is called on _A_ again, which is a no-op because it is already ~evaluating~. At this point, _D_.[[PendingAsyncDependencies]] is 0, so ExecuteAsyncModule(_D_) is called and we call _D_.ExecuteModule with a new PromiseCapability tracking the asynchronous execution of _D_. We unwind back to the InnerModuleEvaluation on _B_, setting _B_.[[PendingAsyncDependencies]] to 1 and _B_.[[AsyncEvaluationOrder]] to 1. We unwind back to the original InnerModuleEvaluation on _A_, setting _A_.[[PendingAsyncDependencies]] to 1. In the next iteration of the loop over _A_'s dependencies, we call InnerModuleEvaluation on _C_ and thus on _D_ (again a no-op) and _E_. As _E_ has no dependencies and is not part of a cycle, we call ExecuteAsyncModule(_E_) in the same manner as _D_ and _E_ is immediately removed from the stack. We unwind once more to the InnerModuleEvaluation on _C_, setting _C_.[[AsyncEvaluationOrder]] to 3. Now we finish the loop over _A_'s dependencies, set _A_.[[AsyncEvaluationOrder]] to 4, and remove the entire strongly connected component from the stack, transitioning all of the modules to ~evaluating-async~ at once. At this point, the fields of the modules are as given in <emu-xref href="#table-module-graph-cycle-async-fields-1"></emu-xref>.</p>
 
           <emu-table id="table-module-graph-cycle-async-fields-1" caption="Module fields after the initial Evaluate() call">
             <table>
@@ -27358,12 +27492,12 @@
                 <td>~evaluating-async~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
-                <td>*true*</td>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
+                <td>1</td>
+                <td>3</td>
+                <td>0</td>
+                <td>2*</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27411,9 +27545,9 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>3</td>
+                <td>2</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27428,7 +27562,7 @@
             </table>
           </emu-table>
 
-          <p>_D_ is next to finish (as it was the only module that was still executing). When that happens, AsyncModuleExecutionFulfilled is called again and _D_.[[Status]] is set to ~evaluated~. Then _B_.[[PendingAsyncDependencies]] is decremented to become 0, ExecuteAsyncModule is called on _B_, and it starts executing. _C_.[[PendingAsyncDependencies]] is also decremented to become 0, and _C_ starts executing (potentially in parallel to _B_ if _B_ contains an `await`). The fields of the updated modules are as given in <emu-xref href="#table-module-graph-cycle-async-fields-3"></emu-xref>.</p>
+          <p>_D_ is next to finish (as it was the only module that was still executing). When that happens, AsyncModuleExecutionFulfilled is called again and _D_.[[Status]] is set to ~evaluated~. Its ancestors available for execution are _B_ (whose [[AsyncEvaluationOrder]] is 1) and _C_ (whose [[AsyncEvaluationOrder]] is 3), thus _B_ will be handled first: _B_.[[PendingAsyncDependencies]] is decremented to become 0, ExecuteAsyncModule is called on _B_, and it starts executing. _C_.[[PendingAsyncDependencies]] is also decremented to become 0, and _C_ starts executing (potentially in parallel to _B_ if _B_ contains an `await`). The fields of the updated modules are as given in <emu-xref href="#table-module-graph-cycle-async-fields-3"></emu-xref>.</p>
 
           <emu-table id="table-module-graph-cycle-async-fields-3" caption="Module fields after module _D_ finishes executing">
             <table>
@@ -27459,10 +27593,10 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>1</td>
+                <td>3</td>
+                <td>0</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27506,9 +27640,9 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
+                <td>3</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27550,9 +27684,9 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
+                <td>1</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27590,8 +27724,8 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27631,9 +27765,9 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
+                <td>3</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27676,8 +27810,8 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -27722,9 +27856,9 @@
                 <td>~evaluated~</td>
               </tr>
               <tr>
-                <th>[[AsyncEvaluation]]</th>
-                <td>*true*</td>
-                <td>*true*</td>
+                <th>[[AsyncEvaluationOrder]]</th>
+                <td>4</td>
+                <td>1</td>
               </tr>
               <tr>
                 <th>[[AsyncParentModules]]</th>
@@ -28286,7 +28420,7 @@
               1. Else,
                 1. Append _ee_ to _indirectExportEntries_.
             1. Let _async_ be _body_ Contains `await`.
-            1. Return Source Text Module Record { [[Realm]]: _realm_, [[Environment]]: ~empty~, [[Namespace]]: ~empty~, [[CycleRoot]]: ~empty~, [[HasTLA]]: _async_, [[AsyncEvaluation]]: *false*, [[TopLevelCapability]]: ~empty~, [[AsyncParentModules]]: « », [[PendingAsyncDependencies]]: ~empty~, [[Status]]: ~new~, [[EvaluationError]]: ~empty~, [[HostDefined]]: _hostDefined_, [[ECMAScriptCode]]: _body_, [[Context]]: ~empty~, [[ImportMeta]]: ~empty~, [[RequestedModules]]: _requestedModules_, [[LoadedModules]]: « », [[ImportEntries]]: _importEntries_, [[LocalExportEntries]]: _localExportEntries_, [[IndirectExportEntries]]: _indirectExportEntries_, [[StarExportEntries]]: _starExportEntries_, [[DFSIndex]]: ~empty~, [[DFSAncestorIndex]]: ~empty~ }.
+            1. Return Source Text Module Record { [[Realm]]: _realm_, [[Environment]]: ~empty~, [[Namespace]]: ~empty~, [[CycleRoot]]: ~empty~, [[HasTLA]]: _async_, [[AsyncEvaluationOrder]]: ~unset~, [[TopLevelCapability]]: ~empty~, [[AsyncParentModules]]: « », [[PendingAsyncDependencies]]: ~empty~, [[Status]]: ~new~, [[EvaluationError]]: ~empty~, [[HostDefined]]: _hostDefined_, [[ECMAScriptCode]]: _body_, [[Context]]: ~empty~, [[ImportMeta]]: ~empty~, [[RequestedModules]]: _requestedModules_, [[LoadedModules]]: « », [[ImportEntries]]: _importEntries_, [[LocalExportEntries]]: _localExportEntries_, [[IndirectExportEntries]]: _indirectExportEntries_, [[StarExportEntries]]: _starExportEntries_, [[DFSIndex]]: ~empty~, [[DFSAncestorIndex]]: ~empty~ }.
           </emu-alg>
           <emu-note>
             <p>An implementation may parse module source text and analyse it for Early Error conditions prior to the evaluation of ParseModule for that module source text. However, the reporting of any errors must be deferred until the point where this specification actually performs ParseModule upon that source text.</p>
@@ -44212,15 +44346,15 @@ THH:mm:ss.sss
           1. If _isLittleEndian_ is *false*, reverse the order of the elements of _rawBytes_.
           1. If _type_ is ~float16~, then
             1. Let _value_ be the byte elements of _rawBytes_ concatenated and interpreted as a little-endian bit string encoding of an IEEE 754-2019 binary16 value.
-            1. If _value_ is an IEEE 754-2019 binary16 NaN value, return the *NaN* Number value.
+            1. If _value_ is a NaN, return *NaN*.
             1. Return the Number value that corresponds to _value_.
           1. If _type_ is ~float32~, then
             1. Let _value_ be the byte elements of _rawBytes_ concatenated and interpreted as a little-endian bit string encoding of an IEEE 754-2019 binary32 value.
-            1. If _value_ is an IEEE 754-2019 binary32 NaN value, return the *NaN* Number value.
+            1. If _value_ is a NaN, return *NaN*.
             1. Return the Number value that corresponds to _value_.
           1. If _type_ is ~float64~, then
             1. Let _value_ be the byte elements of _rawBytes_ concatenated and interpreted as a little-endian bit string encoding of an IEEE 754-2019 binary64 value.
-            1. If _value_ is an IEEE 754-2019 binary64 NaN value, return the *NaN* Number value.
+            1. If _value_ is a NaN, return *NaN*.
             1. Return the Number value that corresponds to _value_.
           1. If IsUnsignedElementType(_type_) is *true*, then
             1. Let _intValue_ be the byte elements of _rawBytes_ concatenated and interpreted as a bit string encoding of an unsigned little-endian binary number.
@@ -44298,11 +44432,11 @@ THH:mm:ss.sss
         </dl>
         <emu-alg>
           1. If _type_ is ~float16~, then
-            1. Let _rawBytes_ be a List whose elements are the 2 bytes that are the result of converting _value_ to IEEE 754-2019 binary16 format using roundTiesToEven mode. The bytes are arranged in little endian order. If _value_ is *NaN*, _rawBytes_ may be set to any implementation chosen IEEE 754-2019 binary16 format Not-a-Number encoding. An implementation must always choose the same encoding for each implementation distinguishable *NaN* value.
+            1. Let _rawBytes_ be a List whose elements are the 2 bytes that are the result of converting _value_ to IEEE 754-2019 binary16 format using roundTiesToEven mode. The bytes are arranged in little endian order. If _value_ is *NaN*, _rawBytes_ may be set to any implementation chosen IEEE 754-2019 binary16 format NaN encoding. An implementation must always choose the same encoding for each implementation distinguishable *NaN* value.
           1. Else if _type_ is ~float32~, then
-            1. Let _rawBytes_ be a List whose elements are the 4 bytes that are the result of converting _value_ to IEEE 754-2019 binary32 format using roundTiesToEven mode. The bytes are arranged in little endian order. If _value_ is *NaN*, _rawBytes_ may be set to any implementation chosen IEEE 754-2019 binary32 format Not-a-Number encoding. An implementation must always choose the same encoding for each implementation distinguishable *NaN* value.
+            1. Let _rawBytes_ be a List whose elements are the 4 bytes that are the result of converting _value_ to IEEE 754-2019 binary32 format using roundTiesToEven mode. The bytes are arranged in little endian order. If _value_ is *NaN*, _rawBytes_ may be set to any implementation chosen IEEE 754-2019 binary32 format NaN encoding. An implementation must always choose the same encoding for each implementation distinguishable *NaN* value.
           1. Else if _type_ is ~float64~, then
-            1. Let _rawBytes_ be a List whose elements are the 8 bytes that are the IEEE 754-2019 binary64 format encoding of _value_. The bytes are arranged in little endian order. If _value_ is *NaN*, _rawBytes_ may be set to any implementation chosen IEEE 754-2019 binary64 format Not-a-Number encoding. An implementation must always choose the same encoding for each implementation distinguishable *NaN* value.
+            1. Let _rawBytes_ be a List whose elements are the 8 bytes that are the IEEE 754-2019 binary64 format encoding of _value_. The bytes are arranged in little endian order. If _value_ is *NaN*, _rawBytes_ may be set to any implementation chosen IEEE 754-2019 binary64 format NaN encoding. An implementation must always choose the same encoding for each implementation distinguishable *NaN* value.
           1. Else,
             1. Let _n_ be the Element Size value specified in <emu-xref href="#table-the-typedarray-constructors"></emu-xref> for Element Type _type_.
             1. Let _conversionOperation_ be the abstract operation named in the Conversion Operation column in <emu-xref href="#table-the-typedarray-constructors"></emu-xref> for Element Type _type_.
@@ -45218,8 +45352,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getBigInt64 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~bigint64~).
+          1. Let _view_ be the *this* value.
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~bigint64~).
         </emu-alg>
       </emu-clause>
 
@@ -45227,8 +45361,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getBigUint64 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~biguint64~).
+          1. Let _view_ be the *this* value.
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~biguint64~).
         </emu-alg>
       </emu-clause>
 
@@ -45236,9 +45370,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getFloat16 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~float16~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~float16~).
         </emu-alg>
       </emu-clause>
 
@@ -45246,9 +45380,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getFloat32 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~float32~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~float32~).
         </emu-alg>
       </emu-clause>
 
@@ -45256,9 +45390,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getFloat64 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~float64~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~float64~).
         </emu-alg>
       </emu-clause>
 
@@ -45266,8 +45400,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getInt8 ( _byteOffset_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? GetViewValue(_v_, _byteOffset_, *true*, ~int8~).
+          1. Let _view_ be the *this* value.
+          1. Return ? GetViewValue(_view_, _byteOffset_, *true*, ~int8~).
         </emu-alg>
       </emu-clause>
 
@@ -45275,9 +45409,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getInt16 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~int16~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~int16~).
         </emu-alg>
       </emu-clause>
 
@@ -45285,9 +45419,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getInt32 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~int32~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~int32~).
         </emu-alg>
       </emu-clause>
 
@@ -45295,8 +45429,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getUint8 ( _byteOffset_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? GetViewValue(_v_, _byteOffset_, *true*, ~uint8~).
+          1. Let _view_ be the *this* value.
+          1. Return ? GetViewValue(_view_, _byteOffset_, *true*, ~uint8~).
         </emu-alg>
       </emu-clause>
 
@@ -45304,9 +45438,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getUint16 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~uint16~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~uint16~).
         </emu-alg>
       </emu-clause>
 
@@ -45314,9 +45448,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.getUint32 ( _byteOffset_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? GetViewValue(_v_, _byteOffset_, _littleEndian_, ~uint32~).
+          1. Return ? GetViewValue(_view_, _byteOffset_, _littleEndian_, ~uint32~).
         </emu-alg>
       </emu-clause>
 
@@ -45324,8 +45458,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setBigInt64 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~bigint64~, _value_).
+          1. Let _view_ be the *this* value.
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~bigint64~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45333,8 +45467,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setBigUint64 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~biguint64~, _value_).
+          1. Let _view_ be the *this* value.
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~biguint64~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45342,9 +45476,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setFloat16 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~float16~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~float16~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45352,9 +45486,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setFloat32 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~float32~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~float32~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45362,9 +45496,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setFloat64 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~float64~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~float64~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45372,8 +45506,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setInt8 ( _byteOffset_, _value_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? SetViewValue(_v_, _byteOffset_, *true*, ~int8~, _value_).
+          1. Let _view_ be the *this* value.
+          1. Return ? SetViewValue(_view_, _byteOffset_, *true*, ~int8~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45381,9 +45515,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setInt16 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~int16~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~int16~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45391,9 +45525,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setInt32 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~int32~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~int32~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45401,8 +45535,8 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setUint8 ( _byteOffset_, _value_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
-          1. Return ? SetViewValue(_v_, _byteOffset_, *true*, ~uint8~, _value_).
+          1. Let _view_ be the *this* value.
+          1. Return ? SetViewValue(_view_, _byteOffset_, *true*, ~uint8~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45410,9 +45544,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setUint16 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~uint16~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~uint16~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -45420,9 +45554,9 @@ THH:mm:ss.sss
         <h1>DataView.prototype.setUint32 ( _byteOffset_, _value_ [ , _littleEndian_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _v_ be the *this* value.
+          1. Let _view_ be the *this* value.
           1. If _littleEndian_ is not present, set _littleEndian_ to *false*.
-          1. Return ? SetViewValue(_v_, _byteOffset_, _littleEndian_, ~uint32~, _value_).
+          1. Return ? SetViewValue(_view_, _byteOffset_, _littleEndian_, ~uint32~, _value_).
         </emu-alg>
       </emu-clause>
 
@@ -52835,13 +52969,7 @@ THH:mm:ss.sss
   <p><emu-xref href="#sec-asyncfromsynciteratorcontinuation"></emu-xref>, <emu-xref href="#sec-asyncgeneratorresume"></emu-xref>: In ECMAScript 2019, the number of Jobs enqueued by `await` was reduced, which could create an observable difference in resolution order between a `then()` call and an `await` expression.</p>
 </emu-annex>
 
-<emu-annex id="sec-colophon">
-  <h1>Colophon</h1>
-  <p>This specification is authored on <a href="https://github.com/tc39/ecma262">GitHub</a> in a plaintext source format called <a href="https://github.com/bterlson/ecmarkup">Ecmarkup</a>. Ecmarkup is an HTML and Markdown dialect that provides a framework and toolset for authoring ECMAScript specifications in plaintext and processing the specification into a full-featured HTML rendering that follows the editorial conventions for this document. Ecmarkup builds on and integrates a number of other formats and technologies including <a href="https://github.com/rbuckton/grammarkdown">Grammarkdown</a> for defining syntax and <a href="https://github.com/domenic/ecmarkdown">Ecmarkdown</a> for authoring algorithm steps. PDF renderings of this specification are produced by printing the HTML rendering to a PDF.</p>
-  <p>Prior editions of this specification were authored using Word—the Ecmarkup source text that formed the basis of this edition was produced by converting the ECMAScript 2015 Word document to Ecmarkup using an automated conversion tool.</p>
-</emu-annex>
-
-<emu-annex id="sec-bibliography">
+<emu-annex id="sec-bibliography" back-matter>
   <h1>Bibliography</h1>
   <ol>
     <li>
@@ -52896,4 +53024,10 @@ THH:mm:ss.sss
       <i>RFC 7231 “Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content”</i>, available at &lt;<a href="https://tools.ietf.org/html/rfc7231">https://tools.ietf.org/html/rfc7231</a>>
     </li>
   </ol>
+</emu-annex>
+
+<emu-annex id="sec-colophon" back-matter>
+  <h1>Colophon</h1>
+  <p>This specification is authored on <a href="https://github.com/tc39/ecma262">GitHub</a> in a plaintext source format called <a href="https://github.com/bterlson/ecmarkup">Ecmarkup</a>. Ecmarkup is an HTML and Markdown dialect that provides a framework and toolset for authoring ECMAScript specifications in plaintext and processing the specification into a full-featured HTML rendering that follows the editorial conventions for this document. Ecmarkup builds on and integrates a number of other formats and technologies including <a href="https://github.com/rbuckton/grammarkdown">Grammarkdown</a> for defining syntax and <a href="https://github.com/domenic/ecmarkdown">Ecmarkdown</a>for authoring algorithm steps. PDF renderings of this specification are produced using a print stylesheet which takes advantage of the CSS Paged Media specification and is converted using <a href="https://www.princexml.com/">PrinceXML</a>.</p>
+  <p>Prior editions of this specification were authored using Word—the Ecmarkup source text that formed the basis of this edition was produced by converting the ECMAScript 2015 Word document to Ecmarkup using an automated conversion tool.</p>
 </emu-annex>
