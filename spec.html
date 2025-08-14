@@ -1366,8 +1366,8 @@
     <emu-clause id="sec-ecmascript-language-types-symbol-type">
       <h1>The Symbol Type</h1>
       <p>The <dfn variants="is a Symbol,is not a Symbol">Symbol type</dfn> is the set of all non-String values that may be used as the key of an Object property (<emu-xref href="#sec-object-type"></emu-xref>).</p>
-      <p>Each possible Symbol value is unique and immutable.</p>
-      <p>Each Symbol value immutably holds an associated value called [[Description]] that is either *undefined* or a String value.</p>
+      <p>Each Symbol is unique and immutable.</p>
+      <p>Each Symbol has an immutable [[Description]] internal slot whose value is either a String or *undefined*.</p>
 
       <emu-clause id="sec-well-known-symbols">
         <h1>Well-Known Symbols</h1>
@@ -3012,7 +3012,7 @@
         <h1>Object Internal Methods and Internal Slots</h1>
         <p>The actual semantics of objects, in ECMAScript, are specified via algorithms called <em>internal methods</em>. Each object in an ECMAScript engine is associated with a set of internal methods that defines its runtime behaviour. These internal methods are not part of the ECMAScript language. They are defined by this specification purely for expository purposes. However, each object within an implementation of ECMAScript must behave as specified by the internal methods associated with it. The exact manner in which this is accomplished is determined by the implementation.</p>
         <p>Internal method names are polymorphic. This means that different object values may perform different algorithms when a common internal method name is invoked upon them. That actual object upon which an internal method is invoked is the “target” of the invocation. If, at runtime, the implementation of an algorithm attempts to use an internal method of an object that the object does not support, a *TypeError* exception is thrown.</p>
-        <p>Internal slots correspond to internal state that is associated with objects and used by various ECMAScript specification algorithms. Internal slots are not object properties and they are not inherited. Depending upon the specific internal slot specification, such state may consist of values of any ECMAScript language type or of specific ECMAScript specification type values. Unless explicitly specified otherwise, internal slots are allocated as part of the process of creating an object and may not be dynamically added to an object. Unless specified otherwise, the initial value of an internal slot is the value *undefined*. Various algorithms within this specification create objects that have internal slots. However, the ECMAScript language provides no direct way to associate internal slots with an object.</p>
+        <p>Internal slots correspond to internal state that is associated with objects, Symbols, or Private Names and used by various ECMAScript specification algorithms. Internal slots are not object properties and they are not inherited. Depending upon the specific internal slot specification, such state may consist of values of any ECMAScript language type or of specific ECMAScript specification type values. Unless explicitly specified otherwise, internal slots are allocated as part of the process of creating an object, Symbol, or Private Name and may not be dynamically added. Unless specified otherwise, the initial value of an internal slot is the value *undefined*. Various algorithms within this specification create values that have internal slots. However, the ECMAScript language provides no direct way to manipulate internal slots.</p>
         <p>All objects have an internal slot named [[PrivateElements]], which is a List of PrivateElements. This List represents the values of the private fields, methods, and accessors for the object. Initially, it is an empty List.</p>
         <p>Internal methods and internal slots are identified within this specification using names enclosed in double square brackets [[ ]].</p>
         <p><emu-xref href="#table-essential-internal-methods"></emu-xref> summarizes the <em>essential internal methods</em> used by this specification that are applicable to all objects created or manipulated by ECMAScript code. Every object must have algorithms for all of the essential internal methods. However, all objects do not necessarily use the same algorithms for those methods.</p>
@@ -4984,7 +4984,7 @@
 
     <emu-clause id="sec-private-names">
       <h1>Private Names</h1>
-      <p>The <dfn variants="Private Names">Private Name</dfn> specification type is used to describe a globally unique value (one which differs from any other Private Name, even if they are otherwise indistinguishable) which represents the key of a private class element (field, method, or accessor). Each Private Name has an associated immutable [[Description]] which is a String value. A Private Name may be installed on any ECMAScript object with PrivateFieldAdd or PrivateMethodOrAccessorAdd, and then read or written using PrivateGet and PrivateSet.</p>
+      <p>The <dfn variants="Private Names">Private Name</dfn> specification type is used to describe a globally unique value (one which differs from any other Private Name, even if they are otherwise indistinguishable) which represents the key of a private class element (field, method, or accessor). Each Private Name has an immutable [[Description]] internal slot which is a String. A Private Name may be installed on any ECMAScript object with PrivateFieldAdd or PrivateMethodOrAccessorAdd, and then read or written using PrivateGet and PrivateSet.</p>
     </emu-clause>
 
     <emu-clause id="sec-classstaticblockdefinition-record-specification-type">
@@ -5703,86 +5703,18 @@
       </h1>
       <dl class="header">
         <dt>description</dt>
-        <dd>It converts _argument_ to a value of type Object according to <emu-xref href="#table-toobject-conversions"></emu-xref>:</dd>
+        <dd>It converts _argument_ to a value of type Object.</dd>
       </dl>
-      <emu-table id="table-toobject-conversions" caption="ToObject Conversions" oldids="table-13">
-        <table>
-          <thead>
-            <tr>
-              <th>
-                Argument Type
-              </th>
-              <th>
-                Result
-              </th>
-            </tr>
-          </thead>
-          <tr>
-            <td>
-              Undefined
-            </td>
-            <td>
-              Throw a *TypeError* exception.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Null
-            </td>
-            <td>
-              Throw a *TypeError* exception.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Boolean
-            </td>
-            <td>
-              Return a new Boolean object whose [[BooleanData]] internal slot is set to _argument_. See <emu-xref href="#sec-boolean-objects"></emu-xref> for a description of Boolean objects.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Number
-            </td>
-            <td>
-              Return a new Number object whose [[NumberData]] internal slot is set to _argument_. See <emu-xref href="#sec-number-objects"></emu-xref> for a description of Number objects.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              String
-            </td>
-            <td>
-              Return a new String object whose [[StringData]] internal slot is set to _argument_. See <emu-xref href="#sec-string-objects"></emu-xref> for a description of String objects.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Symbol
-            </td>
-            <td>
-              Return a new Symbol object whose [[SymbolData]] internal slot is set to _argument_. See <emu-xref href="#sec-symbol-objects"></emu-xref> for a description of Symbol objects.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              BigInt
-            </td>
-            <td>
-              Return a new BigInt object whose [[BigIntData]] internal slot is set to _argument_. See <emu-xref href="#sec-bigint-objects"></emu-xref> for a description of BigInt objects.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Object
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-        </table>
-      </emu-table>
+      <emu-alg>
+        1. If _argument_ is either *undefined* or *null*, throw a *TypeError* exception.
+        1. If _argument_ is a Boolean, return a new Boolean object whose [[BooleanData]] internal slot is set to _argument_. See <emu-xref href="#sec-boolean-objects"></emu-xref> for a description of Boolean objects.
+        1. If _argument_ is a Number, return a new Number object whose [[NumberData]] internal slot is set to _argument_. See <emu-xref href="#sec-number-objects"></emu-xref> for a description of Number objects.
+        1. If _argument_ is a String, return a new String object whose [[StringData]] internal slot is set to _argument_. See <emu-xref href="#sec-string-objects"></emu-xref> for a description of String objects.
+        1. If _argument_ is a Symbol, return a new Symbol object whose [[SymbolData]] internal slot is set to _argument_. See <emu-xref href="#sec-symbol-objects"></emu-xref> for a description of Symbol objects.
+        1. If _argument_ is a BigInt, return a new BigInt object whose [[BigIntData]] internal slot is set to _argument_. See <emu-xref href="#sec-bigint-objects"></emu-xref> for a description of BigInt objects.
+        1. Assert: _argument_ is an Object.
+        1. Return _argument_.
+      </emu-alg>
     </emu-clause>
 
     <emu-clause id="sec-topropertykey" type="abstract operation">
@@ -5868,86 +5800,12 @@
       </h1>
       <dl class="header">
         <dt>description</dt>
-        <dd>It throws an error if _argument_ is a value that cannot be converted to an Object using ToObject. It is defined by <emu-xref href="#table-requireobjectcoercible-results"></emu-xref>:</dd>
+        <dd>It throws an error if _argument_ is a value that cannot be converted to an Object using ToObject.</dd>
       </dl>
-      <emu-table id="table-requireobjectcoercible-results" caption="RequireObjectCoercible Results" oldids="table-14">
-        <table>
-          <thead>
-            <tr>
-              <th>
-                Argument Type
-              </th>
-              <th>
-                Result
-              </th>
-            </tr>
-          </thead>
-          <tr>
-            <td>
-              Undefined
-            </td>
-            <td>
-              Throw a *TypeError* exception.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Null
-            </td>
-            <td>
-              Throw a *TypeError* exception.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Boolean
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Number
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              String
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Symbol
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              BigInt
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Object
-            </td>
-            <td>
-              Return _argument_.
-            </td>
-          </tr>
-        </table>
-      </emu-table>
+      <emu-alg>
+        1. If _argument_ is either *undefined* or *null*, throw a *TypeError* exception.
+        1. Return _argument_.
+      </emu-alg>
     </emu-clause>
 
     <emu-clause id="sec-isarray" type="abstract operation">
@@ -13817,7 +13675,7 @@
       <emu-alg>
         1. Assert: _F_ is an extensible object that does not have a *"name"* own property.
         1. If _name_ is a Symbol, then
-          1. Let _description_ be _name_'s [[Description]] value.
+          1. Let _description_ be _name_.[[Description]].
           1. If _description_ is *undefined*, set _name_ to the empty String.
           1. Else, set _name_ to the string-concatenation of *"["*, _description_, and *"]"*.
         1. Else if _name_ is a Private Name, then
@@ -31719,7 +31577,7 @@
           <dl class="header">
           </dl>
           <emu-alg>
-            1. Let _desc_ be _sym_'s [[Description]] value.
+            1. Let _desc_ be _sym_.[[Description]].
             1. If _desc_ is *undefined*, set _desc_ to the empty String.
             1. Assert: _desc_ is a String.
             1. Return the string-concatenation of *"Symbol("*, _desc_, and *")"*.
