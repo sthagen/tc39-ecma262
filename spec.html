@@ -54,16 +54,22 @@
   /**
   * ECMA-262-specific hacks. Shouldn't require a ton of maintenance; audit if
   * visual inspection results in unexpected page breaks.
+  *
+  * For print version, the table captioned "Module fields after the initial Evaluate() call" _may_ need to set the row
+  * EVALUATING-ASYNC to one cell with a colspan of 5. It typically does not fit on the page, but the cell merging is
+  * not a perfectly accurate solution and will not be merged back in to the specification.
+  * See https://github.com/tc39/ecma262/pull/3623#issuecomment-3029366960
   */
+
+  /* Make sure tables are wide enough for their captions */
+  table {
+    min-width: 135mm;
+  }
+
   /* 2.2 Examples of legacy/normative-optional are small enough to be aggressive against breaks */
   #sec-conformance [example],
-
-  /* 8.3.3 avoid breaking in small alg lists */
-  #sec-static-semantics-containsundefinedcontinuetarget li,
-
-  /* 16.2.1.5.4 many tables */
-  #table-module-graph-cycle-async-fields-1 table,
-  #table-module-graph-cycle-async-fields-9 table {
+  /* 16.2.1.xxx many tables */
+  #sec-example-cyclic-module-record-graphs table {
     break-inside: avoid-page;
   }
 
@@ -73,7 +79,7 @@
     break-inside: initial;
   }
 
-  /* 12.10.2, 12.10.3, 12.10.3.2 Sections start with an <em> not inside a <p> */
+  /* 12.10.X Sections start with an <em> not inside a <p> */
   #sec-examples-of-automatic-semicolon-insertion > em,
   #sec-interesting-cases-of-automatic-semicolon-insertion > em,
   #sec-asi-cases-with-no-lineterminator-here > em {
@@ -81,7 +87,7 @@
     margin-top: 1.25ex;
   }
 
-  /* 15.1.2 bad spacing between intro and first emu-grammar */
+  /* 15.1.X missing spacing between intro and first emu-grammar */
   #sec-static-semantics-containsexpression > emu-grammar:first-of-type {
     margin-top: 2ex;
   }
@@ -91,63 +97,18 @@
     text-align: left;
   }
 
-  /* 16.2.1.5.4 squish margins on graphics so table 46 fits on one page */
-  #sec-example-cyclic-module-record-graphs figure:has(> img),
-  #sec-example-cyclic-module-record-graphs figure > img {
-    margin: 0;
-  }
-  #sec-example-cyclic-module-record-graphs figure:has(> img) > figcaption {
-    margin-bottom: 1ex;
-  }
-  #sec-example-cyclic-module-record-graphs emu-figure:has(> figure > img) + p {
-    margin-top: 1ex;
-  }
-
-  /* 16.2.1.5.4 table 51 & 54 are too narrow for caption */
-  #table-module-graph-cycle-async-fields-6 table {
-    width: 110mm;
-  }
-  #table-module-graph-cycle-async-fields-9 table {
-    width: 135mm;
-  }
-
-  /* 20.1.3.7 legacy title */
+  /* 20.X legacy title */
   #sec-object\.prototype\.__proto__ > .attributes-tag {
     break-before: avoid-page;
     break-after: avoid-page;
   }
 
-  /* 21.4.1.22 Table 61 middle column is too narrow */
+  /* 21.X table middle column is too narrow */
   #table-time-zone-identifier-record-fields > figure > table th:nth-of-type(2) {
-    width: 15%;
+    min-width: 19mm;
   }
 
-  /* 21.4.4.41.2 These tables are way too narrow for their captions */
-  #sec-todatestring-day-names table,
-  #sec-todatestring-month-names table {
-    width: 100mm;
-  }
-
-  /* 27.2.6 squeeze to make more room for figure-2.svg */
-  #table-internal-slots-of-promise-instances > figure {
-    margin-bottom: 0;
-  }
-
-  /* 27.3 fit generator objects relationships diagram */
-  #sec-generatorfunction-objects,
-  #sec-generatorfunction-objects h1 {
-    margin-top: 1.5ex;
-  }
-
-  /* 27.3 `figure-2.svg` is just a tiny bit too big to fit on the page, results in weird white space */
-  #figure-2 figure {
-    margin: 1ex 0;
-  }
-  #figure-2 > figure > img {
-    width: 97%;
-  }
-
-  /* 29.11 extremely long note */
+  /* 29.X extremely long note */
   #sec-shared-memory-guidelines > emu-note {
     break-inside: auto;
   }
@@ -163,8 +124,9 @@
   }
 
   .corner-cell {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2UtbWl0ZXJsaW1pdD0iMS41IiB2aWV3Qm94PSIwIDAgMjQyIDQ2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48Y2xpcFBhdGggaWQ9ImEiPjxwYXRoIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0ibS03Ny43MDQtMzYuMDI3aDI0MS4wNDJ2NDUuMDQyaC0yNDEuMDQyeiIvPjwvY2xpcFBhdGg+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzcuNzAzOSAzNi4wMjY2KSI+PHBhdGggZD0ibS03Ny43MDQtMzYuMDI3aDI0MS4wNDJ2NDUuMDQyaC0yNDEuMDQyeiIgZmlsbD0ibm9uZSIvPjxnIGNsaXAtcGF0aD0idXJsKCNhKSI+PHBhdGggZD0ibTMxNC45MyAzOTUuOTM1IDI0MS4wNDIgNDUuMDQyIiBmaWxsPSJub25lIiBzdHJva2U9IiMyMzFmMjAiIHN0cm9rZS13aWR0aD0iMS4wNCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTM5Mi42MzQgLTQzMS45NjIpIi8+PC9nPjwvZz48L3N2Zz4=);
-    background-size: cover;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGwtcnVsZT0iZXZlbm9kZCIgaGVpZ2h0PSI0NiIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEuNSIgd2lkdGg9IjI0MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJtMzE1LjI2NiAzOTYuMzQzIDI0MS4zOTQgNDUuMTU1IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS4wNCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTMxNC45MyAtMzk1LjkzNSkiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 100% 3em;
     height: 3em;
     padding: 0;
     vertical-align: inherit;
@@ -5797,7 +5759,7 @@
       <h1>
         RequireObjectCoercible (
           _argument_: an ECMAScript language value,
-        ): either a normal completion containing an ECMAScript language value or a throw completion
+        ): either a normal completion containing ~unused~ or a throw completion
       </h1>
       <dl class="header">
         <dt>description</dt>
@@ -5805,7 +5767,7 @@
       </dl>
       <emu-alg>
         1. If _argument_ is either *undefined* or *null*, throw a *TypeError* exception.
-        1. Return _argument_.
+        1. Return ~unused~.
       </emu-alg>
     </emu-clause>
 
@@ -9352,9 +9314,8 @@
       </emu-alg>
       <emu-grammar>ClassExpression : `class` ClassTail</emu-grammar>
       <emu-alg>
-        1. Let _value_ be ? ClassDefinitionEvaluation of |ClassTail| with arguments *undefined* and _name_.
-        1. Set _value_.[[SourceText]] to the source text matched by |ClassExpression|.
-        1. Return _value_.
+        1. Let _sourceText_ be the source text matched by |ClassExpression|.
+        1. Return ? ClassDefinitionEvaluation of |ClassTail| with arguments *undefined*, _name_, and _sourceText_.
       </emu-alg>
     </emu-clause>
   </emu-clause>
@@ -25056,6 +25017,7 @@
         Runtime Semantics: ClassDefinitionEvaluation (
           _classBinding_: a String or *undefined*,
           _className_: a property key or a Private Name,
+          _sourceText_: ECMAScript source text,
         ): either a normal completion containing a function object or an abrupt completion
       </h1>
       <dl class="header">
@@ -25124,6 +25086,7 @@
           1. Let _F_ be _constructorInfo_.[[Closure]].
           1. Perform MakeClassConstructor(_F_).
           1. Perform SetFunctionName(_F_, _className_).
+        1. Set _F_.[[SourceText]] to _sourceText_.
         1. Perform MakeConstructor(_F_, *false*, _proto_).
         1. If |ClassHeritage| is present, set _F_.[[ConstructorKind]] to ~derived~.
         1. Perform ! DefineMethodProperty(_proto_, *"constructor"*, _F_, *false*).
@@ -25189,17 +25152,16 @@
       <emu-grammar>ClassDeclaration : `class` BindingIdentifier ClassTail</emu-grammar>
       <emu-alg>
         1. Let _className_ be the StringValue of |BindingIdentifier|.
-        1. Let _value_ be ? ClassDefinitionEvaluation of |ClassTail| with arguments _className_ and _className_.
-        1. Set _value_.[[SourceText]] to the source text matched by |ClassDeclaration|.
+        1. Let _sourceText_ be the source text matched by |ClassDeclaration|.
+        1. Let _value_ be ? ClassDefinitionEvaluation of |ClassTail| with arguments _className_, _className_, and _sourceText_.
         1. Let _env_ be the running execution context's LexicalEnvironment.
         1. Perform ? InitializeBoundName(_className_, _value_, _env_).
         1. Return _value_.
       </emu-alg>
       <emu-grammar>ClassDeclaration : `class` ClassTail</emu-grammar>
       <emu-alg>
-        1. Let _value_ be ? ClassDefinitionEvaluation of |ClassTail| with arguments *undefined* and *"default"*.
-        1. Set _value_.[[SourceText]] to the source text matched by |ClassDeclaration|.
-        1. Return _value_.
+        1. Let _sourceText_ be the source text matched by |ClassDeclaration|.
+        1. Return ? ClassDefinitionEvaluation of |ClassTail| with arguments *undefined*, *"default"*, and _sourceText_.
       </emu-alg>
       <emu-note>
         <p><emu-grammar>ClassDeclaration : `class` ClassTail</emu-grammar> only occurs as part of an |ExportDeclaration| and establishing its binding is handled as part of the evaluation action for that production. See <emu-xref href="#sec-exports-runtime-semantics-evaluation"></emu-xref>.</p>
@@ -25218,16 +25180,14 @@
       </emu-note>
       <emu-grammar>ClassExpression : `class` ClassTail</emu-grammar>
       <emu-alg>
-        1. Let _value_ be ? ClassDefinitionEvaluation of |ClassTail| with arguments *undefined* and *""*.
-        1. Set _value_.[[SourceText]] to the source text matched by |ClassExpression|.
-        1. Return _value_.
+        1. Let _sourceText_ be the source text matched by |ClassExpression|.
+        1. Return ? ClassDefinitionEvaluation of |ClassTail| with arguments *undefined*, *""*, and _sourceText_.
       </emu-alg>
       <emu-grammar>ClassExpression : `class` BindingIdentifier ClassTail</emu-grammar>
       <emu-alg>
         1. Let _className_ be the StringValue of |BindingIdentifier|.
-        1. Let _value_ be ? ClassDefinitionEvaluation of |ClassTail| with arguments _className_ and _className_.
-        1. Set _value_.[[SourceText]] to the source text matched by |ClassExpression|.
-        1. Return _value_.
+        1. Let _sourceText_ be the source text matched by |ClassExpression|.
+        1. Return ? ClassDefinitionEvaluation of |ClassTail| with arguments _className_, _className_, and _sourceText_.
       </emu-alg>
       <emu-grammar>ClassElementName : PrivateIdentifier</emu-grammar>
       <emu-alg>
@@ -30765,7 +30725,7 @@
         <h1>Object.setPrototypeOf ( _O_, _proto_ )</h1>
         <p>This function performs the following steps when called:</p>
         <emu-alg>
-          1. Set _O_ to ? RequireObjectCoercible(_O_).
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _proto_ is not an Object and _proto_ is not *null*, throw a *TypeError* exception.
           1. If _O_ is not an Object, return _O_.
           1. Let _status_ be ? <emu-meta effects="user-code">_O_.[[SetPrototypeOf]]</emu-meta>(_proto_).
@@ -30915,7 +30875,8 @@
           <h1>set Object.prototype.__proto__</h1>
           <p>The value of the [[Set]] attribute is a built-in function that takes an argument _proto_. It performs the following steps when called:</p>
           <emu-alg>
-            1. Let _O_ be ? RequireObjectCoercible(*this* value).
+            1. Let _O_ be the *this* value.
+            1. Perform ? RequireObjectCoercible(_O_).
             1. If _proto_ is not an Object and _proto_ is not *null*, return *undefined*.
             1. If _O_ is not an Object, return *undefined*.
             1. Let _status_ be ? <emu-meta effects="user-code">_O_.[[SetPrototypeOf]]</emu-meta>(_proto_).
@@ -35392,7 +35353,8 @@ THH:mm:ss.sss
       <emu-clause id="sec-string.prototype.at">
         <h1>String.prototype.at ( _index_ )</h1>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _len_ be the length of _S_.
           1. Let _relativeIndex_ be ? ToIntegerOrInfinity(_index_).
@@ -35413,7 +35375,8 @@ THH:mm:ss.sss
         </emu-note>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _position_ be ? ToIntegerOrInfinity(_pos_).
           1. Let _size_ be the length of _S_.
@@ -35432,7 +35395,8 @@ THH:mm:ss.sss
         </emu-note>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _position_ be ? ToIntegerOrInfinity(_pos_).
           1. Let _size_ be the length of _S_.
@@ -35451,7 +35415,8 @@ THH:mm:ss.sss
         </emu-note>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _position_ be ? ToIntegerOrInfinity(_pos_).
           1. Let _size_ be the length of _S_.
@@ -35471,7 +35436,8 @@ THH:mm:ss.sss
         </emu-note>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _R_ be _S_.
           1. For each element _next_ of _args_, do
@@ -35494,7 +35460,8 @@ THH:mm:ss.sss
         <h1>String.prototype.endsWith ( _searchString_ [ , _endPosition_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _isRegExp_ be ? IsRegExp(_searchString_).
           1. If _isRegExp_ is *true*, throw a *TypeError* exception.
@@ -35525,7 +35492,8 @@ THH:mm:ss.sss
         <h1>String.prototype.includes ( _searchString_ [ , _position_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _isRegExp_ be ? IsRegExp(_searchString_).
           1. If _isRegExp_ is *true*, throw a *TypeError* exception.
@@ -35556,7 +35524,8 @@ THH:mm:ss.sss
         </emu-note>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _searchStr_ be ? ToString(_searchString_).
           1. Let _pos_ be ? ToIntegerOrInfinity(_position_).
@@ -35576,7 +35545,8 @@ THH:mm:ss.sss
         <h1>String.prototype.isWellFormed ( )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Return IsStringWellFormedUnicode(_S_).
         </emu-alg>
@@ -35589,7 +35559,8 @@ THH:mm:ss.sss
         </emu-note>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _searchStr_ be ? ToString(_searchString_).
           1. Let _numPos_ be ? ToNumber(_position_).
@@ -35613,7 +35584,8 @@ THH:mm:ss.sss
         <p>This method returns a Number other than *NaN* representing the result of an implementation-defined locale-sensitive String comparison of the *this* value (converted to a String _S_) with _that_ (converted to a String _thatValue_). The result is intended to correspond with a sort order of String values according to conventions of the host environment's current locale, and will be negative when _S_ is ordered before _thatValue_, positive when _S_ is ordered after _thatValue_, and zero in all other cases (representing no relative ordering between _S_ and _thatValue_).</p>
         <p>Before performing the comparisons, this method performs the following steps to prepare the Strings:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _thatValue_ be ? ToString(_that_).
         </emu-alg>
@@ -35657,7 +35629,8 @@ THH:mm:ss.sss
         <h1>String.prototype.match ( _regexp_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _regexp_ is neither *undefined* nor *null*, then
             1. Let _matcher_ be ? GetMethod(_regexp_, %Symbol.match%).
             1. If _matcher_ is not *undefined*, then
@@ -35677,7 +35650,8 @@ THH:mm:ss.sss
         <p>It performs the following steps when called:</p>
 
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _regexp_ is neither *undefined* nor *null*, then
             1. Let _isRegExp_ be ? IsRegExp(_regexp_).
             1. If _isRegExp_ is *true*, then
@@ -35699,7 +35673,8 @@ THH:mm:ss.sss
         <h1>String.prototype.normalize ( [ _form_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. If _form_ is *undefined*, let _f_ be *"NFC"*.
           1. Else, let _f_ be ? ToString(_form_).
@@ -35716,7 +35691,8 @@ THH:mm:ss.sss
         <h1>String.prototype.padEnd ( _maxLength_ [ , _fillString_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Return ? StringPaddingBuiltinsImpl(_O_, _maxLength_, _fillString_, ~end~).
         </emu-alg>
       </emu-clause>
@@ -35725,7 +35701,8 @@ THH:mm:ss.sss
         <h1>String.prototype.padStart ( _maxLength_ [ , _fillString_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Return ? StringPaddingBuiltinsImpl(_O_, _maxLength_, _fillString_, ~start~).
         </emu-alg>
 
@@ -35799,7 +35776,8 @@ THH:mm:ss.sss
         <h1>String.prototype.repeat ( _count_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _n_ be ? ToIntegerOrInfinity(_count_).
           1. If _n_ &lt; 0 or _n_ = +∞, throw a *RangeError* exception.
@@ -35818,7 +35796,8 @@ THH:mm:ss.sss
         <h1>String.prototype.replace ( _searchValue_, _replaceValue_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _searchValue_ is neither *undefined* nor *null*, then
             1. Let _replacer_ be ? GetMethod(_searchValue_, %Symbol.replace%).
             1. If _replacer_ is not *undefined*, then
@@ -35931,7 +35910,8 @@ THH:mm:ss.sss
         <h1>String.prototype.replaceAll ( _searchValue_, _replaceValue_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _searchValue_ is neither *undefined* nor *null*, then
             1. Let _isRegExp_ be ? IsRegExp(_searchValue_).
             1. If _isRegExp_ is *true*, then
@@ -35975,7 +35955,8 @@ THH:mm:ss.sss
         <h1>String.prototype.search ( _regexp_ )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _regexp_ is neither *undefined* nor *null*, then
             1. Let _searcher_ be ? GetMethod(_regexp_, %Symbol.search%).
             1. If _searcher_ is not *undefined*, then
@@ -35994,7 +35975,8 @@ THH:mm:ss.sss
         <p>This method returns a <emu-not-ref>substring</emu-not-ref> of the result of converting this object to a String, starting from index _start_ and running to, but not including, index _end_ (or through the end of the String if _end_ is *undefined*). If _start_ is negative, it is treated as <emu-eqn>_sourceLength_ + _start_</emu-eqn> where _sourceLength_ is the length of the String. If _end_ is negative, it is treated as <emu-eqn>_sourceLength_ + _end_</emu-eqn> where _sourceLength_ is the length of the String. The result is a String value, not a String object.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _len_ be the length of _S_.
           1. Let _intStart_ be ? ToIntegerOrInfinity(_start_).
@@ -36018,7 +36000,8 @@ THH:mm:ss.sss
         <p>This method returns an Array into which substrings of the result of converting this object to a String have been stored. The substrings are determined by searching from left to right for occurrences of _separator_; these occurrences are not part of any String in the returned array, but serve to divide up the String value. The value of _separator_ may be a String of any length or it may be an object, such as a RegExp, that has a %Symbol.split% method.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. If _separator_ is neither *undefined* nor *null*, then
             1. Let _splitter_ be ? GetMethod(_separator_, %Symbol.split%).
             1. If _splitter_ is not *undefined*, then
@@ -36065,7 +36048,8 @@ THH:mm:ss.sss
         <h1>String.prototype.startsWith ( _searchString_ [ , _position_ ] )</h1>
         <p>This method performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _isRegExp_ be ? IsRegExp(_searchString_).
           1. If _isRegExp_ is *true*, throw a *TypeError* exception.
@@ -36099,7 +36083,8 @@ THH:mm:ss.sss
         <p>If _start_ is strictly greater than _end_, they are swapped.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _len_ be the length of _S_.
           1. Let _intStart_ be ? ToIntegerOrInfinity(_start_).
@@ -36142,7 +36127,8 @@ THH:mm:ss.sss
         <p>This method interprets a String value as a sequence of UTF-16 encoded code points, as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _sText_ be StringToCodePoints(_S_).
           1. Let _lowerText_ be toLowercase(_sText_), according to the Unicode Default Case Conversion algorithm.
@@ -36183,7 +36169,8 @@ THH:mm:ss.sss
         <p>This method returns a String representation of this object with all leading surrogates and trailing surrogates that are not part of a surrogate pair replaced with U+FFFD (REPLACEMENT CHARACTER).</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _strLen_ be the length of _S_.
           1. Let _k_ be 0.
@@ -36223,8 +36210,8 @@ THH:mm:ss.sss
             <dd>It interprets _string_ as a sequence of UTF-16 encoded code points, as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>.</dd>
           </dl>
           <emu-alg>
-            1. Let _str_ be ? RequireObjectCoercible(_string_).
-            1. Let _S_ be ? ToString(_str_).
+            1. Perform ? RequireObjectCoercible(_string_).
+            1. Let _S_ be ? ToString(_string_).
             1. If _where_ is ~start~, then
               1. Let _T_ be the String value that is a copy of _S_ with leading white space removed.
             1. Else if _where_ is ~end~, then
@@ -36295,7 +36282,8 @@ THH:mm:ss.sss
         <p>This method returns an iterator object that iterates over the code points of a String value, returning each code point as a String value.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _s_ be ? ToString(_O_).
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _s_ and performs the following steps when called:
             1. Let _len_ be the length of _s_.
@@ -38632,7 +38620,7 @@ THH:mm:ss.sss
           1. Let _rer_ be the RegExp Record { [[IgnoreCase]]: _i_, [[Multiline]]: _m_, [[DotAll]]: _s_, [[Unicode]]: _u_, [[UnicodeSets]]: _v_, [[CapturingGroupsCount]]: _capturingGroupsCount_ }.
           1. Set _obj_.[[RegExpRecord]] to _rer_.
           1. Set _obj_.[[RegExpMatcher]] to CompilePattern of _parseResult_ with argument _rer_.
-          1. Perform ? Set(_obj_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*).
+          1. Perform ? <emu-meta suppress-effects="user-code">Set(_obj_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*)</emu-meta>.
           1. Return _obj_.
         </emu-alg>
       </emu-clause>
@@ -39280,7 +39268,7 @@ THH:mm:ss.sss
         </dl>
         <emu-alg>
           1. Let _length_ be the length of _S_.
-          1. Let _lastIndex_ be ℝ(? ToLength(? Get(_R_, *"lastIndex"*))).
+          1. Let _lastIndex_ be ℝ(? ToLength(! Get(_R_, *"lastIndex"*))).
           1. Let _flags_ be _R_.[[OriginalFlags]].
           1. If _flags_ contains *"g"*, let _global_ be *true*; else let _global_ be *false*.
           1. If _flags_ contains *"y"*, let _sticky_ be *true*; else let _sticky_ be *false*.
@@ -39294,13 +39282,13 @@ THH:mm:ss.sss
           1. Repeat, while _matchSucceeded_ is *false*,
             1. If _lastIndex_ > _length_, then
               1. If _global_ is *true* or _sticky_ is *true*, then
-                1. Perform ? Set(_R_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*).
+                1. Perform ? <emu-meta suppress-effects="user-code">Set(_R_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*)</emu-meta>.
               1. Return *null*.
             1. Let _inputIndex_ be the index into _input_ of the character that was obtained from element _lastIndex_ of _S_.
             1. Let _r_ be _matcher_(_input_, _inputIndex_).
             1. If _r_ is ~failure~, then
               1. If _sticky_ is *true*, then
-                1. Perform ? Set(_R_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*).
+                1. Perform ? <emu-meta suppress-effects="user-code">Set(_R_, *"lastIndex"*, *+0*<sub>𝔽</sub>, *true*)</emu-meta>.
                 1. Return *null*.
               1. Set _lastIndex_ to AdvanceStringIndex(_S_, _lastIndex_, _fullUnicode_).
             1. Else,
@@ -39309,7 +39297,7 @@ THH:mm:ss.sss
           1. Let _e_ be _r_.[[EndIndex]].
           1. If _fullUnicode_ is *true*, set _e_ to GetStringIndex(_S_, _e_).
           1. If _global_ is *true* or _sticky_ is *true*, then
-            1. Perform ? Set(_R_, *"lastIndex"*, 𝔽(_e_), *true*).
+            1. Perform ? <emu-meta suppress-effects="user-code">Set(_R_, *"lastIndex"*, 𝔽(_e_), *true*)</emu-meta>.
           1. Let _n_ be the number of elements in _r_.[[Captures]].
           1. Assert: _n_ = _R_.[[RegExpRecord]].[[CapturingGroupsCount]].
           1. Assert: _n_ &lt; 2<sup>32</sup> - 1.
@@ -42409,11 +42397,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. Let _taRecord_ be ? ValidateTypedArray(_O_, ~seq-cst~).
-          1. Let _length_ be TypedArrayLength(_taRecord_).
-          1. Let _A_ be ? TypedArrayCreateSameType(_O_, « 𝔽(_length_) »).
+          1. Let _len_ be TypedArrayLength(_taRecord_).
+          1. Let _A_ be ? TypedArrayCreateSameType(_O_, _len_).
           1. Let _k_ be 0.
-          1. Repeat, while _k_ &lt; _length_,
-            1. Let _from_ be ! ToString(𝔽(_length_ - _k_ - 1)).
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _from_ be ! ToString(𝔽(_len_ - _k_ - 1)).
             1. Let _Pk_ be ! ToString(𝔽(_k_)).
             1. Let _fromValue_ be ! Get(_O_, _from_).
             1. Perform ! Set(_A_, _Pk_, _fromValue_, *true*).
@@ -42430,7 +42418,7 @@ THH:mm:ss.sss
           1. Let _O_ be the *this* value.
           1. Let _taRecord_ be ? ValidateTypedArray(_O_, ~seq-cst~).
           1. Let _len_ be TypedArrayLength(_taRecord_).
-          1. Let _A_ be ? TypedArrayCreateSameType(_O_, « 𝔽(_len_) »).
+          1. Let _A_ be ? TypedArrayCreateSameType(_O_, _len_).
           1. NOTE: The following closure performs a numeric comparison rather than the string comparison used in <emu-xref href="#sec-array.prototype.tosorted"></emu-xref>.
           1. Let _SortCompare_ be a new Abstract Closure with parameters (_x_, _y_) that captures _comparator_ and performs the following steps when called:
             1. Return ? CompareTypedArrayElements(_x_, _y_, _comparator_).
@@ -42471,7 +42459,7 @@ THH:mm:ss.sss
           1. If _O_.[[ContentType]] is ~bigint~, let _numericValue_ be ? ToBigInt(_value_).
           1. Else, let _numericValue_ be ? ToNumber(_value_).
           1. If IsValidIntegerIndex(_O_, 𝔽(_actualIndex_)) is *false*, throw a *RangeError* exception.
-          1. Let _A_ be ? TypedArrayCreateSameType(_O_, « 𝔽(_len_) »).
+          1. Let _A_ be ? TypedArrayCreateSameType(_O_, _len_).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_,
             1. Let _Pk_ be ! ToString(𝔽(_k_)).
@@ -42534,16 +42522,17 @@ THH:mm:ss.sss
         <h1>
           TypedArrayCreateSameType (
             _exemplar_: a TypedArray,
-            _argumentList_: a List of ECMAScript language values,
+            _length_: a non-negative integer,
           ): either a normal completion containing a TypedArray or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
-          <dd>It is used to specify the creation of a new TypedArray using a constructor function that is derived from _exemplar_. Unlike TypedArraySpeciesCreate, which can construct custom TypedArray subclasses through the use of %Symbol.species%, this operation always uses one of the built-in TypedArray constructors.</dd>
+          <dd>It is used to specify the creation of a new TypedArray using a constructor function that is derived from _exemplar_, and a _length_. Unlike TypedArraySpeciesCreate, which can construct custom TypedArray subclasses through the use of %Symbol.species%, this operation always uses one of the built-in TypedArray constructors.</dd>
         </dl>
         <emu-alg>
           1. Let _constructor_ be the intrinsic object associated with the constructor name _exemplar_.[[TypedArrayName]] in <emu-xref href="#table-the-typedarray-constructors"></emu-xref>.
-          1. Let _result_ be ? TypedArrayCreateFromConstructor(_constructor_, _argumentList_).
+          1. Let _result_ be ? <emu-meta suppress-effects="user-code">TypedArrayCreateFromConstructor(_constructor_, « 𝔽(_length_) »)</emu-meta>.
+          1. Assert: _result_ has [[TypedArrayName]] and [[ContentType]] internal slots.
           1. Assert: _result_.[[ContentType]] is _exemplar_.[[ContentType]].
           1. Return _result_.
         </emu-alg>
@@ -52354,7 +52343,8 @@ THH:mm:ss.sss
         <p>This method returns a <emu-not-ref>substring</emu-not-ref> of the result of converting the *this* value to a String, starting from index _start_ and running for _length_ code units (or through the end of the String if _length_ is *undefined*). If _start_ is negative, it is treated as <emu-eqn>_sourceLength_ + _start_</emu-eqn> where _sourceLength_ is the length of the String. The result is a String value, not a String object.</p>
         <p>It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be ? RequireObjectCoercible(*this* value).
+          1. Let _O_ be the *this* value.
+          1. Perform ? RequireObjectCoercible(_O_).
           1. Let _S_ be ? ToString(_O_).
           1. Let _size_ be the length of _S_.
           1. Let _intStart_ be ? ToIntegerOrInfinity(_start_).
@@ -52391,8 +52381,8 @@ THH:mm:ss.sss
           <dl class="header">
           </dl>
           <emu-alg>
-            1. Let _str_ be ? RequireObjectCoercible(_string_).
-            1. Let _S_ be ? ToString(_str_).
+            1. Perform ? RequireObjectCoercible(_string_).
+            1. Let _S_ be ? ToString(_string_).
             1. Let _p1_ be the string-concatenation of *"&lt;"* and _tag_.
             1. If _attribute_ is not the empty String, then
               1. Let _V_ be ? ToString(_value_).
@@ -53045,6 +53035,6 @@ THH:mm:ss.sss
 
 <emu-annex id="sec-colophon" back-matter>
   <h1>Colophon</h1>
-  <p>This specification is authored on <a href="https://github.com/tc39/ecma262">GitHub</a> in a plaintext source format called <a href="https://github.com/bterlson/ecmarkup">Ecmarkup</a>. Ecmarkup is an HTML and Markdown dialect that provides a framework and toolset for authoring ECMAScript specifications in plaintext and processing the specification into a full-featured HTML rendering that follows the editorial conventions for this document. Ecmarkup builds on and integrates a number of other formats and technologies including <a href="https://github.com/rbuckton/grammarkdown">Grammarkdown</a> for defining syntax and <a href="https://github.com/domenic/ecmarkdown">Ecmarkdown</a> for authoring algorithm steps. PDF renderings of this specification are produced using a print stylesheet which takes advantage of the CSS Paged Media specification and is converted using <a href="https://www.princexml.com/">PrinceXML</a>.</p>
+  <p>This specification is authored on <a href="https://github.com/tc39/ecma262">GitHub</a> in a plaintext source format called <a href="https://github.com/bterlson/ecmarkup">Ecmarkup</a>. Ecmarkup is an HTML and Markdown dialect that provides a framework and toolset for authoring Ecma specifications in plaintext and processing the specification into a full-featured HTML rendering that follows the editorial conventions for this document. Ecmarkup builds on and integrates a number of other formats and technologies including <a href="https://github.com/rbuckton/grammarkdown">Grammarkdown</a> for defining syntax and <a href="https://github.com/domenic/ecmarkdown">Ecmarkdown</a> for authoring algorithm steps. PDF renderings of this specification are produced using a print stylesheet which takes advantage of the CSS Paged Media specification and is converted using <a href="https://www.princexml.com/">PrinceXML</a>.</p>
   <p>Prior editions of this specification were authored using Word—the Ecmarkup source text that formed the basis of this edition was produced by converting the ECMAScript 2015 Word document to Ecmarkup using an automated conversion tool.</p>
 </emu-annex>
