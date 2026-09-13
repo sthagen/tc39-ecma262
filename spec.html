@@ -10186,33 +10186,33 @@
       </emu-alg>
       <emu-grammar>SingleNameBinding : BindingIdentifier Initializer?</emu-grammar>
       <emu-alg>
-        1. Let _bindingId_ be the StringValue of |BindingIdentifier|.
-        1. Let _lhs_ be ? ResolveBinding(_bindingId_, _envRecord_).
-        1. Let _v_ be *undefined*.
+        1. Let _name_ be the StringValue of |BindingIdentifier|.
+        1. Let _lhs_ be ? ResolveBinding(_name_, _envRecord_).
+        1. Let _value_ be *undefined*.
         1. If _iteratorRecord_.[[Done]] is *false*, then
           1. Let _next_ be ? IteratorStepValue(_iteratorRecord_).
           1. If _next_ is not ~done~, then
-            1. Set _v_ to _next_.
-        1. If |Initializer| is present and _v_ is *undefined*, then
+            1. Set _value_ to _next_.
+        1. If |Initializer| is present and _value_ is *undefined*, then
           1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
-            1. Set _v_ to ? NamedEvaluation of |Initializer| with argument _bindingId_.
+            1. Set _value_ to ? NamedEvaluation of |Initializer| with argument _name_.
           1. Else,
             1. Let _defaultValue_ be ? Evaluation of |Initializer|.
-            1. Set _v_ to ? GetValue(_defaultValue_).
-        1. If _envRecord_ is *undefined*, return ? PutValue(_lhs_, _v_).
-        1. Return ? InitializeReferencedBinding(_lhs_, _v_).
+            1. Set _value_ to ? GetValue(_defaultValue_).
+        1. If _envRecord_ is *undefined*, return ? PutValue(_lhs_, _value_).
+        1. Return ? InitializeReferencedBinding(_lhs_, _value_).
       </emu-alg>
       <emu-grammar>BindingElement : BindingPattern Initializer?</emu-grammar>
       <emu-alg>
-        1. Let _v_ be *undefined*.
+        1. Let _value_ be *undefined*.
         1. If _iteratorRecord_.[[Done]] is *false*, then
           1. Let _next_ be ? IteratorStepValue(_iteratorRecord_).
           1. If _next_ is not ~done~, then
-            1. Set _v_ to _next_.
-        1. If |Initializer| is present and _v_ is *undefined*, then
+            1. Set _value_ to _next_.
+        1. If |Initializer| is present and _value_ is *undefined*, then
           1. Let _defaultValue_ be ? Evaluation of |Initializer|.
-          1. Set _v_ to ? GetValue(_defaultValue_).
-        1. Return ? BindingInitialization of |BindingPattern| with arguments _v_ and _envRecord_.
+          1. Set _value_ to ? GetValue(_defaultValue_).
+        1. Return ? BindingInitialization of |BindingPattern| with arguments _value_ and _envRecord_.
       </emu-alg>
       <emu-grammar>BindingRestElement : `...` BindingIdentifier</emu-grammar>
       <emu-alg>
@@ -10258,12 +10258,12 @@
       </emu-alg>
       <emu-grammar>ArrowParameters : BindingIdentifier</emu-grammar>
       <emu-alg>
-        1. Let _v_ be *undefined*.
+        1. Let _value_ be *undefined*.
         1. Assert: _iteratorRecord_.[[Done]] is *false*.
         1. Let _next_ be ? IteratorStepValue(_iteratorRecord_).
         1. If _next_ is not ~done~, then
-          1. Set _v_ to _next_.
-        1. Return ? BindingInitialization of |BindingIdentifier| with arguments _v_ and _envRecord_.
+          1. Set _value_ to _next_.
+        1. Return ? BindingInitialization of |BindingIdentifier| with arguments _value_ and _envRecord_.
       </emu-alg>
       <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
       <emu-alg>
@@ -10274,12 +10274,12 @@
         AsyncArrowBindingIdentifier : BindingIdentifier
       </emu-grammar>
       <emu-alg>
-        1. Let _v_ be *undefined*.
+        1. Let _value_ be *undefined*.
         1. Assert: _iteratorRecord_.[[Done]] is *false*.
         1. Let _next_ be ? IteratorStepValue(_iteratorRecord_).
         1. If _next_ is not ~done~, then
-          1. Set _v_ to _next_.
-        1. Return ? BindingInitialization of |BindingIdentifier| with arguments _v_ and _envRecord_.
+          1. Set _value_ to _next_.
+        1. Return ? BindingInitialization of |BindingIdentifier| with arguments _value_ and _envRecord_.
       </emu-alg>
     </emu-clause>
 
@@ -16266,15 +16266,15 @@
         1. Let _targetDesc_ be ? <emu-meta effects="user-code">_target_.[[GetOwnProperty]](_propertyKey_)</emu-meta>.
         1. Let _extensibleTarget_ be ? IsExtensible(_target_).
         1. If _propertyDesc_ has a [[Configurable]] field and _propertyDesc_.[[Configurable]] is *false*, then
-          1. Let _settingConfigFalse_ be *true*.
+          1. Let _settingConfigurableFalse_ be *true*.
         1. Else,
-          1. Let _settingConfigFalse_ be *false*.
+          1. Let _settingConfigurableFalse_ be *false*.
         1. If _targetDesc_ is *undefined*, then
           1. If _extensibleTarget_ is *false*, throw a *TypeError* exception.
-          1. If _settingConfigFalse_ is *true*, throw a *TypeError* exception.
+          1. If _settingConfigurableFalse_ is *true*, throw a *TypeError* exception.
         1. Else,
           1. If IsCompatiblePropertyDescriptor(_extensibleTarget_, _propertyDesc_, _targetDesc_) is *false*, throw a *TypeError* exception.
-          1. If _settingConfigFalse_ is *true* and _targetDesc_.[[Configurable]] is *true*, throw a *TypeError* exception.
+          1. If _settingConfigurableFalse_ is *true* and _targetDesc_.[[Configurable]] is *true*, throw a *TypeError* exception.
           1. If IsDataDescriptor(_targetDesc_) is *true*, _targetDesc_.[[Configurable]] is *false*, and _targetDesc_.[[Writable]] is *true*, then
             1. If _propertyDesc_ has a [[Writable]] field and _propertyDesc_.[[Writable]] is *false*, throw a *TypeError* exception.
         1. Return *true*.
@@ -18768,8 +18768,8 @@
           IdentifierName IdentifierPart
       </emu-grammar>
       <emu-alg>
-        1. Let _idTextUnescaped_ be the IdentifierCodePoints of |IdentifierName|.
-        1. Return CodePointsToString(_idTextUnescaped_).
+        1. Let _nameUnescaped_ be the IdentifierCodePoints of |IdentifierName|.
+        1. Return CodePointsToString(_nameUnescaped_).
       </emu-alg>
       <emu-grammar>
         IdentifierReference : `yield`
@@ -21707,16 +21707,14 @@
           1. If |Initializer| is present and _value_ is *undefined*, then
             1. If IsAnonymousFunctionDefinition(|Initializer|) is *true* and IsIdentifierRef of |DestructuringAssignmentTarget| is *true*, then
               1. Let _target_ be the StringValue of |DestructuringAssignmentTarget|.
-              1. Let _v_ be ? NamedEvaluation of |Initializer| with argument _target_.
+              1. Set _value_ to ? NamedEvaluation of |Initializer| with argument _target_.
             1. Else,
               1. Let _defaultValue_ be ? Evaluation of |Initializer|.
-              1. Let _v_ be ? GetValue(_defaultValue_).
-          1. Else,
-            1. Let _v_ be _value_.
+              1. Set _value_ to ? GetValue(_defaultValue_).
           1. If |DestructuringAssignmentTarget| is either an |ObjectLiteral| or an |ArrayLiteral|, then
             1. Let _nestedAssignmentPattern_ be the |AssignmentPattern| that is covered by |DestructuringAssignmentTarget|.
-            1. Return ? DestructuringAssignmentEvaluation of _nestedAssignmentPattern_ with argument _v_.
-          1. Return ? PutValue(_leftRef_, _v_).
+            1. Return ? DestructuringAssignmentEvaluation of _nestedAssignmentPattern_ with argument _value_.
+          1. Return ? PutValue(_leftRef_, _value_).
         </emu-alg>
         <emu-note>
           <p>Left to right evaluation order is maintained by evaluating a |DestructuringAssignmentTarget| that is not a destructuring pattern prior to accessing the iterator or evaluating the |Initializer|.</p>
@@ -22113,10 +22111,10 @@
         </emu-note>
         <emu-grammar>LexicalBinding : BindingIdentifier Initializer</emu-grammar>
         <emu-alg>
-          1. Let _bindingId_ be the StringValue of |BindingIdentifier|.
-          1. Let _lhs_ be ! ResolveBinding(_bindingId_).
+          1. Let _name_ be the StringValue of |BindingIdentifier|.
+          1. Let _lhs_ be ! ResolveBinding(_name_).
           1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
-            1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _bindingId_.
+            1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _name_.
           1. Else,
             1. Let _rhs_ be ? Evaluation of |Initializer|.
             1. Let _value_ be ? GetValue(_rhs_).
@@ -22176,10 +22174,10 @@
         </emu-alg>
         <emu-grammar>VariableDeclaration : BindingIdentifier Initializer</emu-grammar>
         <emu-alg>
-          1. Let _bindingId_ be the StringValue of |BindingIdentifier|.
-          1. Let _lhs_ be ? ResolveBinding(_bindingId_).
+          1. Let _name_ be the StringValue of |BindingIdentifier|.
+          1. Let _lhs_ be ? ResolveBinding(_name_).
           1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
-            1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _bindingId_.
+            1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _name_.
           1. Else,
             1. Let _rhs_ be ? Evaluation of |Initializer|.
             1. Let _value_ be ? GetValue(_rhs_).
@@ -22323,12 +22321,12 @@
         </emu-alg>
         <emu-grammar>SingleNameBinding : BindingIdentifier Initializer?</emu-grammar>
         <emu-alg>
-          1. Let _bindingId_ be the StringValue of |BindingIdentifier|.
-          1. Let _lhs_ be ? ResolveBinding(_bindingId_, _envRecord_).
+          1. Let _name_ be the StringValue of |BindingIdentifier|.
+          1. Let _lhs_ be ? ResolveBinding(_name_, _envRecord_).
           1. Set _value_ to ? GetV(_value_, _propertyName_).
           1. If |Initializer| is present and _value_ is *undefined*, then
             1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
-              1. Set _value_ to ? NamedEvaluation of |Initializer| with argument _bindingId_.
+              1. Set _value_ to ? NamedEvaluation of |Initializer| with argument _name_.
             1. Else,
               1. Let _defaultValue_ be ? Evaluation of |Initializer|.
               1. Set _value_ to ? GetValue(_defaultValue_).
@@ -22692,8 +22690,8 @@
             1. If _result_.[[Value]] is not ~empty~, set _iterationResult_ to _result_.[[Value]].
             1. Perform ? CreatePerIterationEnvironment(_perIterationBindings_).
             1. If _increment_ is not ~empty~, then
-              1. Let _incRef_ be ? Evaluation of _increment_.
-              1. Perform ? GetValue(_incRef_).
+              1. Let _incrementRef_ be ? Evaluation of _increment_.
+              1. Perform ? GetValue(_incrementRef_).
         </emu-alg>
       </emu-clause>
 
@@ -23109,8 +23107,8 @@
             `await`
         </emu-grammar>
         <emu-alg>
-          1. Let _bindingId_ be the StringValue of |BindingIdentifier|.
-          1. Return ? ResolveBinding(_bindingId_).
+          1. Let _name_ be the StringValue of |BindingIdentifier|.
+          1. Return ? ResolveBinding(_name_).
         </emu-alg>
       </emu-clause>
 
@@ -35055,12 +35053,12 @@ THH:mm:ss.sss
             1. If _value_ is an Object and _value_ has a [[DateValue]] internal slot, then
               1. Let _tv_ be _value_.[[DateValue]].
             1. Else,
-              1. Let _v_ be ? ToPrimitive(_value_).
-              1. If _v_ is a String, then
-                1. Assert: The next step never returns an abrupt completion because _v_ is a String.
-                1. Let _tv_ be the result of parsing _v_ as a date, in exactly the same manner as for the `parse` method (<emu-xref href="#sec-date.parse"></emu-xref>).
+              1. Let _primitive_ be ? ToPrimitive(_value_).
+              1. If _primitive_ is a String, then
+                1. Assert: The next step never returns an abrupt completion because _primitive_ is a String.
+                1. Let _tv_ be the result of parsing _primitive_ as a date, in exactly the same manner as for the `parse` method (<emu-xref href="#sec-date.parse"></emu-xref>).
               1. Else,
-                1. Let _tv_ be ? ToNumber(_v_).
+                1. Let _tv_ be ? ToNumber(_primitive_).
             1. Let _dv_ be TimeClip(_tv_).
           1. Else,
             1. Assert: _numberOfArgs_ ≥ 2.
@@ -36005,8 +36003,8 @@ THH:mm:ss.sss
               1. Let _absOffsetMilliseconds_ be -_offsetMilliseconds_.
             1. Let _offsetMinute_ be ToZeroPaddedDecimalString(MinuteFromTime(𝔽(_absOffsetMilliseconds_)), 2).
             1. Let _offsetHour_ be ToZeroPaddedDecimalString(HourFromTime(𝔽(_absOffsetMilliseconds_)), 2).
-            1. Let _tzName_ be an implementation-defined string that is either the empty String or the string-concatenation of the code unit 0x0020 (SPACE), the code unit 0x0028 (LEFT PARENTHESIS), an implementation-defined timezone name, and the code unit 0x0029 (RIGHT PARENTHESIS).
-            1. Return the string-concatenation of _offsetSign_, _offsetHour_, _offsetMinute_, and _tzName_.
+            1. Let _timeZoneName_ be an implementation-defined string that is either the empty String or the string-concatenation of the code unit 0x0020 (SPACE), the code unit 0x0028 (LEFT PARENTHESIS), an implementation-defined time zone name, and the code unit 0x0029 (RIGHT PARENTHESIS).
+            1. Return the string-concatenation of _offsetSign_, _offsetHour_, _offsetMinute_, and _timeZoneName_.
           </emu-alg>
         </emu-clause>
 
@@ -38037,8 +38035,8 @@ THH:mm:ss.sss
           GroupName :: `&lt;` RegExpIdentifierName `&gt;`
         </emu-grammar>
         <emu-alg>
-          1. Let _idTextUnescaped_ be the RegExpIdentifierCodePoints of |RegExpIdentifierName|.
-          1. Return CodePointsToString(_idTextUnescaped_).
+          1. Let _nameUnescaped_ be the RegExpIdentifierCodePoints of |RegExpIdentifierName|.
+          1. Return CodePointsToString(_nameUnescaped_).
         </emu-alg>
       </emu-clause>
 
@@ -41213,12 +41211,12 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _obj_ be ? ToObject(*this* value).
           1. Let _length_ be ? LengthOfArrayLike(_obj_).
-          1. If _separator_ is *undefined*, let _sep_ be *","*.
-          1. Else, let _sep_ be ? ToString(_separator_).
+          1. If _separator_ is *undefined*, let _separatorString_ be *","*.
+          1. Else, let _separatorString_ be ? ToString(_separator_).
           1. Let _result_ be the empty String.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. If _k_ > 0, set _result_ to the string-concatenation of _result_ and _sep_.
+            1. If _k_ > 0, set _result_ to the string-concatenation of _result_ and _separatorString_.
             1. Let _element_ be ? Get(_obj_, ! ToString(𝔽(_k_))).
             1. If _element_ is neither *undefined* nor *null*, then
               1. Let _elementString_ be ? ToString(_element_).
@@ -42420,13 +42418,12 @@ THH:mm:ss.sss
             1. Let _targetObj_ be ? TypedArrayCreateFromConstructor(_ctor_, « 𝔽(_length_) »).
             1. Let _k_ be 0.
             1. Repeat, while _k_ &lt; _length_,
-              1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
               1. Let _kValue_ be _values_[_k_].
               1. If _mapping_ is *true*, then
                 1. Let _mappedValue_ be ? Call(_mapper_, _thisArg_, « _kValue_, 𝔽(_k_) »).
               1. Else,
                 1. Let _mappedValue_ be _kValue_.
-              1. Perform ? Set(_targetObj_, _propertyKey_, _mappedValue_, *true*).
+              1. Perform ? TypedArraySetElement(_targetObj_, 𝔽(_k_), _mappedValue_).
               1. Set _k_ to _k_ + 1.
             1. Return _targetObj_.
           1. NOTE: _source_ is not an iterable object, so assume it is already an array-like object.
@@ -42441,7 +42438,7 @@ THH:mm:ss.sss
               1. Let _mappedValue_ be ? Call(_mapper_, _thisArg_, « _kValue_, 𝔽(_k_) »).
             1. Else,
               1. Let _mappedValue_ be _kValue_.
-            1. Perform ? Set(_targetObj_, _propertyKey_, _mappedValue_, *true*).
+            1. Perform ? TypedArraySetElement(_targetObj_, 𝔽(_k_), _mappedValue_).
             1. Set _k_ to _k_ + 1.
           1. Return _targetObj_.
         </emu-alg>
@@ -42458,8 +42455,7 @@ THH:mm:ss.sss
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
             1. Let _kValue_ be _items_[_k_].
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Perform ? Set(_newObj_, _propertyKey_, _kValue_, *true*).
+            1. Perform ? TypedArraySetElement(_newObj_, 𝔽(_k_), _kValue_).
             1. Set _k_ to _k_ + 1.
           1. Return _newObj_.
         </emu-alg>
@@ -42502,7 +42498,7 @@ THH:mm:ss.sss
           1. Let _length_ be TypedArrayLength(_taRecord_).
           1. Let _k_ be ? ToAbsoluteIndex(_index_, _length_).
           1. If _k_ &lt; 0 or _k_ ≥ _length_, return *undefined*.
-          1. Return ! Get(_obj_, ! ToString(𝔽(_k_))).
+          1. Return TypedArrayGetElement(_obj_, 𝔽(_k_)).
         </emu-alg>
       </emu-clause>
 
@@ -42613,8 +42609,7 @@ THH:mm:ss.sss
           1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Let _testResult_ be ToBoolean(? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _obj_ »)).
             1. If _testResult_ is *false*, return *false*.
             1. Set _k_ to _k_ + 1.
@@ -42640,8 +42635,7 @@ THH:mm:ss.sss
           1. Set _endIndex_ to min(_endIndex_, _length_).
           1. Let _k_ be _startIndex_.
           1. Repeat, while _k_ &lt; _endIndex_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Perform ! Set(_obj_, _propertyKey_, _value_, *true*).
+            1. Perform ! TypedArraySetElement(_obj_, 𝔽(_k_), _value_).
             1. Set _k_ to _k_ + 1.
           1. Return _obj_.
         </emu-alg>
@@ -42660,8 +42654,7 @@ THH:mm:ss.sss
           1. Let _captured_ be 0.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Let _selected_ be ToBoolean(? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _obj_ »)).
             1. If _selected_ is *true*, then
               1. Append _kValue_ to _kept_.
@@ -42670,7 +42663,7 @@ THH:mm:ss.sss
           1. Let _result_ be ? TypedArraySpeciesCreate(_obj_, « 𝔽(_captured_) »).
           1. Let _n_ be 0.
           1. For each element _element_ of _kept_, do
-            1. Perform ! Set(_result_, ! ToString(𝔽(_n_)), _element_, *true*).
+            1. Perform ! TypedArraySetElement(_result_, 𝔽(_n_), _element_).
             1. Set _n_ to _n_ + 1.
           1. Return _result_.
         </emu-alg>
@@ -42744,8 +42737,7 @@ THH:mm:ss.sss
           1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Perform ? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _obj_ »).
             1. Set _k_ to _k_ + 1.
           1. Return *undefined*.
@@ -42764,7 +42756,7 @@ THH:mm:ss.sss
           1. If _length_ = 0, return *false*.
           1. Let _k_ be ? ToClampedIndex(_fromIndex_, _length_).
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _elementK_ be ! Get(_obj_, ! ToString(𝔽(_k_))).
+            1. Let _elementK_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. If SameValueZero(_searchElement_, _elementK_) is *true*, return *true*.
             1. Set _k_ to _k_ + 1.
           1. Return *false*.
@@ -42786,7 +42778,7 @@ THH:mm:ss.sss
             1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
             1. Let _kPresent_ be ! HasProperty(_obj_, _propertyKey_).
             1. If _kPresent_ is *true*, then
-              1. Let _elementK_ be ! Get(_obj_, _propertyKey_).
+              1. Let _elementK_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
               1. If IsStrictlyEqual(_searchElement_, _elementK_) is *true*, return 𝔽(_k_).
             1. Set _k_ to _k_ + 1.
           1. Return *-1*<sub>𝔽</sub>.
@@ -42802,13 +42794,13 @@ THH:mm:ss.sss
           1. Let _obj_ be the *this* value.
           1. Let _taRecord_ be ? ValidateTypedArray(_obj_, ~seq-cst~).
           1. Let _length_ be TypedArrayLength(_taRecord_).
-          1. If _separator_ is *undefined*, let _sep_ be *","*.
-          1. Else, let _sep_ be ? ToString(_separator_).
+          1. If _separator_ is *undefined*, let _separatorString_ be *","*.
+          1. Else, let _separatorString_ be ? ToString(_separator_).
           1. Let _result_ be the empty String.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. If _k_ > 0, set _result_ to the string-concatenation of _result_ and _sep_.
-            1. Let _element_ be ! Get(_obj_, ! ToString(𝔽(_k_))).
+            1. If _k_ > 0, set _result_ to the string-concatenation of _result_ and _separatorString_.
+            1. Let _element_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. If _element_ is not *undefined*, then
               1. Let _elementString_ be ! ToString(_element_).
               1. Set _result_ to the string-concatenation of _result_ and _elementString_.
@@ -42842,7 +42834,7 @@ THH:mm:ss.sss
             1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
             1. Let _kPresent_ be ! HasProperty(_obj_, _propertyKey_).
             1. If _kPresent_ is *true*, then
-              1. Let _elementK_ be ! Get(_obj_, _propertyKey_).
+              1. Let _elementK_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
               1. If IsStrictlyEqual(_searchElement_, _elementK_) is *true*, return 𝔽(_k_).
             1. Set _k_ to _k_ - 1.
           1. Return *-1*<sub>𝔽</sub>.
@@ -42877,10 +42869,9 @@ THH:mm:ss.sss
           1. Let _result_ be ? TypedArraySpeciesCreate(_obj_, « 𝔽(_length_) »).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Let _mappedValue_ be ? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _obj_ »).
-            1. Perform ? Set(_result_, _propertyKey_, _mappedValue_, *true*).
+            1. Perform ? TypedArraySetElement(_result_, 𝔽(_k_), _mappedValue_).
             1. Set _k_ to _k_ + 1.
           1. Return _result_.
         </emu-alg>
@@ -42902,12 +42893,10 @@ THH:mm:ss.sss
           1. If _initialValue_ is present, then
             1. Set _accumulator_ to _initialValue_.
           1. Else,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Set _accumulator_ to ! Get(_obj_, _propertyKey_).
+            1. Set _accumulator_ to TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Set _k_ to _k_ + 1.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Set _accumulator_ to ? Call(_callback_, *undefined*, « _accumulator_, _kValue_, 𝔽(_k_), _obj_ »).
             1. Set _k_ to _k_ + 1.
           1. Return _accumulator_.
@@ -42930,12 +42919,10 @@ THH:mm:ss.sss
           1. If _initialValue_ is present, then
             1. Set _accumulator_ to _initialValue_.
           1. Else,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Set _accumulator_ to ! Get(_obj_, _propertyKey_).
+            1. Set _accumulator_ to TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Set _k_ to _k_ - 1.
           1. Repeat, while _k_ ≥ 0,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Set _accumulator_ to ? Call(_callback_, *undefined*, « _accumulator_, _kValue_, 𝔽(_k_), _obj_ »).
             1. Set _k_ to _k_ - 1.
           1. Return _accumulator_.
@@ -42955,12 +42942,10 @@ THH:mm:ss.sss
           1. Let _lower_ be 0.
           1. Repeat, while _lower_ ≠ _middle_,
             1. Let _upper_ be _length_ - _lower_ - 1.
-            1. Let _upperP_ be ! ToString(𝔽(_upper_)).
-            1. Let _lowerP_ be ! ToString(𝔽(_lower_)).
-            1. Let _lowerValue_ be ! Get(_obj_, _lowerP_).
-            1. Let _upperValue_ be ! Get(_obj_, _upperP_).
-            1. Perform ! Set(_obj_, _lowerP_, _upperValue_, *true*).
-            1. Perform ! Set(_obj_, _upperP_, _lowerValue_, *true*).
+            1. Let _lowerValue_ be TypedArrayGetElement(_obj_, 𝔽(_lower_)).
+            1. Let _upperValue_ be TypedArrayGetElement(_obj_, 𝔽(_upper_)).
+            1. Perform ! TypedArraySetElement(_obj_, 𝔽(_lower_), _upperValue_).
+            1. Perform ! TypedArraySetElement(_obj_, 𝔽(_upper_), _lowerValue_).
             1. Set _lower_ to _lower_ + 1.
           1. Return _obj_.
         </emu-alg>
@@ -43106,9 +43091,8 @@ THH:mm:ss.sss
               1. Let _n_ be 0.
               1. Let _k_ be _startIndex_.
               1. Repeat, while _k_ &lt; _endIndex_,
-                1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-                1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
-                1. Perform ! Set(_resultArray_, ! ToString(𝔽(_n_)), _kValue_, *true*).
+                1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
+                1. Perform ! TypedArraySetElement(_resultArray_, 𝔽(_n_), _kValue_).
                 1. Set _k_ to _k_ + 1.
                 1. Set _n_ to _n_ + 1.
           1. Return _resultArray_.
@@ -43127,8 +43111,7 @@ THH:mm:ss.sss
           1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _kValue_ be ! Get(_obj_, _propertyKey_).
+            1. Let _kValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
             1. Let _testResult_ be ToBoolean(? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _obj_ »)).
             1. If _testResult_ is *true*, return *true*.
             1. Set _k_ to _k_ + 1.
@@ -43153,7 +43136,7 @@ THH:mm:ss.sss
           1. Let _sortedList_ be ? SortIndexedProperties(_obj_, _length_, _sortCompare_, ~read-through-holes~).
           1. Let _j_ be 0.
           1. Repeat, while _j_ &lt; _length_,
-            1. Perform ! Set(_obj_, ! ToString(𝔽(_j_)), _sortedList_[_j_], *true*).
+            1. Perform ! TypedArraySetElement(_obj_, 𝔽(_j_), _sortedList_[_j_]).
             1. Set _j_ to _j_ + 1.
           1. Return _obj_.
         </emu-alg>
@@ -43208,10 +43191,9 @@ THH:mm:ss.sss
           1. Let _resultArray_ be ? TypedArrayCreateSameType(_obj_, _length_).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _from_ be ! ToString(𝔽(_length_ - _k_ - 1)).
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
-            1. Let _fromValue_ be ! Get(_obj_, _from_).
-            1. Perform ! Set(_resultArray_, _propertyKey_, _fromValue_, *true*).
+            1. Let _from_ be _length_ - _k_ - 1.
+            1. Let _fromValue_ be TypedArrayGetElement(_obj_, 𝔽(_from_)).
+            1. Perform ! TypedArraySetElement(_resultArray_, 𝔽(_k_), _fromValue_).
             1. Set _k_ to _k_ + 1.
           1. Return _resultArray_.
         </emu-alg>
@@ -43232,7 +43214,7 @@ THH:mm:ss.sss
           1. Let _sortedList_ be ? SortIndexedProperties(_obj_, _length_, _sortCompare_, ~read-through-holes~).
           1. Let _j_ be 0.
           1. Repeat, while _j_ &lt; _length_,
-            1. Perform ! Set(_resultArray_, ! ToString(𝔽(_j_)), _sortedList_[_j_], *true*).
+            1. Perform ! TypedArraySetElement(_resultArray_, 𝔽(_j_), _sortedList_[_j_]).
             1. Set _j_ to _j_ + 1.
           1. Return _resultArray_.
         </emu-alg>
@@ -43267,10 +43249,9 @@ THH:mm:ss.sss
           1. Let _resultArray_ be ? TypedArrayCreateSameType(_obj_, _length_).
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _length_,
-            1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
             1. If _k_ = _actualIndex_, let _fromValue_ be _numericValue_.
-            1. Else, let _fromValue_ be ! Get(_obj_, _propertyKey_).
-            1. Perform ! Set(_resultArray_, _propertyKey_, _fromValue_, *true*).
+            1. Else, let _fromValue_ be TypedArrayGetElement(_obj_, 𝔽(_k_)).
+            1. Perform ! TypedArraySetElement(_resultArray_, 𝔽(_k_), _fromValue_).
             1. Set _k_ to _k_ + 1.
           1. Return _resultArray_.
         </emu-alg>
@@ -43622,9 +43603,8 @@ THH:mm:ss.sss
             1. Perform ? AllocateTypedArrayBuffer(_obj_, _length_).
             1. Let _k_ be 0.
             1. Repeat, while _k_ &lt; _length_,
-              1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
               1. Let _kValue_ be _values_[_k_].
-              1. Perform ? Set(_obj_, _propertyKey_, _kValue_, *true*).
+              1. Perform ? TypedArraySetElement(_obj_, 𝔽(_k_), _kValue_).
               1. Set _k_ to _k_ + 1.
             1. Return ~unused~.
           </emu-alg>
@@ -43646,7 +43626,7 @@ THH:mm:ss.sss
             1. Repeat, while _k_ &lt; _length_,
               1. Let _propertyKey_ be ! ToString(𝔽(_k_)).
               1. Let _kValue_ be ? Get(_arrayLike_, _propertyKey_).
-              1. Perform ? Set(_obj_, _propertyKey_, _kValue_, *true*).
+              1. Perform ? TypedArraySetElement(_obj_, 𝔽(_k_), _kValue_).
               1. Set _k_ to _k_ + 1.
             1. Return ~unused~.
           </emu-alg>
@@ -43739,11 +43719,11 @@ THH:mm:ss.sss
         <h1>Uint8Array.fromBase64 ( _string_ [ , _options_ ] )</h1>
         <emu-alg>
           1. If _string_ is not a String, throw a *TypeError* exception.
-          1. Let _opts_ be ? GetOptionsObject(_options_).
-          1. Let _alphabet_ be ? Get(_opts_, *"alphabet"*).
+          1. Let _optionsObj_ be ? GetOptionsObject(_options_).
+          1. Let _alphabet_ be ? Get(_optionsObj_, *"alphabet"*).
           1. If _alphabet_ is *undefined*, set _alphabet_ to *"base64"*.
           1. If _alphabet_ is neither *"base64"* nor *"base64url"*, throw a *TypeError* exception.
-          1. Let _lastChunkHandling_ be ? Get(_opts_, *"lastChunkHandling"*).
+          1. Let _lastChunkHandling_ be ? Get(_optionsObj_, *"lastChunkHandling"*).
           1. If _lastChunkHandling_ is *undefined*, set _lastChunkHandling_ to *"loose"*.
           1. If _lastChunkHandling_ is not one of *"loose"*, *"strict"*, or *"stop-before-partial"*, throw a *TypeError* exception.
           1. Let _result_ be FromBase64(_string_, _alphabet_, _lastChunkHandling_).
@@ -43782,11 +43762,11 @@ THH:mm:ss.sss
           1. Let _into_ be the *this* value.
           1. Perform ? ValidateUint8Array(_into_).
           1. If _string_ is not a String, throw a *TypeError* exception.
-          1. Let _opts_ be ? GetOptionsObject(_options_).
-          1. Let _alphabet_ be ? Get(_opts_, *"alphabet"*).
+          1. Let _optionsObj_ be ? GetOptionsObject(_options_).
+          1. Let _alphabet_ be ? Get(_optionsObj_, *"alphabet"*).
           1. If _alphabet_ is *undefined*, set _alphabet_ to *"base64"*.
           1. If _alphabet_ is neither *"base64"* nor *"base64url"*, throw a *TypeError* exception.
-          1. Let _lastChunkHandling_ be ? Get(_opts_, *"lastChunkHandling"*).
+          1. Let _lastChunkHandling_ be ? Get(_optionsObj_, *"lastChunkHandling"*).
           1. If _lastChunkHandling_ is *undefined*, set _lastChunkHandling_ to *"loose"*.
           1. If _lastChunkHandling_ is not one of *"loose"*, *"strict"*, or *"stop-before-partial"*, throw a *TypeError* exception.
           1. Let _taRecord_ be ? ValidateTypedArrayBounds(_into_, ~seq-cst~).
@@ -43834,11 +43814,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _obj_ be the *this* value.
           1. Perform ? ValidateUint8Array(_obj_).
-          1. Let _opts_ be ? GetOptionsObject(_options_).
-          1. Let _alphabet_ be ? Get(_opts_, *"alphabet"*).
+          1. Let _optionsObj_ be ? GetOptionsObject(_options_).
+          1. Let _alphabet_ be ? Get(_optionsObj_, *"alphabet"*).
           1. If _alphabet_ is *undefined*, set _alphabet_ to *"base64"*.
           1. If _alphabet_ is neither *"base64"* nor *"base64url"*, throw a *TypeError* exception.
-          1. Let _omitPadding_ be ToBoolean(? Get(_opts_, *"omitPadding"*)).
+          1. Let _omitPadding_ be ToBoolean(? Get(_optionsObj_, *"omitPadding"*)).
           1. Let _toEncode_ be ? GetUint8ArrayBytes(_obj_).
           1. If _alphabet_ is *"base64"*, then
             1. Let _outAscii_ be the sequence of code points which results from encoding _toEncode_ according to the base64 encoding specified in section 4 of <a href="https://rfc-editor.org/info/rfc4648">RFC 4648</a>. Padding is included if and only if _omitPadding_ is *false*.
@@ -46125,13 +46105,13 @@ THH:mm:ss.sss
           1. If _new_.[[ArrayBufferByteLength]] &lt; _newLength_, throw a *TypeError* exception.
           1. NOTE: Side-effects of the above steps may have detached or resized _obj_.
           1. If IsDetachedBuffer(_obj_) is *true*, throw a *TypeError* exception.
-          1. Let _fromBuf_ be _obj_.[[ArrayBufferData]].
-          1. Let _toBuf_ be _new_.[[ArrayBufferData]].
+          1. Let _fromBlock_ be _obj_.[[ArrayBufferData]].
+          1. Let _toBlock_ be _new_.[[ArrayBufferData]].
           1. Let _currentLength_ be _obj_.[[ArrayBufferByteLength]].
           1. Let _maxCount_ be _currentLength_ - _first_.
           1. If _maxCount_ > 0, then
             1. Let _count_ be min(_newLength_, _maxCount_).
-            1. Perform CopyDataBlockBytes(_toBuf_, 0, _fromBuf_, _first_, _count_).
+            1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, _first_, _count_).
           1. Return _new_.
         </emu-alg>
       </emu-clause>
@@ -46220,8 +46200,8 @@ THH:mm:ss.sss
           1. Else,
             1. Append [[ArrayBufferByteLength]] to _slots_.
           1. Let _obj_ be ? OrdinaryCreateFromConstructor(_ctor_, *"%SharedArrayBuffer.prototype%"*, _slots_).
-          1. If _allocatingGrowableBuffer_ is *true*, let _allocLength_ be _maxByteLength_; else let _allocLength_ be _byteLength_.
-          1. Let _block_ be ? CreateSharedByteDataBlock(_allocLength_).
+          1. If _allocatingGrowableBuffer_ is *true*, let _allocationLength_ be _maxByteLength_; else let _allocationLength_ be _byteLength_.
+          1. Let _block_ be ? CreateSharedByteDataBlock(_allocationLength_).
           1. Set _obj_.[[ArrayBufferData]] to _block_.
           1. If _allocatingGrowableBuffer_ is *true*, then
             1. Assert: _byteLength_ ≤ _maxByteLength_.
@@ -46450,9 +46430,9 @@ THH:mm:ss.sss
           1. If IsSharedArrayBuffer(_new_) is *false*, throw a *TypeError* exception.
           1. If _new_.[[ArrayBufferData]] is _obj_.[[ArrayBufferData]], throw a *TypeError* exception.
           1. If ArrayBufferByteLength(_new_, ~seq-cst~) &lt; _newLength_, throw a *TypeError* exception.
-          1. Let _fromBuf_ be _obj_.[[ArrayBufferData]].
-          1. Let _toBuf_ be _new_.[[ArrayBufferData]].
-          1. Perform CopyDataBlockBytes(_toBuf_, 0, _fromBuf_, _first_, _newLength_).
+          1. Let _fromBlock_ be _obj_.[[ArrayBufferData]].
+          1. Let _toBlock_ be _new_.[[ArrayBufferData]].
+          1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, _first_, _newLength_).
           1. Return _new_.
         </emu-alg>
       </emu-clause>
@@ -50016,8 +49996,8 @@ THH:mm:ss.sss
           1. If _valueWrapper_ is an abrupt completion, _done_ is *false*, and _closeOnRejection_ is *true*, then
             1. Set _valueWrapper_ to Completion(IteratorClose(_syncIteratorRecord_, _valueWrapper_)).
           1. IfAbruptRejectPromise(_valueWrapper_, _promiseCapability_).
-          1. Let _unwrap_ be a new Abstract Closure with parameters (_v_) that captures _done_ and performs the following steps when called:
-            1. Return CreateIteratorResultObject(_v_, _done_).
+          1. Let _unwrap_ be a new Abstract Closure with parameters (_value_) that captures _done_ and performs the following steps when called:
+            1. Return CreateIteratorResultObject(_value_, _done_).
           1. Let _onFulfilled_ be CreateBuiltinFunction(_unwrap_, 1, *""*, « »).
           1. NOTE: _onFulfilled_ is used when processing the *"value"* property of an IteratorResult object in order to wait for its value if it is a promise and re-package the result in a new “unwrapped” IteratorResult object.
           1. If _done_ is *true* or _closeOnRejection_ is *false*, then
@@ -52611,8 +52591,8 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _asyncContext_ be the running execution context.
           1. Let _promise_ be ? PromiseResolve(%Promise%, _arg_).
-          1. Let _fulfilledClosure_ be a new Abstract Closure with parameters (_v_) that captures _asyncContext_ and performs the following steps when called:
-            1. Perform Completion(RunSuspendedContext(_asyncContext_, NormalCompletion(_v_))).
+          1. Let _fulfilledClosure_ be a new Abstract Closure with parameters (_value_) that captures _asyncContext_ and performs the following steps when called:
+            1. Perform Completion(RunSuspendedContext(_asyncContext_, NormalCompletion(_value_))).
             1. NOTE: The Completion Record returned by RunSuspendedContext is intentionally ignored.
             1. Return NormalCompletion(*undefined*).
           1. Let _onFulfilled_ be CreateBuiltinFunction(_fulfilledClosure_, 1, *""*, « »).
@@ -54842,10 +54822,10 @@ THH:mm:ss.sss
       <p>The runtime semantics of ForInOfLoopEvaluation with argument _labelSet_ are augmented with the following:</p>
       <emu-grammar>ForInOfStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Let _bindingId_ be the StringValue of |BindingIdentifier|.
-        1. Let _lhs_ be ? ResolveBinding(_bindingId_).
+        1. Let _name_ be the StringValue of |BindingIdentifier|.
+        1. Let _lhs_ be ? ResolveBinding(_name_).
         1. If IsAnonymousFunctionDefinition(|Initializer|) is *true*, then
-          1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _bindingId_.
+          1. Let _value_ be ? NamedEvaluation of |Initializer| with argument _name_.
         1. Else,
           1. Let _rhs_ be ? Evaluation of |Initializer|.
           1. Let _value_ be ? GetValue(_rhs_).
